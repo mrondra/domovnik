@@ -1,0 +1,21 @@
+rc: .lefthookrc
+
+pre-commit:
+  parallel: true
+  commands:
+    eslint:
+      glob: '{packages,apps}/**/*.{ts,tsx,js,cjs,mjs}'
+      run: pnpm eslint --max-warnings=0 {staged_files}
+    prettier:
+      glob: '*.{ts,tsx,js,cjs,mjs,json,yml,yaml,md}'
+      run: pnpm prettier --check {staged_files}
+    gitleaks:
+      run: gitleaks protect --staged --no-banner
+commit-msg:
+  commands:
+    commitlint:
+      run: pnpm commitlint --edit {1}
+pre-push:
+  commands:
+    verify:
+      run: pnpm verify

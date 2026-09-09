@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "include": ["eslint.config.js", "rules/*.js"],
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": true
+  }
+}
