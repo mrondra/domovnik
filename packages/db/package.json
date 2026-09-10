@@ -7,6 +7,18 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate": "tsx --env-file-if-exists=../../.env src/bin/generate.ts",
+    "migrate": "tsx --env-file-if-exists=../../.env src/bin/migrate.ts",
+    "seed": "tsx --env-file-if-exists=../../.env src/bin/seed.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.2"
+  },
+  "devDependencies": {
+    "@testcontainers/postgresql": "^12.1.0",
+    "drizzle-kit": "^0.31.10",
+    "tsx": "^4.23.13",
+    "vitest": "^5.0.0"
   }
 }

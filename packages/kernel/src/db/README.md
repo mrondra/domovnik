@@ -1,7 +1,7 @@
 # db
 
 The only way to the database. Neither the Drizzle client nor the pool leaves this module — only
-`withTenant` and `withSystem` do.
+`withTenant`, `withSystem` and `closeConnections` do.
 
 | File / directory | Contents                                                                                        |
 | ---------------- | ----------------------------------------------------------------------------------------------- |
@@ -18,6 +18,9 @@ open transaction, so one service can call another without losing atomicity; a ne
 
 `withSystem({ reason }, fn)` is the only route to data without RLS — for migrations, seed and
 cross-tenant jobs. It demands a reason and logs a warning.
+
+`closeConnections()` ends both pools. A long-running app never calls it; a CLI (`pnpm db:migrate`,
+`pnpm db:seed`) has to, or the process hangs on an open pool.
 
 **The rule:** every table with a `tenant_id` is created through `tenantTable()`, because that is
 what guarantees it an RLS policy (ADR 0003). The policy reads `current_setting('app.tenant_id')`
