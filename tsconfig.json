@@ -1,6 +1,6 @@
 {
   "extends": "./tsconfig.base.json",
-  "include": ["eslint.config.js", "vitest.config.ts", "commitlint.config.js"],
+  "include": ["eslint.config.js", "vitest.config.ts", "commitlint.config.js", "tooling/generators"],
   "compilerOptions": {
     "noEmit": true
   }

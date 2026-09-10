@@ -6,6 +6,8 @@ import vitest from '@vitest/eslint-plugin';
 import noRestrictedPatterns from './rules/no-llm-in-loop.js';
 import indexIsBarrel from './rules/index-is-barrel.js';
 import requireDirectoryReadme from './rules/require-directory-readme.js';
+import requireUseClient from './rules/require-use-client.js';
+import forbidUseClient from './rules/forbid-use-client.js';
 
 /** From outside, a feature may only be imported through its index.ts. */
 const FEATURE_PUBLIC = { element: { type: 'feature', fileInternalPath: 'index.ts' } };
@@ -43,6 +45,8 @@ export default tseslint.config(
           'no-llm-in-loop': noRestrictedPatterns,
           'index-is-barrel': indexIsBarrel,
           'require-directory-readme': requireDirectoryReadme,
+          'require-use-client': requireUseClient,
+          'forbid-use-client': forbidUseClient,
         },
       },
     },
@@ -176,6 +180,11 @@ export default tseslint.config(
   {
     files: ['packages/kernel/src/llm/**', 'packages/kernel/src/agents/**'],
     rules: { 'no-restricted-imports': 'off' }, // the only place allowed to use the Anthropic SDKs
+  },
+  {
+    files: ['packages/features/*/api/*.module.ts'],
+    // A Nest module is a decorated marker class; it has no members and is not supposed to.
+    rules: { '@typescript-eslint/no-extraneous-class': 'off' },
   },
   {
     files: ['packages/features/*/ui/**/*.client.tsx'],

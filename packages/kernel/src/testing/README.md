@@ -13,8 +13,9 @@ reach them.
 | `sse.ts`         | assembling an SSE stream from a fixture message                              |
 | `contract.ts`    | `describeAdapterContract` — one suite for both the mock and the real adapter |
 
-`startTestDb()` uses `DATABASE_URL` when a Postgres is running (docker compose, the CI service) and
-starts a testcontainer otherwise. Either way it creates a **new database and a new application
+`startTestDb(featureSchema?)` pushes the kernel schema plus whatever tables the caller passes in, so
+a feature's integration test provisions its own tables without `packages/db`. It uses `DATABASE_URL`
+when a Postgres is running (docker compose, the CI service) and starts a testcontainer otherwise. Either way it creates a **new database and a new application
 role** — Postgres does not enforce RLS against a superuser or against the table owner, so an
 isolation test connected as the owner would pass without proving anything (ADR 0013).
 

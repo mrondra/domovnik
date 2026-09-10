@@ -40,8 +40,12 @@ const startCluster = async (): Promise<BaseCluster> => {
 /**
  * A fresh database per test file, plus a dedicated non-superuser role: RLS is bypassed for
  * superusers, so an isolation test connected as the owner would pass without proving anything.
+ *
+ * `featureSchema` carries the tables of the feature under test (`startTestDb({ demoRecord })`);
+ * the kernel schema is always pushed, and every table built by `tenantTable`/`svjTable` gets its
+ * RLS policy from the registry regardless of which package declared it.
  */
-export const startTestDb = async (): Promise<TestDatabase> => {
+export const startTestDb = async (featureSchema: Record<string, unknown> = {}): Promise<TestDatabase> => {
   const cluster = await startCluster();
   const suffix = randomBytes(6).toString('hex');
   const database = `domovnik_test_${suffix}`;
@@ -60,7 +64,7 @@ export const startTestDb = async (): Promise<TestDatabase> => {
   await closeConnections();
   applyTestEnv({ DATABASE_URL: appUrl, DATABASE_ADMIN_URL: adminUrl });
 
-  const push = await pushSchema(schema, administrativeDb());
+  const push = await pushSchema({ ...schema, ...featureSchema }, administrativeDb());
   await push.apply();
 
   await runSql(adminUrl, [

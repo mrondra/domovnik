@@ -13,7 +13,12 @@ export default defineConfig({
       defineProject({
         test: {
           name: 'unit',
-          include: ['packages/**/src/**/*.test.ts', 'packages/features/**/tests/**/*.test.ts'],
+          include: [
+            'packages/**/src/**/*.test.ts',
+            'packages/features/**/tests/**/*.test.ts',
+            'tooling/**/*.test.ts',
+            'tooling/eslint/rules/*.test.js',
+          ],
           exclude: ['**/node_modules/**', '**/*.int.test.ts', '**/*.contract.test.ts', '**/*.eval.ts'],
         },
       }),
