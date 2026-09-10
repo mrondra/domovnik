@@ -4,6 +4,8 @@ import tseslint from 'typescript-eslint';
 import boundaries from 'eslint-plugin-boundaries';
 import vitest from '@vitest/eslint-plugin';
 import noRestrictedPatterns from './rules/no-llm-in-loop.js';
+import indexIsBarrel from './rules/index-is-barrel.js';
+import requireDirectoryReadme from './rules/require-directory-readme.js';
 
 /** From outside, a feature may only be imported through its index.ts. */
 const FEATURE_PUBLIC = { element: { type: 'feature', fileInternalPath: 'index.ts' } };
@@ -33,7 +35,17 @@ export default tseslint.config(
   ...tseslint.configs.stylisticTypeChecked,
   {
     languageOptions: { parserOptions: { projectService: true } },
-    plugins: { boundaries, vitest, domovnik: { rules: { 'no-llm-in-loop': noRestrictedPatterns } } },
+    plugins: {
+      boundaries,
+      vitest,
+      domovnik: {
+        rules: {
+          'no-llm-in-loop': noRestrictedPatterns,
+          'index-is-barrel': indexIsBarrel,
+          'require-directory-readme': requireDirectoryReadme,
+        },
+      },
+    },
     settings: {
       'boundaries/elements': [
         { type: 'app', pattern: 'apps/*', capture: ['app'] },
@@ -42,7 +54,13 @@ export default tseslint.config(
         { type: 'db', pattern: 'packages/db' },
         { type: 'feature', pattern: 'packages/features/*', capture: ['feature'] },
       ],
-      'boundaries/ignore': ['**/*.test.ts', '**/*.int.test.ts', '**/*.contract.test.ts', '**/*.eval.ts'],
+      'boundaries/ignore': [
+        '**/*.test.ts',
+        '**/*.int.test.ts',
+        '**/*.contract.test.ts',
+        '**/*.eval.ts',
+        '**/*.fixture.ts',
+      ],
       'import/resolver': { typescript: { project: TS_CONFIG } },
     },
     rules: {
@@ -103,6 +121,7 @@ export default tseslint.config(
       '@typescript-eslint/explicit-module-boundary-types': 'error',
       '@typescript-eslint/no-non-null-assertion': 'error',
       'no-console': 'error',
+      'max-lines': ['error', { max: 100, skipBlankLines: true, skipComments: true }],
       'no-restricted-syntax': [
         'error',
         {
@@ -144,8 +163,19 @@ export default tseslint.config(
     },
   },
   {
+    files: ['**/index.ts'],
+    rules: {
+      'domovnik/index-is-barrel': 'error',
+      'domovnik/require-directory-readme': 'error',
+    },
+  },
+  {
     files: ['packages/kernel/src/db/**'],
     rules: { 'no-restricted-imports': 'off' }, // the only place allowed to use the pg/drizzle client
+  },
+  {
+    files: ['packages/kernel/src/llm/**', 'packages/kernel/src/agents/**'],
+    rules: { 'no-restricted-imports': 'off' }, // the only place allowed to use the Anthropic SDKs
   },
   {
     files: ['packages/features/*/ui/**/*.client.tsx'],

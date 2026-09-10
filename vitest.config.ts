@@ -14,13 +14,14 @@ export default defineConfig({
         test: {
           name: 'unit',
           include: ['packages/**/src/**/*.test.ts', 'packages/features/**/tests/**/*.test.ts'],
-          exclude: ['**/*.int.test.ts', '**/*.contract.test.ts', '**/*.eval.ts'],
+          exclude: ['**/node_modules/**', '**/*.int.test.ts', '**/*.contract.test.ts', '**/*.eval.ts'],
         },
       }),
       defineProject({
         test: {
           name: 'integration',
           include: ['packages/**/*.int.test.ts', 'packages/**/*.contract.test.ts'],
+          exclude: ['**/node_modules/**'],
           // DATABASE_URL is inherited from the environment (docker compose locally, service in CI)
           pool: 'forks',
           fileParallelism: false,
@@ -30,6 +31,7 @@ export default defineConfig({
         test: {
           name: 'evals',
           include: ['packages/**/*.eval.ts'],
+          exclude: ['**/node_modules/**'],
         },
       }),
     ],

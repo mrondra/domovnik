@@ -36,7 +36,8 @@ module.exports = {
       name: 'no-direct-db-client',
       severity: 'error',
       from: { pathNot: '^packages/kernel/src/db' },
-      to: { path: 'node_modules/(pg|drizzle-orm/node-postgres)' },
+      // The trailing slash keeps `pg-boss` out of the match; only the Postgres client is meant.
+      to: { path: 'node_modules/(pg|drizzle-orm/node-postgres)/' },
     },
     {
       name: 'no-direct-anthropic',
@@ -53,8 +54,8 @@ module.exports = {
     {
       name: 'no-test-in-prod',
       severity: 'error',
-      from: { pathNot: '\\.(test|int\\.test|contract\\.test|eval)\\.ts$' },
-      to: { path: '\\.(test|int\\.test|contract\\.test|eval)\\.ts$|/tests/' },
+      from: { pathNot: '\\.(test|int\\.test|contract\\.test|eval|fixture)\\.ts$' },
+      to: { path: '\\.(test|int\\.test|contract\\.test|eval|fixture)\\.ts$|/tests/' },
     },
   ],
   options: {

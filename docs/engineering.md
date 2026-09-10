@@ -25,6 +25,19 @@ popisuje zbytek a vysvětluje proč.
 
 Viz `AGENTS.md` §2. Doplnění:
 
+- **`index.ts` je barrel, ne modul.** Smí obsahovat jen `import` a re-export (`export … from`, `export * from`). Jediná povolená výjimka je složení namespace objektu z už naimportovaných funkcí (`export const events = { emit, subscribe } as const`). Definice – funkce, třídy, schémata, konstanty – patří do pojmenovaného souboru vedle (`errors/taxonomy.ts`, `env/load.ts`, `audit/record.ts`) a `index.ts` je jen vypíše. Důvod: z `index.ts` se má dát přečíst, co adresář nabízí, bez čtení implementace, a diff na veřejném rozhraní se nemíchá s diffem na chování. Vynuceno pravidlem `domovnik/index-is-barrel`.
+- **Soubor má strop 100 řádků** (`max-lines`, počítají se jen řádky s kódem). Platí i na testy. Když soubor přeroste, udělej z něj složku s `index.ts` a rozděl obsah podle odpovědnosti, ne podle abecedy nebo velikosti:
+
+  ```
+  agents/runtime/        types.ts · tool-bridge.ts · session.ts · outcome.ts · run-agent.ts · index.ts
+  identity/service/      tenants.ts · users.ts · authentication.ts · sessions.ts · api-tokens.ts · index.ts
+  db/schema/             enums.ts · organisation.ts · access.ts · agents.ts · events.ts · governance.ts · index.ts
+  ```
+
+  Barrel se pak importuje jako `./runtime/index`, takže volající o rozdělení neví. Nezvyšuj strop a nepiš `eslint-disable`; když se odpovědnost opravdu nedá rozdělit, je to téma na ADR.
+
+- Sdílená příprava pro testy (definice agenta, mock toolu, seed) žije v `*.fixture.ts` vedle testu. Produkční kód z fixtury importovat nesmí (hlídá `dependency-cruiser`).
+- **Každá složka s `index.ts` má `README.md`** (u `src/` ho zastupuje README v kořeni balíčku). Tři části, **anglicky** (README stojí u kódu, platí pro něj stejné pravidlo jako pro komentáře): k čemu složka je; tabulka soubor → odpovědnost; pravidlo, které v ní platí, a proč – tam patří i odkaz na ADR. Píše se pro někoho, kdo do složky přišel poprvé a potřebuje vědět, čeho se v ní držet, ne výčet funkcí, který stejně řekne `index.ts`. Vynuceno pravidlem `domovnik/require-directory-readme`.
 - `index.ts` feature exportuje: service rozhraní (jen ty metody, které ostatní potřebují), doménové typy/DTO, názvy eventů se schématy. **Neexportuje** schema tabulek, interní helpery, adaptery.
 - Feature nesmí číst tabulky jiné feature přímo přes Drizzle. Jediná výjimka: `packages/db` (migrace, seed) a `features/reports` + `features/copilot`, které mají read-only přístup přes explicitně exportované „read modely" (`index.ts` → `readModels`).
 - Cross-feature zápis vždy přes event nebo přes service druhé feature. Nikdy přes DB.
@@ -58,7 +71,7 @@ Viz `AGENTS.md` §2. Doplnění:
 - Service je třída s DI (NestJS), bez I/O mimo repository (Drizzle přes `withTenant`) a adaptery.
 - Každá veřejná metoda přijímá `ctx: RequestContext` (tenant, actor, correlationId) jako první argument.
 - Service emituje eventy přes `events.emit(ctx, event)` uvnitř transakce (outbox tabulka; workers doručují). Nikdy neemituj event z controlleru, toolu nebo agenta.
-- Mutace zapisují `audit_log` (`actor`, `reason`) – kernel to dělá automaticky přes `withTenant`, service jen dodá `reason`.
+- Mutace zapisují `audit_log` explicitním `audit.record(ctx, { action, entity, reason, … })` uvnitř transakce z `withTenant` (ADR 0011).
 - Deterministické zpracování je v service (`matchTransactions`); agentní residuál se emituje jako jeden dávkový event.
 
 ## 6. Tooly a agenti

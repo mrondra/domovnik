@@ -32,6 +32,8 @@ index.ts  schema.ts  domain/  service/  tools/  agents/  api/  ui/  adapters/  s
 Hranice (vynucené `eslint-plugin-boundaries` + `dependency-cruiser`):
 
 - feature importuje z jiné feature jen přes `index.ts`
+- **`index.ts` je jen re-export** – žádná logika, žádné definice; ty patří do souboru vedle
+- **složka s `index.ts` má `README.md`** (anglicky) – k čemu je, co který soubor dělá, jaké pravidlo v ní platí
 - `kernel` nezná žádnou feature; `shared` nezná nic
 - `apps/*` jsou jen bootstrap/composition, žádná business logika
 - cykly mezi features jsou chyba buildu
@@ -65,7 +67,8 @@ pnpm adr:new "<title>"
 - Logování jen přes `logger` z kernelu (pino), vždy s kontextem. Žádné `console.*`.
 - Event handlery idempotentní podle `eventId`.
 - Malé funkce, jedna odpovědnost, pojmenování říká „co", ne „jak". Žádné boolean parametry, žádné komentáře vysvětlující špatný kód – oprav kód.
-- Čeština v UI textech a doménových názvech, které vidí uživatel; angličtina v kódu, identifikátorech, commitech, ADR.
+- **Malé soubory: strop je 100 řádků** (`max-lines`, bez prázdných řádků a komentářů). Když soubor roste, není odpovědí větší strop, ale složka s `index.ts` a soubory podle odpovědnosti (`agents/runtime/`, `identity/service/`).
+- Čeština v UI textech, doménových názvech, které vidí uživatel, a v `docs/` (včetně ADR); angličtina v kódu, komentářích, `README.md` u kódu, identifikátorech a commitech.
 
 ## 5. Testy
 

@@ -1,0 +1,90 @@
+{
+  "exchanges": [
+    {
+      "name": "session-title",
+      "when": {
+        "contains": ["naming a coding session"]
+      },
+      "message": {
+        "id": "msg_title",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"title\":\"Kontrola faktury\"}"
+          }
+        ],
+        "stopReason": "end_turn",
+        "inputTokens": 10,
+        "outputTokens": 5
+      }
+    },
+    {
+      "name": "calls-invoice-get-with-bad-id",
+      "when": {
+        "contains": ["mcp__domovnik__invoice_get", "rozbij-tool"],
+        "missing": ["tool_result"]
+      },
+      "message": {
+        "id": "msg_bad",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_bad",
+            "name": "mcp__domovnik__invoice_get",
+            "input": {
+              "invoiceId": "8f14e45f-ceea-467a-9f30-1b0e0b0e0999"
+            }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1100,
+        "outputTokens": 30
+      }
+    },
+    {
+      "name": "calls-invoice-get",
+      "when": {
+        "contains": ["mcp__domovnik__invoice_get"],
+        "missing": ["tool_result"]
+      },
+      "message": {
+        "id": "msg_tool",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_invoice_get",
+            "name": "mcp__domovnik__invoice_get",
+            "input": {
+              "invoiceId": "8f14e45f-ceea-467a-9f30-1b0e0b0e0001"
+            }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1200,
+        "outputTokens": 40
+      }
+    },
+    {
+      "name": "final-answer",
+      "when": {
+        "contains": ["tool_result"]
+      },
+      "message": {
+        "id": "msg_final",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "text",
+            "text": "Faktura je v pořádku, celkem 1200 Kč."
+          }
+        ],
+        "stopReason": "end_turn",
+        "inputTokens": 1500,
+        "outputTokens": 60
+      }
+    }
+  ]
+}
