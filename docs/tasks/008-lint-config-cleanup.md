@@ -10,13 +10,18 @@ Během úkolu 000 (bootstrap) bylo potřeba upravit `tooling/eslint/eslint.confi
 
 ### `tooling/eslint/eslint.config.js`
 
-- Přidány ignores: `**/*.cjs`, `tooling/**`, `eslint.config.js`, `commitlint.config.js`, `vitest.workspace.ts`
+- Přidány ignores: `**/*.cjs`, `tooling/**`, `eslint.config.js`, `commitlint.config.js`, `vitest.config.ts`
 - Důvod: ESLint s `projectService: true` nemohl najít tyto soubory v žádném tsconfig
 
-### `packages/*/package.json` (kernel, shared, db)
+### `package.json` (root)
 
 - Přidáno `--passWithNoTests` do skriptu `test`
 - Důvod: vitest padá s exit code 1, když nenajde žádné testy
+
+### `package.json` (root) – depcruise
+
+- Ze skriptů `depcruise` a `depcruise:graph` odebrán adresář `apps` (v gitu neexistuje, dependency-cruiser na chybějící cestě padá)
+- Důvod: `apps/*` vzniká až v úkolech 004–006
 
 ### `knip.json`
 
@@ -34,9 +39,11 @@ Během úkolu 000 (bootstrap) bylo potřeba upravit `tooling/eslint/eslint.confi
 
 2. **Knip:** Vrátit workspace patterny `apps/*` a `packages/features/*` a entry patterny pro `packages/db`, jakmile příslušné adresáře/soubory existují. Opravit pravidlo `"unused"` na platný název v aktuální verzi knip.
 
-3. **Vitest:** Odebrat `--passWithNoTests` z `packages/*/package.json`, jakmile každý package má alespoň jeden test.
+3. **Vitest:** Odebrat `--passWithNoTests` ze skriptu `test` v rootu, jakmile existuje alespoň jeden test.
 
-4. `pnpm verify` musí po změnách projít.
+4. **depcruise:** Vrátit `apps` do skriptů `depcruise` a `depcruise:graph`, jakmile `apps/*` existuje (nejpozději po 004).
+
+5. `pnpm verify` musí po změnách projít.
 
 ## Kdy spustit
 
@@ -49,3 +56,4 @@ Po dokončení úkolů, které vytvoří chybějící struktury — nejpozději 
 - `pnpm verify` zelený
 - Žádný source soubor v repu není vyloučený z lintování
 - `--passWithNoTests` se nepoužívá v žádném package.json
+- `pnpm depcruise` prochází i adresář `apps`

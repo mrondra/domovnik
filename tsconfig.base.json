@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "Preserve",
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -12,13 +11,6 @@
     "useUnknownInCatchVariables": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
-    "skipLibCheck": true,
-    "paths": {
-      "@domovnik/kernel": ["./packages/kernel/src/index.ts"],
-      "@domovnik/kernel/*": ["./packages/kernel/src/*"],
-      "@domovnik/shared": ["./packages/shared/src/index.ts"],
-      "@domovnik/db": ["./packages/db/src/index.ts"],
-      "@domovnik/features/*": ["./packages/features/*/index.ts"]
-    }
+    "skipLibCheck": true
   }
 }

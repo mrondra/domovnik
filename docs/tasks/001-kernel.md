@@ -74,7 +74,7 @@ Wrapper nad Anthropic SDK: `llm.complete`, `llm.extract(schema)`, `llm.classify(
 
 ### `testing`
 
-`startTestDb()` (testcontainers pgvector, migrace), `withTestTenant()`, `runAgentInTest()`, `replayLlm(fixturePath)`, `describeAdapterContract()`. Export z `@domovnik/kernel/testing` (ne z hlavního indexu; knip entry).
+`startTestDb()` (testcontainers pgvector, migrace), `withTestTenant()`, `runAgentInTest()`, `replayLlm(fixturePath)`, `describeAdapterContract()`. Export z `packages/kernel/src/testing` (ne z hlavního indexu; knip entry).
 
 ## Mimo rozsah
 

@@ -1,6 +1,6 @@
 /**
- * Zakazuje volání LLM (runAgent / llm.complete / llm.extract) uvnitř cyklů.
- * ADR 0004: LLM nikdy neběží v cyklu nad položkami – dávkuj.
+ * Forbids LLM calls (runAgent / llm.complete / llm.extract) inside loops.
+ * ADR 0004: an LLM never runs in a loop over items - batch them instead.
  */
 const LLM_CALLEES = new Set(['runAgent', 'complete', 'extract', 'classify', 'embed']);
 const LOOPS = new Set([

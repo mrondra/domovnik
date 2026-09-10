@@ -1,6 +1,8 @@
 # 005 – apps/workers a apps/mcp
 
-Reference: ADR 0004, 0006, 0008; zadání kap. 5, 6, 9.
+Reference: ADR 0004, 0006, 0008, 0009; zadání kap. 5, 6, 9.
+
+Pozn. k ADR 0009: importy jsou bezpříponové, takže `apps/workers` a `apps/mcp` neběží v Node bez bundle kroku – v devu `tsx`, pro produkci bundle (esbuild/tsup).
 
 ## Cíl
 

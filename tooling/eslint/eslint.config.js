@@ -1,8 +1,19 @@
 // @ts-check
+import { join } from 'node:path';
 import tseslint from 'typescript-eslint';
 import boundaries from 'eslint-plugin-boundaries';
 import vitest from '@vitest/eslint-plugin';
 import noRestrictedPatterns from './rules/no-llm-in-loop.js';
+
+/** From outside, a feature may only be imported through its index.ts. */
+const FEATURE_PUBLIC = { element: { type: 'feature', fileInternalPath: 'index.ts' } };
+
+/**
+ * Imports are relative and carry no extension (ADR 0010). The bundled node resolver does not try
+ * `.ts`/`.tsx`, so without the TypeScript resolver every import stays unresolved and the boundaries
+ * rules silently pass everything.
+ */
+const TS_CONFIG = join(import.meta.dirname, '../../tsconfig.base.json');
 
 export default tseslint.config(
   {
@@ -15,7 +26,7 @@ export default tseslint.config(
       'tooling/**',
       'eslint.config.js',
       'commitlint.config.js',
-      'vitest.workspace.ts',
+      'vitest.config.ts',
     ],
   },
   ...tseslint.configs.strictTypeChecked,
@@ -25,40 +36,52 @@ export default tseslint.config(
     plugins: { boundaries, vitest, domovnik: { rules: { 'no-llm-in-loop': noRestrictedPatterns } } },
     settings: {
       'boundaries/elements': [
-        { type: 'app', pattern: 'apps/*', mode: 'folder', capture: ['app'] },
-        { type: 'kernel', pattern: 'packages/kernel', mode: 'folder' },
-        { type: 'shared', pattern: 'packages/shared', mode: 'folder' },
-        { type: 'db', pattern: 'packages/db', mode: 'folder' },
-        {
-          type: 'feature-public',
-          pattern: 'packages/features/*/index.ts',
-          mode: 'file',
-          capture: ['feature'],
-        },
-        { type: 'feature', pattern: 'packages/features/*', mode: 'folder', capture: ['feature'] },
+        { type: 'app', pattern: 'apps/*', capture: ['app'] },
+        { type: 'kernel', pattern: 'packages/kernel' },
+        { type: 'shared', pattern: 'packages/shared' },
+        { type: 'db', pattern: 'packages/db' },
+        { type: 'feature', pattern: 'packages/features/*', capture: ['feature'] },
       ],
       'boundaries/ignore': ['**/*.test.ts', '**/*.int.test.ts', '**/*.contract.test.ts', '**/*.eval.ts'],
+      'import/resolver': { typescript: { project: TS_CONFIG } },
     },
     rules: {
-      // ---- hranice ----
-      'boundaries/element-types': [
+      // ---- boundaries ----
+      'boundaries/dependencies': [
         'error',
         {
           default: 'disallow',
-          rules: [
-            { from: 'shared', allow: [] },
-            { from: 'kernel', allow: ['shared'] },
-            { from: 'db', allow: ['kernel', 'shared', 'feature-public', 'feature'] }, // db skládá schema.ts
+          policies: [
+            { from: [{ element: { type: 'shared' } }], allow: [] },
+            { from: [{ element: { type: 'kernel' } }], allow: [{ to: { element: { type: 'shared' } } }] },
             {
-              from: 'feature',
-              allow: ['kernel', 'shared', 'feature-public', ['feature', { feature: '${from.feature}' }]],
+              from: [{ element: { type: 'db' } }], // db composes the feature schema.ts files
+              allow: [{ to: { element: { type: ['kernel', 'shared', 'feature'] } } }],
             },
-            { from: 'app', allow: ['kernel', 'shared', 'db', 'feature-public'] },
+            {
+              from: [{ element: { type: 'feature' } }],
+              allow: [
+                { to: { element: { type: ['kernel', 'shared'] } } },
+                {
+                  to: {
+                    element: {
+                      type: 'feature',
+                      captured: { feature: '{{ from.element.captured.feature }}' },
+                    },
+                  },
+                },
+                { to: FEATURE_PUBLIC },
+              ],
+            },
+            {
+              from: [{ element: { type: 'app' } }],
+              allow: [{ to: { element: { type: ['kernel', 'shared', 'db'] } } }, { to: FEATURE_PUBLIC }],
+            },
           ],
         },
       ],
       'boundaries/no-unknown-files': 'error',
-      // ---- únikové cesty ----
+      // ---- escape hatches ----
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/ban-ts-comment': [
         'error',
@@ -84,7 +107,7 @@ export default tseslint.config(
         'error',
         {
           selector: "NewExpression[callee.name='Error']",
-          message: 'Use error taxonomy from @domovnik/kernel/errors.',
+          message: 'Use the error taxonomy from packages/kernel/src/errors.',
         },
         { selector: 'TSAsExpression > TSUnknownKeyword', message: 'No `as unknown as` casts.' },
         {
@@ -96,20 +119,17 @@ export default tseslint.config(
         'error',
         {
           paths: [
-            { name: 'drizzle-orm/node-postgres', message: 'Use withTenant() from @domovnik/kernel/db.' },
-            { name: 'pg', message: 'Use withTenant() from @domovnik/kernel/db.' },
-            { name: '@anthropic-ai/sdk', message: 'Use agent runtime / llm client from @domovnik/kernel.' },
-          ],
-          patterns: [
+            { name: 'drizzle-orm/node-postgres', message: 'Use withTenant() from packages/kernel/src/db.' },
+            { name: 'pg', message: 'Use withTenant() from packages/kernel/src/db.' },
             {
-              group: ['@domovnik/features/*/!(index)', '@domovnik/features/*/*/**'],
-              message: 'Import features only via their index.ts.',
+              name: '@anthropic-ai/sdk',
+              message: 'Use the agent runtime / llm client from packages/kernel/src.',
             },
           ],
         },
       ],
       'domovnik/no-llm-in-loop': 'error',
-      // ---- eslint-disable jen se zdůvodněním (hlídá eslint-comments) ----
+      // ---- eslint-disable only with a justification (enforced by eslint-comments) ----
     },
   },
   {
@@ -119,13 +139,13 @@ export default tseslint.config(
       'vitest/no-disabled-tests': 'error',
       'vitest/no-focused-tests': 'error',
       'vitest/expect-expect': 'error',
-      'vitest/valid-title': ['error', { mustMatch: { it: ['^(?!should).+'] } }], // "rejects duplicate", ne "should reject"
+      'vitest/valid-title': ['error', { mustMatch: { it: ['^(?!should).+'] } }], // "rejects duplicate", not "should reject"
       '@typescript-eslint/no-unsafe-type-assertion': 'off',
     },
   },
   {
     files: ['packages/kernel/src/db/**'],
-    rules: { 'no-restricted-imports': 'off' }, // jediné místo, kde smí být pg/drizzle klient
+    rules: { 'no-restricted-imports': 'off' }, // the only place allowed to use the pg/drizzle client
   },
   {
     files: ['packages/features/*/ui/**/*.client.tsx'],
