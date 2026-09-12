@@ -24,10 +24,12 @@ Scope: `docs/tasks/001-kernel.md`. Decisions: ADR 0003, 0004, 0006, 0007, 0008, 
 | `events/`    | typed events, the transactional outbox, delivery through pg-boss              |
 | `tools/`     | the capability registry: `defineTool`, `executeTool`                          |
 | `agents/`    | declarative agent definitions and the runtime that executes them              |
+| `seed/`      | the contract a feature's demo data implements; the runner lives in `db`       |
 | `llm/`       | direct model calls outside the agent loop, with record/replay                 |
 | `testing/`   | test helpers; a separate entry point, `@domovnik/kernel/testing`              |
 
-`discovery.ts` at the root loads tools and agents by directory convention; both registries use it.
+`discovery.ts` at the root loads tools, agents and seeds by directory convention; all three
+registries use it.
 
 ## The four invariants this package exists for
 
@@ -50,4 +52,4 @@ Scope: `docs/tasks/001-kernel.md`. Decisions: ADR 0003, 0004, 0006, 0007, 0008, 
 | a kernel table          | `db/schema/` through `tenantTable()`, plus an RLS isolation test |
 | a branded id            | `ids/identifiers.ts`                                             |
 | a kernel event          | `defineEvent` in the module that emits it                        |
-| a tool or an agent      | into a feature, not here — the kernel only holds the registry    |
+| a tool, agent or seed   | into a feature, not here — the kernel only holds the registry    |

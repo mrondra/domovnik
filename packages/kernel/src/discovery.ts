@@ -17,3 +17,6 @@ export const loadToolsFrom = (patterns: readonly string[]): Promise<number> => i
 
 /** Same for agents: a new agent is a new directory, nothing else (ADR 0008). */
 export const loadAgentsFrom = (patterns: readonly string[]): Promise<number> => importAll(patterns);
+
+/** And for seeds, which `packages/db` collects the same way. */
+export const loadSeedsFrom = (patterns: readonly string[]): Promise<number> => importAll(patterns);

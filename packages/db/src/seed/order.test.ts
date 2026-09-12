@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { orderSeedModules } from './index';
-import type { SeedModule } from './index';
+import type { SeedModule } from '../../../kernel/src/seed/index';
+import { orderSeedModules } from './order';
 
 const module = (name: string, dependsOn: readonly string[] = []): SeedModule => ({
   name,

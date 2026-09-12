@@ -3,7 +3,9 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { withSystem } from '../../../kernel/src/db/index';
 import { tenant, user } from '../../../kernel/src/db/schema/index';
 import { ROLES } from '../../../kernel/src/identity/index';
-import { DEMO_TENANT_NAME, runSeed, type SeedContext, type SeedModule } from './index';
+import { clearSeeds, defineSeed, type SeedContext } from '../../../kernel/src/seed/index';
+import { DEMO_TENANT_NAME } from './demo-tenant';
+import { runSeed } from './index';
 import { startMigratedDb, type MigratedDatabase } from '../database.fixture';
 
 let database: MigratedDatabase;
@@ -30,33 +32,43 @@ const users = (): Promise<number> =>
 
 describe('runSeed', () => {
   it('creates the demo tenant with one user per role', async () => {
-    await runSeed([]);
+    clearSeeds();
+    await runSeed();
 
     await expect(demoTenants()).resolves.toBe(1);
     await expect(users()).resolves.toBe(ROLES.length);
   });
 
   it('adds nothing when it runs again', async () => {
-    await runSeed([]);
-    await runSeed([]);
+    clearSeeds();
+    await runSeed();
+    await runSeed();
 
     await expect(demoTenants()).resolves.toBe(1);
     await expect(users()).resolves.toBe(ROLES.length);
   });
 
-  it('runs a feature seed after the feature it depends on', async () => {
+  // Declaring the seed is what registers it, so this covers the whole path a feature will take:
+  // defineSeed -> discovery -> dependency order -> run.
+  it('runs a declared feature seed after the feature it depends on', async () => {
     const visited: string[] = [];
-    const module = (name: string, dependsOn: readonly string[]): SeedModule => ({
-      name,
-      dependsOn,
-      run: (context: SeedContext) => {
-        visited.push(`${name}:${context.tenantId}`);
-        return Promise.resolve();
-      },
-    });
+    const declare = (name: string, dependsOn: readonly string[]): void => {
+      defineSeed({
+        name,
+        dependsOn,
+        run: (context: SeedContext) => {
+          visited.push(`${name}:${context.tenantId}`);
+          return Promise.resolve();
+        },
+      });
+    };
 
-    await runSeed([module('invoices', ['svj']), module('svj', [])]);
+    clearSeeds();
+    declare('invoices', ['svj']);
+    declare('svj', []);
+    await expect(runSeed()).resolves.toBe(2);
 
     expect(visited.map((entry) => entry.split(':')[0])).toStrictEqual(['svj', 'invoices']);
+    clearSeeds();
   });
 });

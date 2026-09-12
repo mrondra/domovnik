@@ -14,7 +14,7 @@ feature, generates and runs migrations, and holds the seed runner.
 | `src/migrate.ts`    | `pnpm db:migrate`: Drizzle's migration reader applied through `withSystem`        |
 | `src/ledger.ts`     | `drizzle.__drizzle_migrations`, the same bookkeeping Drizzle's own migrator keeps |
 | `src/audit-rls.ts`  | asks the catalogue which `tenant_id` tables lack RLS                              |
-| `src/seed/`         | `pnpm db:seed`: the kernel seed, then the feature seeds in dependency order       |
+| `src/seed/`         | `pnpm db:seed`: the demo tenant, then the feature seeds in dependency order       |
 | `src/bin/`          | the three entry points the package scripts run                                    |
 
 ## Adding a table

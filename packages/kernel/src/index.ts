@@ -10,4 +10,5 @@ export * from './approvals/index';
 export * from './events/index';
 export * from './tools/index';
 export * from './agents/index';
+export * from './seed/index';
 export * from './llm/index';
