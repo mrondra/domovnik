@@ -5,11 +5,13 @@ import {
   ForbiddenError,
   KernelError,
   NotFoundError,
+  UnauthenticatedError,
   ValidationError,
 } from './taxonomy';
 
 const STATUS_BY_ERROR = [
   { type: ValidationError, status: 400 },
+  { type: UnauthenticatedError, status: 401 },
   { type: ForbiddenError, status: 403 },
   { type: NotFoundError, status: 404 },
   { type: ConflictError, status: 409 },

@@ -29,6 +29,13 @@ export class NotFoundError extends KernelError {
   }
 }
 
+/** No usable credential was presented; `ForbiddenError` is for a known actor who may not. */
+export class UnauthenticatedError extends KernelError {
+  constructor(message: string, options: KernelErrorOptions = {}) {
+    super('unauthenticated', message, options);
+  }
+}
+
 export class ForbiddenError extends KernelError {
   constructor(message: string, options: KernelErrorOptions = {}) {
     super('forbidden', message, options);

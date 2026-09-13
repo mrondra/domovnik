@@ -59,6 +59,8 @@ module.exports = {
     },
   ],
   options: {
+    // Build output, not source: a bundle inlines the kernel and would trip every layering rule.
+    exclude: { path: '(^|/)(dist|\\.next|\\.turbo)/' },
     doNotFollow: { path: 'node_modules' },
     tsPreCompilationDeps: true,
     tsConfig: { fileName: 'tsconfig.base.json' },

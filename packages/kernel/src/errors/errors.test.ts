@@ -5,6 +5,7 @@ import {
   DomainError,
   ForbiddenError,
   NotFoundError,
+  UnauthenticatedError,
   ValidationError,
   isKernelError,
   isRetryable,
@@ -23,6 +24,11 @@ describe('error taxonomy', () => {
     expect(isKernelError(error)).toBe(true);
   });
 
+  it('separates a missing credential from a refused actor', () => {
+    expect(new UnauthenticatedError('x').code).toBe('unauthenticated');
+    expect(toHttpStatus(new UnauthenticatedError('x'))).not.toBe(toHttpStatus(new ForbiddenError('x')));
+  });
+
   it('lets a domain rule name its own code', () => {
     expect(new DomainError('duplicita', { code: 'invoice_duplicate' }).code).toBe('invoice_duplicate');
   });
@@ -37,6 +43,7 @@ describe('error taxonomy', () => {
 describe('error mapping', () => {
   it('maps each kind to its HTTP status', () => {
     expect(toHttpStatus(new ValidationError('x'))).toBe(400);
+    expect(toHttpStatus(new UnauthenticatedError('x'))).toBe(401);
     expect(toHttpStatus(new ForbiddenError('x'))).toBe(403);
     expect(toHttpStatus(new NotFoundError('x'))).toBe(404);
     expect(toHttpStatus(new ConflictError('x'))).toBe(409);

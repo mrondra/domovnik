@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { newId, userIdSchema } from '../ids/index';
+import { newId, tenantIdSchema, userIdSchema } from '../ids/index';
 import { applyTestEnv } from '../testing/env';
 import { hasPermission, permissionsOf } from './permissions';
 import { hashPassword, hashToken, newOpaqueToken, verifyPassword } from './secrets';
@@ -57,29 +57,38 @@ describe('secrets', () => {
 
 describe('signed links', () => {
   const subjectId = newId(userIdSchema);
+  const addressee = { tenantId: newId(tenantIdSchema), actorId: newId(userIdSchema) };
 
   it('round-trips purpose and subject', () => {
-    const token = createSignedLink({ purpose: 'approval.decide', subjectId, expiresIn: 60 });
-    expect(verifySignedLink(token, 'approval.decide').subjectId).toBe(subjectId);
+    const token = createSignedLink({ purpose: 'approval.decide', subjectId, expiresIn: 60, ...addressee });
+    const payload = verifySignedLink(token, 'approval.decide');
+    expect(payload.subjectId).toBe(subjectId);
+    expect(payload.actorId).toBe(addressee.actorId);
   });
 
   it('rejects a tampered payload', () => {
-    const token = createSignedLink({ purpose: 'approval.decide', subjectId, expiresIn: 60 });
+    const token = createSignedLink({ purpose: 'approval.decide', subjectId, expiresIn: 60, ...addressee });
     const [payload, signature] = token.split('.');
     const forged = `${Buffer.from(
-      JSON.stringify({ purpose: 'approval.decide', subjectId, expiresAt: 99_999_999_999, nonce: 'x' }),
+      JSON.stringify({
+        purpose: 'approval.decide',
+        subjectId,
+        expiresAt: 99_999_999_999,
+        nonce: 'x',
+        ...addressee,
+      }),
     ).toString('base64url')}.${String(signature)}`;
     expect(payload).toBeDefined();
     expect(() => verifySignedLink(forged, 'approval.decide')).toThrow(/Neplatný podpis/);
   });
 
   it('rejects a link issued for another purpose', () => {
-    const token = createSignedLink({ purpose: 'invoice.view', subjectId, expiresIn: 60 });
+    const token = createSignedLink({ purpose: 'invoice.view', subjectId, expiresIn: 60, ...addressee });
     expect(() => verifySignedLink(token, 'approval.decide')).toThrow(/jiné akci/);
   });
 
   it('rejects an expired link', () => {
-    const token = createSignedLink({ purpose: 'approval.decide', subjectId, expiresIn: -1 });
+    const token = createSignedLink({ purpose: 'approval.decide', subjectId, expiresIn: -1, ...addressee });
     expect(() => verifySignedLink(token, 'approval.decide')).toThrow(/vypršel/);
   });
 

@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-09-09
+- Superseded in part by: 0014 (Passport)
 
 ## Context
 

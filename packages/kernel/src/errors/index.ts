@@ -5,6 +5,7 @@ export {
   ForbiddenError,
   KernelError,
   NotFoundError,
+  UnauthenticatedError,
   ValidationError,
   isKernelError,
   isRetryable,

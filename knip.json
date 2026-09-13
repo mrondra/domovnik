@@ -2,6 +2,10 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignoreBinaries": ["dot"],
   "workspaces": {
+    "apps/api": {
+      "entry": ["src/bin/*.ts"],
+      "ignoreDependencies": ["@node-rs/argon2", "drizzle-orm", "pg", "pino"]
+    },
     "packages/kernel": {},
     "packages/shared": {},
     "packages/db": {}

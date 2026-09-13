@@ -5,12 +5,14 @@ export { hashPassword, hashToken, newOpaqueToken, verifyPassword } from './secre
 export { createSignedLink, verifySignedLink } from './signed-link';
 export type { CreateSignedLinkInput, SignedLinkPayload } from './signed-link';
 export {
+  accessibleSvj,
   authenticate,
   createApiToken,
   createSession,
   createTenant,
   createUser,
   ensureAgentIdentity,
+  listApiTokens,
   requireUser,
   revokeApiToken,
   revokeSession,
@@ -21,6 +23,7 @@ export {
 export type {
   AgentIdentityInput,
   ApiTokenGrant,
+  ApiTokenSummary,
   AuthenticatedUser,
   CreateApiTokenInput,
   CreateTenantInput,

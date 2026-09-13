@@ -2,7 +2,7 @@ import { and, eq, isNull, sql } from 'drizzle-orm';
 import type { RequestContext } from '../../context/index';
 import { session } from '../../db/schema/index';
 import { withSystem, withTenant } from '../../db/tenant';
-import { ForbiddenError } from '../../errors/index';
+import { UnauthenticatedError } from '../../errors/index';
 import { newRowId, tenantIdSchema, userIdSchema, type UserId } from '../../ids/index';
 import { hashToken, newOpaqueToken } from '../secrets';
 import type { AuthenticatedUser } from './authentication';
@@ -55,7 +55,7 @@ export const verifySession = async (token: string): Promise<AuthenticatedUser> =
   });
 
   if (row === undefined) {
-    throw new ForbiddenError('Neplatná relace', { code: 'session_invalid' });
+    throw new UnauthenticatedError('Neplatná relace', { code: 'session_invalid' });
   }
 
   const tenantId = tenantIdSchema.parse(row.tenantId);

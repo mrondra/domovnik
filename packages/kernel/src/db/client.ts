@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { adminDatabaseUrl, loadEnv } from '../env/index';
@@ -29,6 +30,11 @@ export const applicationDb = (): Database => {
 export const administrativeDb = (): Database => {
   administrative ??= connect(adminDatabaseUrl(loadEnv()));
   return administrative.db;
+};
+
+/** Liveness only: it proves the application pool can reach Postgres, nothing about any tenant. */
+export const pingDatabase = async (): Promise<void> => {
+  await applicationDb().execute(sql`select 1`);
 };
 
 export const closeConnections = async (): Promise<void> => {

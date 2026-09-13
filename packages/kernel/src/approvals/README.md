@@ -7,6 +7,7 @@ letter to an owner, an order — ends up as an `Approval` for someone entitled t
 | ----------- | ---------------------------------------------------------------- |
 | `create.ts` | `createApproval` — records the pending proposal and an audit row |
 | `decide.ts` | `decideApproval`, `expireApprovals`                              |
+| `list.ts`   | `listApprovals` (the inbox) and `getApproval`                    |
 
 States: `pending → approved | rejected | expired`.
 
@@ -16,4 +17,5 @@ handler only once that transition has gone through. A second call finds no `pend
 with a `ConflictError`, so the handler cannot run twice even under concurrency (ADR 0006).
 
 Deciding needs the `approval.decide` permission, and where the approver list is non-empty, the actor
-has to be on it.
+has to be on it. `listApprovals` filters by exactly that rule, so the inbox never shows a row the
+actor would be refused on. An actor who may not decide at all gets an empty inbox, not an error.

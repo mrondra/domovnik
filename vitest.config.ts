@@ -14,6 +14,7 @@ export default defineConfig({
         test: {
           name: 'unit',
           include: [
+            'apps/*/src/**/*.test.ts',
             'packages/**/src/**/*.test.ts',
             'packages/features/**/tests/**/*.test.ts',
             'tooling/**/*.test.ts',
@@ -25,7 +26,7 @@ export default defineConfig({
       defineProject({
         test: {
           name: 'integration',
-          include: ['packages/**/*.int.test.ts', 'packages/**/*.contract.test.ts'],
+          include: ['apps/**/*.int.test.ts', 'packages/**/*.int.test.ts', 'packages/**/*.contract.test.ts'],
           exclude: ['**/node_modules/**'],
           // DATABASE_URL is inherited from the environment (docker compose locally, service in CI)
           pool: 'forks',

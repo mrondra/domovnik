@@ -182,7 +182,11 @@ export default tseslint.config(
     rules: { 'no-restricted-imports': 'off' }, // the only place allowed to use the Anthropic SDKs
   },
   {
-    files: ['packages/features/*/api/*.module.ts'],
+    files: [
+      'packages/features/*/api/*.module.ts',
+      'apps/api/src/**/*.module.ts',
+      'apps/api/src/tests/*.fixture.ts',
+    ],
     // A Nest module is a decorated marker class; it has no members and is not supposed to.
     rules: { '@typescript-eslint/no-extraneous-class': 'off' },
   },

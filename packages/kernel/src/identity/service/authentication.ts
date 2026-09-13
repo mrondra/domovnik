@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { user } from '../../db/schema/index';
 import { withSystem } from '../../db/tenant';
-import { ForbiddenError } from '../../errors/index';
+import { UnauthenticatedError } from '../../errors/index';
 import { tenantIdSchema, userIdSchema, type TenantId, type UserId } from '../../ids/index';
 import type { Role } from '../roles';
 import { verifyPassword } from '../secrets';
@@ -32,10 +32,10 @@ export const authenticate = async (email: string, password: string): Promise<Aut
   });
 
   if (!candidate?.isActive) {
-    throw new ForbiddenError(INVALID, { code: 'invalid_credentials' });
+    throw new UnauthenticatedError(INVALID, { code: 'invalid_credentials' });
   }
   if (!(await verifyPassword(candidate.passwordHash, password))) {
-    throw new ForbiddenError(INVALID, { code: 'invalid_credentials' });
+    throw new UnauthenticatedError(INVALID, { code: 'invalid_credentials' });
   }
 
   const tenantId = tenantIdSchema.parse(candidate.tenantId);

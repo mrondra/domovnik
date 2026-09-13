@@ -19,6 +19,9 @@ open transaction, so one service can call another without losing atomicity; a ne
 `withSystem({ reason }, fn)` is the only route to data without RLS — for migrations, seed and
 cross-tenant jobs. It demands a reason and logs a warning.
 
+`pingDatabase()` runs `select 1` on the application pool; it is what `GET /health` reports and says
+nothing about any tenant.
+
 `closeConnections()` ends both pools. A long-running app never calls it; a CLI (`pnpm db:migrate`,
 `pnpm db:seed`) has to, or the process hangs on an open pool.
 

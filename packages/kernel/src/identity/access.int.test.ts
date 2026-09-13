@@ -1,4 +1,6 @@
+import { z } from 'zod';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { clearTools, defineTool } from '../tools/registry/index';
 import { startTestDb, withTestTenant, type TestDatabase, type TestTenant } from '../testing/index';
 import {
   createApiToken,
@@ -16,6 +18,18 @@ let tenant: TestTenant;
 beforeAll(async () => {
   database = await startTestDb();
   tenant = await withTestTenant();
+  clearTools();
+  defineTool({
+    name: 'invoice.get',
+    description: 'Vrátí fakturu.',
+    input: z.object({}),
+    output: z.object({}),
+    permission: 'finance.read',
+    approval: () => ({ required: false, approvers: [] }),
+    userComposable: true,
+    readOnly: true,
+    handler: () => Promise.resolve({}),
+  });
 }, 120_000);
 
 afterAll(async () => {

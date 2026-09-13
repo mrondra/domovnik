@@ -1,12 +1,13 @@
 export { createTenant } from './tenants';
 export type { CreateTenantInput } from './tenants';
 export { createUser, requireUser, rolesOf } from './users';
+export { accessibleSvj } from './svj-access';
 export type { CreateUserInput } from './users';
 export { authenticate } from './authentication';
 export type { AuthenticatedUser } from './authentication';
 export { createSession, revokeSession, verifySession } from './sessions';
 export type { IssuedSession } from './sessions';
-export { createApiToken, revokeApiToken, verifyApiToken } from './api-tokens';
-export type { ApiTokenGrant, CreateApiTokenInput, IssuedApiToken } from './api-tokens';
+export { createApiToken, listApiTokens, revokeApiToken, verifyApiToken } from './api-tokens/index';
+export type { ApiTokenGrant, ApiTokenSummary, CreateApiTokenInput, IssuedApiToken } from './api-tokens/index';
 export { ensureAgentIdentity } from './agent-identity';
 export type { AgentIdentityInput } from './agent-identity';
