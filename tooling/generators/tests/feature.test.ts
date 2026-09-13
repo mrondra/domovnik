@@ -37,6 +37,22 @@ describe('gen:feature', () => {
     expect(schema).toContain('export const fieldReportsRecord');
   });
 
+  it('registers the feature with apps/api, so nothing has to be wired by hand', async () => {
+    await generate('demo');
+
+    const barrel = await readGenerated(root, 'apps/api/src/features/modules.generated.ts');
+    expect(barrel).toContain("import { DemoModule } from '../../../../packages/features/demo';");
+    expect(barrel).toContain('export const featureModules: readonly Type[] = [DemoModule];');
+  });
+
+  it('keeps the features it already registered', async () => {
+    await generate('demo');
+    await generate('invoices', false);
+
+    const barrel = await readGenerated(root, 'apps/api/src/features/modules.generated.ts');
+    expect(barrel).toContain('[DemoModule, InvoicesModule]');
+  });
+
   it('refuses to overwrite an existing feature', async () => {
     await generate('demo');
 

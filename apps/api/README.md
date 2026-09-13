@@ -46,7 +46,14 @@ purpose: relative imports carry no extension (ADR 0010), which Node refuses as E
 happily as CJS, and Nest's own lazy `require()`s of optional packages keep working. Decorator
 metadata comes from SWC — esbuild alone does not emit it and Nest's DI reads it.
 
-**The rule:** a new feature is a new directory, never an edit here. `pnpm api:modules` re-reads
-`packages/features/*/api/*.module.ts` and rewrites the generated list; a test fails if the committed
-file no longer matches what is on disk. Nest needs its modules statically, so this is a committed
-file rather than a runtime glob — a glob would survive `tsx` in dev and vanish in the bundle.
+**The rule:** a new feature is a new directory, never an edit here. `pnpm gen:feature` re-composes
+`src/features/modules.generated.ts` from `packages/features/*/api/*.module.ts` as part of generating
+the feature, so a generated feature is served the moment it exists; `pnpm api:modules` does the same
+on demand, for a module that arrived some other way. A test fails if the committed file no longer
+matches what is on disk.
+
+Nest needs its modules statically, so this is a committed file rather than a runtime glob — a glob
+would survive `tsx` in dev and vanish in the bundle. It is written through the repository's own
+Prettier config, because the list is one array literal that grows: past a handful of features
+Prettier wants to wrap it, and a generated file that `pnpm lint` rejects is a trap for whoever adds
+that feature.

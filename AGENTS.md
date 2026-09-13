@@ -50,7 +50,7 @@ pnpm gen:feature <name>  # kostra feature
 pnpm gen:agent <feature> <name>
 pnpm gen:tool <feature> <name>
 pnpm db:migrate | db:generate | db:seed
-pnpm api:modules          # přegeneruje seznam feature modulů pro apps/api
+pnpm api:modules          # přegeneruje seznam feature modulů pro apps/api (gen:feature ho volá sám)
 pnpm adr:new "<title>"
 ```
 

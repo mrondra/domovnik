@@ -1,6 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
+import { composeModules } from '../../../apps/api/src/features/compose';
+import { modulesFile } from '../../../apps/api/src/features/paths';
 import { GeneratorError, report } from '../lib/cli';
 import { writeAll } from '../lib/files';
 import { isKebabCase, namesOf } from '../lib/names';
@@ -36,6 +38,16 @@ const ensureScope = async (options: FeatureOptions): Promise<void> => {
   report(`  ~ commitlint.config.js (scope \u201e${options.name}\u201c)`);
 };
 
+/**
+ * A Nest module has to be listed statically, so the feature the generator just wrote is invisible to
+ * `apps/api` until the committed barrel names it. Composing here means a generated feature is served
+ * the moment it exists, instead of after a separate command nobody is reminded to run.
+ */
+const registerWithApi = async (root: string): Promise<void> => {
+  await composeModules(root);
+  report(`  ~ ${relative(root, modulesFile(root))}`);
+};
+
 /** A new workspace package has no linked dependencies until pnpm relinks the workspace. */
 const install = (root: string): void => {
   report('  \u2026 pnpm install');
@@ -56,6 +68,7 @@ export const generateFeature = async (options: FeatureOptions): Promise<readonly
 
   const files = featureFiles(namesOf(options.name), await featureDependencies(options.root));
   await writeAll(options.root, files);
+  await registerWithApi(options.root);
   if (options.install) install(options.root);
 
   return files.map((file) => file.path);

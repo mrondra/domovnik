@@ -15,15 +15,20 @@ const COMMITLINT_CONFIG = `export default {
 };
 `;
 
+/** `gen:feature` re-composes this file, so the scaffold has to offer it something to compose into. */
+const API_MODULES = 'apps/api/src/features/modules.generated.ts';
+
 /**
  * The smallest repository a generator needs: the Prettier config it formats with, the commit scopes
- * it checks against, the kernel manifest it reads versions from and the ADR template.
+ * it checks against, the kernel manifest it reads versions from, the ADR template and the barrel of
+ * Nest modules that `apps/api` is built from.
  */
 export const scaffoldRepo = async (): Promise<string> => {
   const root = await mkdtemp(join(tmpdir(), 'domovnik-generators-'));
 
   await mkdir(join(root, 'docs/adr'), { recursive: true });
   await mkdir(join(root, 'packages/kernel'), { recursive: true });
+  await mkdir(join(root, 'apps/api/src/features'), { recursive: true });
 
   await Promise.all([
     cp(join(REPO, '.prettierrc'), join(root, '.prettierrc')),
@@ -32,6 +37,7 @@ export const scaffoldRepo = async (): Promise<string> => {
     cp(join(REPO, 'packages/kernel/package.json'), join(root, 'packages/kernel/package.json')),
     writeFile(join(root, 'docs/adr/0001-first.md'), '# 0001\n'),
     writeFile(join(root, 'docs/adr/0002-second.md'), '# 0002\n'),
+    cp(join(REPO, API_MODULES), join(root, API_MODULES)),
   ]);
 
   return root;

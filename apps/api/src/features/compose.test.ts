@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
-import { describeModule, featureModuleFiles, renderModules } from './compose';
+import { composedSource, describeModule, renderModules } from './compose';
 import { modulesFile } from './paths';
 
 describe('describeModule', () => {
@@ -28,6 +28,6 @@ describe('the committed modules.generated.ts', () => {
   // Nest imports this file; a feature missing from it is a feature the API silently does not serve.
   it('matches what the generator would write today', async () => {
     const committed = await readFile(modulesFile(), 'utf8');
-    expect(committed).toBe(renderModules(await featureModuleFiles()));
+    expect(committed).toBe(await composedSource());
   });
 });

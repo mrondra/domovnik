@@ -1,6 +1,10 @@
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 /** Scripts run with `apps/api` as the working directory; every path is resolved from this file. */
 export const repoRoot = (): string => fileURLToPath(new URL('../../../../', import.meta.url));
 
-export const modulesFile = (): string => fileURLToPath(new URL('./modules.generated.ts', import.meta.url));
+const MODULES_FILE = 'apps/api/src/features/modules.generated.ts';
+
+/** Takes a root so `pnpm gen:feature` can compose the barrel of the repository it is writing into. */
+export const modulesFile = (root: string = repoRoot()): string => join(root, MODULES_FILE);
