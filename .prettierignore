@@ -1,6 +1,9 @@
 dist
 .next
+next-env.d.ts
 node_modules
 drizzle
 pnpm-lock.yaml
 docs/dependency-graph.svg
+test-results
+playwright-report

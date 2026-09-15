@@ -1,6 +1,7 @@
 export { ROLES } from './roles';
 export type { Role } from './roles';
 export { hasPermission, permissionsOf } from './permissions';
+export { SESSION_COOKIE } from './session-cookie';
 export { hashPassword, hashToken, newOpaqueToken, verifyPassword } from './secrets';
 export { createSignedLink, verifySignedLink } from './signed-link';
 export type { CreateSignedLinkInput, SignedLinkPayload } from './signed-link';

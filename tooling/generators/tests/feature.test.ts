@@ -29,6 +29,14 @@ describe('gen:feature', () => {
     );
   });
 
+  it('gives the feature what a .tsx under ui/ needs to type check', async () => {
+    await generate('demo');
+
+    const manifest = await readGenerated(root, 'packages/features/demo/package.json');
+    expect(manifest).toContain('"react"');
+    expect(manifest).toContain('"@types/react"');
+  });
+
   it('names the sample table after the feature', async () => {
     await generate('field-reports');
 

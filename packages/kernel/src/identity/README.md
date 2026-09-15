@@ -4,13 +4,14 @@ Who is acting: tenants, users, roles and permissions, sessions, API tokens, sign
 and agent identities. Auth is our own (ADR 0007) — no sign-up and no password reset; the users come
 from the seed.
 
-| File / directory | Contents                                                                                             |
-| ---------------- | ---------------------------------------------------------------------------------------------------- |
-| `roles.ts`       | the roles (`tenant_admin`, `manager`, `finance`, `technician`, `committee`, `owner`, `agent_author`) |
-| `permissions.ts` | the role → permission map with wildcards, `hasPermission(actor, permission)`                         |
-| `secrets.ts`     | argon2 for passwords, HMAC for tokens, opaque token generation                                       |
-| `signed-link.ts` | the signed link used to approve from an e-mail                                                       |
-| `service/`       | the reads and the writes                                                                             |
+| File / directory    | Contents                                                                                             |
+| ------------------- | ---------------------------------------------------------------------------------------------------- |
+| `roles.ts`          | the roles (`tenant_admin`, `manager`, `finance`, `technician`, `committee`, `owner`, `agent_author`) |
+| `permissions.ts`    | the role → permission map with wildcards, `hasPermission(actor, permission)`                         |
+| `secrets.ts`        | argon2 for passwords, HMAC for tokens, opaque token generation                                       |
+| `session-cookie.ts` | the name of the session cookie, shared by the API that sets it and the web app that reads it         |
+| `signed-link.ts`    | the signed link used to approve from an e-mail                                                       |
+| `service/`          | the reads and the writes                                                                             |
 
 `hasPermission` always lets the `system` actor through; `tenant_admin` holds `*`. A permission reads
 `domain.action` and a wildcard stays inside its domain — `finance.*` does not grant `ops.read`.

@@ -1,4 +1,4 @@
-import { SESSION_COOKIE } from '../http/credentials';
+import { SESSION_COOKIE } from '../../../../packages/kernel/src/identity/index';
 
 const SECONDS_PER_DAY = 86_400;
 

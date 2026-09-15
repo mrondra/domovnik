@@ -13,6 +13,12 @@ import forbidUseClient from './rules/forbid-use-client.js';
 const FEATURE_PUBLIC = { element: { type: 'feature', fileInternalPath: 'index.ts' } };
 
 /**
+ * Everywhere React components live: the UI kit, a feature's own screens and the shell that mounts
+ * them. The `*.client.tsx` convention is enforced in all three (docs/engineering.md §3).
+ */
+const UI_FILES = ['packages/shared/src/ui/**', 'packages/features/*/ui/**', 'apps/web/src/**'];
+
+/**
  * Imports are relative and carry no extension (ADR 0010). The bundled node resolver does not try
  * `.ts`/`.tsx`, so without the TypeScript resolver every import stays unresolved and the boundaries
  * rules silently pass everything.
@@ -24,6 +30,8 @@ export default tseslint.config(
     ignores: [
       '**/dist/**',
       '**/.next/**',
+      // Written by `next build`, down to the triple-slash references it points at `.next`.
+      '**/next-env.d.ts',
       '**/node_modules/**',
       '**/drizzle/**',
       '**/*.cjs',
@@ -191,11 +199,11 @@ export default tseslint.config(
     rules: { '@typescript-eslint/no-extraneous-class': 'off' },
   },
   {
-    files: ['packages/features/*/ui/**/*.client.tsx'],
+    files: UI_FILES.map((pattern) => `${pattern}/*.client.tsx`),
     rules: { 'domovnik/require-use-client': 'error' },
   },
   {
-    files: ['packages/features/*/ui/**/*.tsx'],
+    files: UI_FILES.map((pattern) => `${pattern}/*.tsx`),
     ignores: ['**/*.client.tsx'],
     rules: { 'domovnik/forbid-use-client': 'error' },
   },

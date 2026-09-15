@@ -1,9 +1,13 @@
 node_modules
 dist
 .next
+# Written by `next build`/`next dev`; its references point into .next, which is ignored too.
+next-env.d.ts
 .turbo
 *.tsbuildinfo
 .env
 .env.local
 coverage
+test-results
+playwright-report
 docs/dependency-graph.svg

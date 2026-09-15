@@ -1,0 +1,9 @@
+@import 'tailwindcss';
+
+/* The UI kit lives outside this application (ADR 0002), so its classes are pointed at explicitly. */
+@source '../../../../packages/shared/src/ui';
+
+/* The page ground and the default ink. Every other colour is a tone from the kit. */
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}

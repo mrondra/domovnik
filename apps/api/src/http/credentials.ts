@@ -1,12 +1,11 @@
 import type { FastifyRequest } from 'fastify';
+import { SESSION_COOKIE } from '../../../../packages/kernel/src/identity/index';
 import type { CredentialKind } from './state';
 
 export interface Credential {
   readonly kind: CredentialKind;
   readonly token: string;
 }
-
-export const SESSION_COOKIE = 'domovnik_session';
 
 const BEARER = /^Bearer (?<token>\S+)$/;
 /** The approval link is the URL itself, so the credential has to be read before routing. */

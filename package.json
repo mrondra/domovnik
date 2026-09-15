@@ -13,6 +13,7 @@
     "knip": "knip",
     "test": "vitest run --project unit --project integration --passWithNoTests",
     "test:evals": "vitest run --project evals",
+    "test:e2e": "pnpm --filter @domovnik/web test:e2e",
     "verify": "pnpm lint && pnpm typecheck && pnpm depcruise && pnpm knip && pnpm test",
     "gen:feature": "tsx tooling/generators/feature.ts",
     "gen:agent": "tsx tooling/generators/agent.ts",
@@ -22,6 +23,7 @@
     "db:migrate": "pnpm --filter @domovnik/db migrate",
     "db:seed": "pnpm --filter @domovnik/db seed",
     "api:modules": "pnpm --filter @domovnik/api compose",
+    "web:navigation": "pnpm --filter @domovnik/web compose",
     "prepare": "lefthook install"
   },
   "devDependencies": {

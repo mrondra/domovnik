@@ -8,5 +8,13 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.23",
+    "react": "^19.3.0",
+    "react-hook-form": "^7.88.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0"
   }
 }

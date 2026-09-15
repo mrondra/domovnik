@@ -8,9 +8,12 @@ pnpm install && pnpm dev
 pnpm verify
 ```
 
-`pnpm dev` zvedne infrastrukturu v Dockeru a všechny aplikace: API (3001), workers (health na 3002)
-a MCP server (3003). Schválená akce se provede až ve workers (ADR 0015), takže bez nich se rozhodnutí
-jen zapíše.
+`pnpm dev` zvedne infrastrukturu v Dockeru a všechny aplikace: web (3000), API (3001), workers
+(health na 3002) a MCP server (3003). Schválená akce se provede až ve workers (ADR 0015), takže bez
+nich se rozhodnutí jen zapíše.
+
+`pnpm test:e2e` spustí Playwright nad webem a API. Není součástí `pnpm verify` – potřebuje databázi,
+běžící servery a prohlížeč (`npx playwright install chromium`).
 
 Integrační testy potřebují `DATABASE_URL` k běžícímu Postgresu (`pnpm dev`); bez něj si `startTestDb()`
 nastartuje vlastní kontejner. Každý testovací soubor si zakládá vlastní databázi i aplikační roli,

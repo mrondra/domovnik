@@ -4,14 +4,13 @@ import type { Response } from 'supertest';
 import type TestAgent from 'supertest/lib/agent';
 import { z } from 'zod';
 import { createContext } from '../../../../packages/kernel/src/context/index';
-import { createSession, createUser } from '../../../../packages/kernel/src/identity/index';
+import { createSession, createUser, SESSION_COOKIE } from '../../../../packages/kernel/src/identity/index';
 import type { Role } from '../../../../packages/kernel/src/identity/index';
 import type { SvjId, TenantId, UserId } from '../../../../packages/kernel/src/ids/index';
 import type { RequestContext } from '../../../../packages/kernel/src/context/index';
 import { startTestDb, withTestTenant } from '../../../../packages/kernel/src/testing/index';
 import type { TestDatabase, TestTenant } from '../../../../packages/kernel/src/testing/index';
 import { buildApp } from '../bootstrap';
-import { SESSION_COOKIE } from '../http/credentials';
 
 export interface ApiHarness {
   readonly app: NestFastifyApplication;

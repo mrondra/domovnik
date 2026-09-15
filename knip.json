@@ -7,6 +7,9 @@
       "ignoreDependencies": ["@node-rs/argon2", "drizzle-orm", "pg", "pino"]
     },
     "apps/mcp": {},
+    "apps/web": {
+      "entry": ["src/bin/*.ts", "e2e/**/*.ts"]
+    },
     "apps/workers": {},
     "packages/db": {},
     "packages/kernel": {},

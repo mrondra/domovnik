@@ -1,1 +1,1 @@
-export { SHARED_VERSION } from './version';
+export * from './ui/index';
