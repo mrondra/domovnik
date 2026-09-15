@@ -41,10 +41,15 @@ zod-to-openapi bridge here. Only the error is ours: `http/validation.ts` swaps N
 
 ## Running it
 
-`pnpm dev` runs it under `tsx`; `pnpm build` bundles it with tsup. The bundle is **CommonJS** on
-purpose: relative imports carry no extension (ADR 0010), which Node refuses as ESM but resolves
-happily as CJS, and Nest's own lazy `require()`s of optional packages keep working. Decorator
-metadata comes from SWC — esbuild alone does not emit it and Nest's DI reads it.
+`pnpm build` bundles it with tsup, and `pnpm dev` runs **the same build** in watch mode. The bundle
+is **CommonJS** on purpose: relative imports carry no extension (ADR 0010), which Node refuses as
+ESM but resolves happily as CJS, and Nest's own lazy `require()`s of optional packages keep working.
+
+Decorator metadata comes from SWC, and that is why dev goes through the bundle too. esbuild — which
+is what `tsx` is — does not emit `design:paramtypes`, so a constructor-injected provider resolves to
+`undefined` and every request answers 500. Vitest runs on oxc, which does emit it, so the tests stay
+green while the running application is broken; the smoke step in CI exists because of exactly that.
+The watch covers `packages/kernel/src` as well, since the bundle inlines it.
 
 **The rule:** a new feature is a new directory, never an edit here. `pnpm gen:feature` re-composes
 `src/features/modules.generated.ts` from `packages/features/*/api/*.module.ts` as part of generating

@@ -4,7 +4,7 @@
   "workspaces": {
     "apps/api": {
       "entry": ["src/bin/*.ts"],
-      "ignoreDependencies": ["@node-rs/argon2", "drizzle-orm", "pg", "pino"]
+      "ignoreDependencies": ["@node-rs/argon2", "drizzle-orm", "pg", "pg-boss", "pino"]
     },
     "apps/mcp": {},
     "apps/web": {

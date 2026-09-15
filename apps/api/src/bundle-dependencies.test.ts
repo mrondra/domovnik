@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
  * are therefore this app's runtime packages, even though no file here imports them — which is also
  * why `knip.json` has to be told to leave them alone.
  */
-const BUNDLED_FROM_KERNEL = ['@node-rs/argon2', 'drizzle-orm', 'pg', 'pino', 'uuid'] as const;
+const BUNDLED_FROM_KERNEL = ['@node-rs/argon2', 'drizzle-orm', 'pg', 'pg-boss', 'pino', 'uuid'] as const;
 
 interface Manifest {
   readonly dependencies: Record<string, string>;

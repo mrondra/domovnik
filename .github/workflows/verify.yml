@@ -18,4 +18,28 @@ jobs:
       - run: pnpm verify
         env: { DATABASE_URL: postgres://postgres:test@localhost:5432/domovnik_test }
       - run: pnpm build
+
+      # `pnpm verify` runs on Vitest and `pnpm build` only assembles the bundle, so neither ever
+      # starts the application: a missing runtime dependency or broken dependency injection passes
+      # both. This step is the one place CI finds out whether what we ship actually boots.
+      - name: bundled API boots and answers
+        run: |
+          node apps/api/dist/main.cjs &
+          api=$!
+          for _ in $(seq 1 30); do
+            if curl -sf http://localhost:3001/health; then kill "$api"; exit 0; fi
+            sleep 1
+          done
+          echo 'API nenastartovalo do 30 s'
+          kill "$api" || true
+          exit 1
+        env:
+          DATABASE_URL: postgres://postgres:test@localhost:5432/domovnik_test
+          APP_SECRET: ci-secret-that-is-at-least-32-chars
+          ANTHROPIC_API_KEY: unused-in-this-check
+          S3_ENDPOINT: http://localhost:9000
+          S3_ACCESS_KEY: unused
+          S3_SECRET_KEY: unused
+          S3_BUCKET: unused
+
       - uses: gitleaks/gitleaks-action@v2
