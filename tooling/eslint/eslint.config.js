@@ -184,7 +184,7 @@ export default tseslint.config(
   {
     files: [
       'packages/features/*/api/*.module.ts',
-      'apps/api/src/**/*.module.ts',
+      'apps/*/src/**/*.module.ts',
       'apps/api/src/tests/*.fixture.ts',
     ],
     // A Nest module is a decorated marker class; it has no members and is not supposed to.

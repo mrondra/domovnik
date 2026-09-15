@@ -12,6 +12,7 @@ export {
   createTenant,
   createUser,
   ensureAgentIdentity,
+  listActiveTenants,
   listApiTokens,
   requireUser,
   revokeApiToken,

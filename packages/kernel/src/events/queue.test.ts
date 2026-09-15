@@ -5,6 +5,7 @@ import { clearSubscriptions, subscribe, type DeliveredEvent } from './subscribe'
 
 interface WorkerRegistration {
   readonly queue: string;
+  readonly concurrency: number;
   readonly handler: (jobs: { data: DeliveredEvent }[]) => Promise<unknown>;
 }
 
@@ -22,8 +23,8 @@ const fakeBoss = () => {
       created.push(name);
       return Promise.resolve();
     },
-    work: (queue, _options, handler) => {
-      workers.push({ queue, handler });
+    work: (queue, options, handler) => {
+      workers.push({ queue, concurrency: options.localConcurrency, handler });
       return Promise.resolve(`worker-${queue}`);
     },
   };
@@ -68,11 +69,35 @@ describe('startEventWorkers', () => {
     const { boss, created, workers } = fakeBoss();
     const ids = await startEventWorkers(boss);
 
-    expect(created).toEqual(['finance.invoice.received#invoice-processor']);
-    expect(ids).toEqual(['worker-finance.invoice.received#invoice-processor']);
+    expect(created).toEqual(['finance.invoice.received/invoice-processor']);
+    expect(ids).toEqual(['worker-finance.invoice.received/invoice-processor']);
 
     await workers[0]?.handler([{ data: delivered }]);
     expect(handled).toEqual(['system:finance.invoice.received']);
+  });
+
+  it('gives a subscription the concurrency it asked for', async () => {
+    subscribe('finance.invoice.received', () => Promise.resolve(), {
+      subscriber: 'agent.invoice-processor',
+      concurrency: 4,
+    });
+
+    const { boss, workers } = fakeBoss();
+    await startEventWorkers(boss);
+
+    expect(workers[0]?.concurrency).toBe(4);
+  });
+
+  it('never grows a subscription beyond the node cap', async () => {
+    subscribe('finance.invoice.received', () => Promise.resolve(), {
+      subscriber: 'agent.invoice-processor',
+      concurrency: 4,
+    });
+
+    const { boss, workers } = fakeBoss();
+    await startEventWorkers(boss, { maxConcurrency: 2 });
+
+    expect(workers[0]?.concurrency).toBe(2);
   });
 });
 

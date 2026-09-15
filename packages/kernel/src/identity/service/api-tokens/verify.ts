@@ -2,7 +2,7 @@ import { and, eq, isNull, or, sql } from 'drizzle-orm';
 import { apiToken } from '../../../db/schema/index';
 import { withSystem } from '../../../db/tenant';
 import { UnauthenticatedError } from '../../../errors/index';
-import { svjIdSchema, tenantIdSchema, userIdSchema } from '../../../ids/index';
+import { apiTokenIdSchema, svjIdSchema, tenantIdSchema, userIdSchema } from '../../../ids/index';
 import { hashToken } from '../../secrets';
 import { systemContext } from '../system-context';
 import { rolesOf } from '../users';
@@ -16,6 +16,7 @@ export const verifyApiToken = async (token: string): Promise<ApiTokenGrant> => {
   const row = await withSystem({ reason: 'api token lookup' }, async (tx) => {
     const rows = await tx
       .select({
+        id: apiToken.id,
         tenantId: apiToken.tenantId,
         ownerUserId: apiToken.ownerUserId,
         allowedTools: apiToken.allowedTools,
@@ -40,6 +41,7 @@ export const verifyApiToken = async (token: string): Promise<ApiTokenGrant> => {
   const tenantId = tenantIdSchema.parse(row.tenantId);
   const ownerUserId = userIdSchema.parse(row.ownerUserId);
   return {
+    id: apiTokenIdSchema.parse(row.id),
     tenantId,
     ownerUserId,
     allowedTools: row.allowedTools,

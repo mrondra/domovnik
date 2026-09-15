@@ -22,7 +22,8 @@ What the runtime enforces:
 - **a failing tool** is handed back to the model as an `isError` result, not raised as a failed run.
 
 Tool names take an underscore across the MCP boundary (`invoice.extract` → `invoice_extract`),
-because MCP does not allow a dot in a name.
+because MCP does not allow a dot in a name. That conversion lives in `tools/mcp.ts` and is shared
+with `apps/mcp`, so a tool has one wire name rather than one per surface.
 
 Tests run in replay mode: `ANTHROPIC_BASE_URL` points at the local endpoint from `testing/replay`,
 so a real subprocess and the real tool loop both run, without the network.

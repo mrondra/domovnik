@@ -49,6 +49,6 @@ export class ApprovalsController {
     @Body({ schema: decisionSchema }) body: z.output<typeof decisionSchema>,
   ): Promise<z.output<typeof decisionResultSchema>> {
     const decided = await approvals.decide(ctx, approvalIdSchema.parse(id), body.decision, body.comment);
-    return { status: decided.status, output: decided.output };
+    return { status: decided.status };
   }
 }

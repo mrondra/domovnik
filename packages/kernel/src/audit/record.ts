@@ -11,6 +11,8 @@ export interface AuditEntry {
   readonly reason: string;
   readonly before?: unknown;
   readonly after?: unknown;
+  /** How the actor reached the system when it was not the web session (`api_token:<id>`). */
+  readonly via?: string | undefined;
 }
 
 /**
@@ -40,5 +42,6 @@ export const record = async (ctx: RequestContext, entry: AuditEntry): Promise<vo
     actorId: ctx.actor.id,
     correlationId: ctx.correlationId,
     agentRunId: ctx.agentRunId ?? null,
+    via: entry.via ?? null,
   });
 };

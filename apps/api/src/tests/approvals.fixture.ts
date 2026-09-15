@@ -30,7 +30,7 @@ export const openApproval = (ctx: RequestContext, approvers: readonly string[]):
     approvers,
   });
 
-export const decisionSchema = z.object({ status: z.string(), output: z.unknown() });
+export const decisionSchema = z.object({ status: z.string() });
 
 export const approvalDetailSchema = z.object({
   id: z.uuid(),

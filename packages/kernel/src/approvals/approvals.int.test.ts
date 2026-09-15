@@ -64,7 +64,7 @@ describe('approvals.decide', () => {
 
   it('accepts the decision of a listed approver', async () => {
     const id = await pending([tenant.adminId]);
-    expect((await approvals.decide(tenant.ctx, id, 'approved')).output).toEqual({ sent: true });
+    expect(await approvals.decide(tenant.ctx, id, 'approved')).toEqual({ status: 'approved' });
   });
 });
 

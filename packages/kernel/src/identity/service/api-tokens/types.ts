@@ -16,6 +16,8 @@ export interface IssuedApiToken {
 
 /** What a bearer token resolves to: the tenant, the owner and the owner's roles *right now*. */
 export interface ApiTokenGrant {
+  /** Identifies the token in the audit log (`via: api_token:<id>`, zadání kap. 9). */
+  readonly id: ApiTokenId;
   readonly tenantId: TenantId;
   readonly ownerUserId: UserId;
   readonly allowedTools: readonly string[];

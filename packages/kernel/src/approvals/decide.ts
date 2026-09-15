@@ -4,15 +4,15 @@ import type { RequestContext } from '../context/index';
 import { approval } from '../db/schema/index';
 import { withTenant } from '../db/tenant';
 import { ConflictError, ForbiddenError } from '../errors/index';
+import { events } from '../events/index';
 import { hasPermission } from '../identity/permissions';
 import type { ApprovalId } from '../ids/index';
-import { requireTool, runToolHandler } from '../tools/registry/index';
+import { approvalDecided } from './events';
 
 export type ApprovalDecision = 'approved' | 'rejected';
 
 export interface DecisionResult {
   readonly status: ApprovalDecision;
-  readonly output?: unknown;
 }
 
 const assertMayDecide = (ctx: RequestContext, approvers: readonly string[]): void => {
@@ -27,7 +27,8 @@ const assertMayDecide = (ctx: RequestContext, approvers: readonly string[]): voi
 
 /**
  * The conditional update is what makes a decision single-shot: a second call finds no `pending` row,
- * so the deferred handler can never run twice.
+ * so `approval.decided` is emitted at most once. The deferred handler itself runs in the workers
+ * (ADR 0015) — this returns as soon as the decision is durable.
  */
 export const decideApproval = async (
   ctx: RequestContext,
@@ -35,7 +36,7 @@ export const decideApproval = async (
   decision: ApprovalDecision,
   comment?: string,
 ): Promise<DecisionResult> => {
-  const decided = await withTenant(ctx, async (tx) => {
+  await withTenant(ctx, async (tx) => {
     const current = await tx
       .select({ approvers: approval.approvers })
       .from(approval)
@@ -56,7 +57,7 @@ export const decideApproval = async (
         comment: comment ?? null,
       })
       .where(and(eq(approval.id, id), eq(approval.status, 'pending')))
-      .returning({ toolName: approval.toolName, input: approval.input });
+      .returning({ toolName: approval.toolName });
 
     const row = updated[0];
     if (row === undefined) {
@@ -74,17 +75,13 @@ export const decideApproval = async (
       after: { status: decision },
     });
 
-    return row;
+    await events.emit(
+      ctx,
+      approvalDecided.create({ approvalId: id, toolName: row.toolName, decision, decidedBy: ctx.actor.id }),
+    );
   });
 
-  if (decision === 'rejected') return { status: decision };
-
-  const output = await runToolHandler(ctx, requireTool(decided.toolName), decided.input);
-  await withTenant(ctx, async (tx) => {
-    await tx.update(approval).set({ result: output }).where(eq(approval.id, id));
-  });
-
-  return { status: decision, output };
+  return { status: decision };
 };
 
 /** Marks approvals whose deadline has passed; scheduled by the workers, not by a request. */

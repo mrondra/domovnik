@@ -6,7 +6,8 @@ export type { EventDefinition, EventEnvelope } from './definition';
 export { createOutboxRelay } from './relay';
 export type { JobPublisher, OutboxRelay, OutboxRelayOptions } from './relay';
 export { agentLimits, createJobQueue, createPgBossPublisher, startEventWorkers } from './queue';
-export type { AgentLimits, EventWorkerLimits, JobQueue } from './queue';
+export type { AgentLimits, EventWorkerLimits, JobQueue, QueueRetryPolicy } from './queue';
+export { dailyTick, monthlyTick } from './ticks';
 export {
   clearSubscriptions,
   deliveryContext,

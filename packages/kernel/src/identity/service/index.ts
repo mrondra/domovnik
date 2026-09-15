@@ -1,4 +1,4 @@
-export { createTenant } from './tenants';
+export { createTenant, listActiveTenants } from './tenants';
 export type { CreateTenantInput } from './tenants';
 export { createUser, requireUser, rolesOf } from './users';
 export { accessibleSvj } from './svj-access';

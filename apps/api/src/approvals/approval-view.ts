@@ -18,4 +18,5 @@ export const toDetail = (row: ApprovalDetail): z.output<typeof approvalDetailSch
   evidence: row.evidence,
   comment: row.comment,
   result: row.result,
+  executedAt: row.executedAt?.toISOString() ?? null,
 });

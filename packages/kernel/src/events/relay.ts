@@ -50,7 +50,7 @@ export const createOutboxRelay = (options: OutboxRelayOptions): OutboxRelay => {
   const batchSize = options.batchSize ?? DEFAULT_BATCH_SIZE;
 
   const publishPending = async (): Promise<number> =>
-    withSystem({ reason: 'event outbox relay' }, async (tx) => {
+    withSystem({ reason: 'event outbox relay', frequency: 'routine' }, async (tx) => {
       const pending = await tx
         .select({
           outboxId: eventOutbox.id,

@@ -76,7 +76,7 @@ describe('outbox relay', () => {
     const published = await relay.publishPending();
 
     expect(published).toBeGreaterThan(0);
-    expect(sent.every((entry) => entry.queue === 'finance.invoice.received#test-consumer')).toBe(true);
+    expect(sent.every((entry) => entry.queue === 'finance.invoice.received/test-consumer')).toBe(true);
     expect(new Set(sent.map((entry) => entry.id)).size).toBe(sent.length);
     expect(await relay.publishPending()).toBe(0);
   });

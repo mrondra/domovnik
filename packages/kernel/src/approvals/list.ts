@@ -22,6 +22,8 @@ export interface ApprovalDetail extends ApprovalSummary {
   readonly evidence: unknown;
   readonly comment: string | null;
   readonly result: unknown;
+  /** `null` on an approved row means the deferred handler has not run yet (ADR 0015). */
+  readonly executedAt: Date | null;
 }
 
 const columns = {
@@ -72,6 +74,7 @@ export const getApproval = async (ctx: RequestContext, id: ApprovalId): Promise<
         evidence: approval.evidence,
         comment: approval.comment,
         result: approval.result,
+        executedAt: approval.executedAt,
       })
       .from(approval)
       .where(eq(approval.id, id))

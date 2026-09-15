@@ -6,9 +6,10 @@ import { approvalIdSchema } from '../../../../packages/kernel/src/ids/index';
 import { requirePrincipal } from '../http/require-principal';
 
 /**
- * Deciding an approval runs the deferred tool handler (ADR 0006), so this is the one route in the
- * API that executes a tool by name. An API token is a subset of its owner's tools (zadání §9), and
- * this is where that subset is enforced — a session or a signed link carries no such narrowing.
+ * Deciding an approval releases the deferred tool handler — the workers then run it (ADR 0015) — so
+ * this is the one route in the API that puts a named tool in motion. An API token is a subset of its
+ * owner's tools (zadání §9), and this is where that subset is enforced; a session or a signed link
+ * carries no such narrowing.
  */
 @Injectable()
 export class AllowedToolGuard implements CanActivate {

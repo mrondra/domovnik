@@ -44,22 +44,37 @@ const requestPayment = async (): Promise<ApprovalId> => {
   return execution.approvalId;
 };
 
-describe('approvals.decide', () => {
-  it('runs the deferred handler exactly once', async () => {
-    const approvalId = await requestPayment();
-
-    const decision = await approvals.decide(tenant.ctx, approvalId, 'approved');
-
-    expect(decision.output).toEqual({ orderId: 'order-1' });
-    expect(calls).toEqual(['order:1200']);
-    await expect(approvals.decide(tenant.ctx, approvalId, 'approved')).rejects.toThrow(/už bylo rozhodnuto/);
-    expect(calls).toEqual(['order:1200']);
+describe('a tool whose policy requires approval', () => {
+  it('never reaches its handler on the way in', async () => {
+    await requestPayment();
+    expect(calls).toEqual([]);
   });
 
-  it('never runs the handler for a rejected approval', async () => {
+  it('is still not run by the decision itself', async () => {
     const approvalId = await requestPayment();
-    const decision = await approvals.decide(tenant.ctx, approvalId, 'rejected', 'mimo rozpočet');
-    expect(decision).toEqual({ status: 'rejected' });
+
+    expect(await approvals.decide(tenant.ctx, approvalId, 'approved')).toEqual({ status: 'approved' });
+
+    // The decision only releases the action; the workers carry it out (ADR 0015).
+    expect(calls).toEqual([]);
+    expect((await approvals.get(tenant.ctx, approvalId)).executedAt).toBeNull();
+  });
+
+  it('refuses a second decision on the same approval', async () => {
+    const approvalId = await requestPayment();
+
+    await approvals.decide(tenant.ctx, approvalId, 'approved');
+
+    await expect(approvals.decide(tenant.ctx, approvalId, 'approved')).rejects.toThrow(/už bylo rozhodnuto/);
+  });
+
+  it('is never run for a rejected approval', async () => {
+    const approvalId = await requestPayment();
+
+    expect(await approvals.decide(tenant.ctx, approvalId, 'rejected', 'mimo rozpočet')).toEqual({
+      status: 'rejected',
+    });
+    expect(await approvals.resume(tenant.ctx, approvalId)).toBe(false);
     expect(calls).toEqual([]);
   });
 });

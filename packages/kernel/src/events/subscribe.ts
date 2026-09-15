@@ -1,4 +1,5 @@
 import { createContext, type RequestContext } from '../context/index';
+import { DomainError } from '../errors/index';
 import type { EventId, TenantId } from '../ids/index';
 
 export interface DeliveredEvent<P = unknown> {
@@ -16,6 +17,8 @@ export interface SubscriptionOptions {
   /** Stable identifier of the consumer; it becomes the queue name, so it must not change lightly. */
   readonly subscriber: string;
   readonly idempotencyKey?: (event: DeliveredEvent) => string;
+  /** How many deliveries this consumer tolerates at once. Defaults to one — order over throughput. */
+  readonly concurrency?: number | undefined;
 }
 
 export interface Subscription {
@@ -24,11 +27,26 @@ export interface Subscription {
   readonly queue: string;
   readonly handler: EventHandler;
   readonly idempotencyKey: (event: DeliveredEvent) => string;
+  readonly concurrency: number;
 }
 
 const subscriptions = new Map<string, Subscription>();
 
-export const queueNameFor = (event: string, subscriber: string): string => `${event}#${subscriber}`;
+const DEFAULT_CONCURRENCY = 1;
+
+/** pg-boss accepts letters, digits, `_`, `-`, `.` and `/` in a queue name, and nothing else. */
+const QUEUE_NAME = /^[A-Za-z0-9_\-./]+$/;
+
+export const queueNameFor = (event: string, subscriber: string): string => {
+  const queue = `${event}/${subscriber}`;
+  if (!QUEUE_NAME.test(queue)) {
+    throw new DomainError(`Z odběru ${queue} nejde udělat název fronty`, {
+      code: 'subscription_name_invalid',
+      details: { event, subscriber },
+    });
+  }
+  return queue;
+};
 
 export const subscribe = (
   name: string,
@@ -42,6 +60,7 @@ export const subscribe = (
     queue,
     handler,
     idempotencyKey: options.idempotencyKey ?? ((delivered) => delivered.eventId),
+    concurrency: options.concurrency ?? DEFAULT_CONCURRENCY,
   };
   subscriptions.set(queue, subscription);
   return subscription;

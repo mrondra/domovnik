@@ -4,16 +4,25 @@ import { logger } from '../logger/index';
 import type { JobPublisher } from './relay';
 import { deliveryContext, registeredSubscriptions, type DeliveredEvent } from './subscribe';
 
+/** Retry with backoff, because most delivery failures are a rate limit or a busy external system. */
+export interface QueueRetryPolicy {
+  readonly retryLimit: number;
+  readonly retryDelay: number;
+  readonly retryBackoff: boolean;
+}
+
 /** The slice of pg-boss the kernel depends on; everything else stays with `apps/workers`. */
 export interface JobQueue {
   send(name: string, data: DeliveredEvent, options: { id: string }): Promise<string | null>;
-  createQueue(name: string): Promise<void>;
+  createQueue(name: string, options?: QueueRetryPolicy): Promise<void>;
   work(
     name: string,
-    options: { batchSize: number },
+    options: { batchSize: number; localConcurrency: number },
     handler: (jobs: { data: DeliveredEvent }[]) => Promise<unknown>,
   ): Promise<string>;
 }
+
+const DELIVERY_RETRY: QueueRetryPolicy = { retryLimit: 5, retryDelay: 5, retryBackoff: true };
 
 /** pg-boss owns its own schema, so it connects with the administrative credentials. */
 export const createJobQueue = async (): Promise<PgBoss & JobQueue> => {
@@ -31,28 +40,37 @@ export const createPgBossPublisher = (queue: JobQueue): JobPublisher => ({
 });
 
 export interface EventWorkerLimits {
-  readonly concurrency?: number | undefined;
+  /** Caps every subscription, whatever it asked for. Used to shrink a busy node, never to grow one. */
+  readonly maxConcurrency?: number | undefined;
 }
 
-/** Binds every registered subscription to its own queue. Called by `apps/workers` at startup. */
+/**
+ * Binds every registered subscription to its own queue. Called by `apps/workers` at startup.
+ *
+ * One job per fetch and `localConcurrency` pollers, rather than one poller fetching a batch: a batch
+ * handler settles as a whole, so a single failing delivery would retry the rest with it.
+ */
 export const startEventWorkers = async (
   queue: JobQueue,
   limits: EventWorkerLimits = {},
 ): Promise<readonly string[]> => {
   const subscriptions = registeredSubscriptions();
-  const batchSize = limits.concurrency ?? loadEnv().AGENT_MAX_CONCURRENCY;
+  const cap = limits.maxConcurrency ?? Number.POSITIVE_INFINITY;
 
-  await Promise.all(subscriptions.map((subscription) => queue.createQueue(subscription.queue)));
+  await Promise.all(
+    subscriptions.map((subscription) => queue.createQueue(subscription.queue, DELIVERY_RETRY)),
+  );
 
   return Promise.all(
-    subscriptions.map((subscription) =>
-      queue.work(subscription.queue, { batchSize }, async (jobs) => {
+    subscriptions.map((subscription) => {
+      const localConcurrency = Math.min(subscription.concurrency, cap);
+      return queue.work(subscription.queue, { batchSize: 1, localConcurrency }, async (jobs) => {
         for (const job of jobs) {
-          logger().debug({ queue: subscription.queue, eventId: job.data.eventId }, 'Doručuji event');
+          logger().debug({ queue: subscription.queue, eventId: job.data.eventId }, 'Delivering event');
           await subscription.handler(deliveryContext(job.data), job.data);
         }
-      }),
-    ),
+      });
+    }),
   );
 };
 

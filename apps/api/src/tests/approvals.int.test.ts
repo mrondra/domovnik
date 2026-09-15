@@ -41,7 +41,7 @@ describe('GET /approvals', () => {
 });
 
 describe('POST /approvals/:id/decide', () => {
-  it('runs the deferred handler once the decision goes through', async () => {
+  it('records the decision without running the deferred handler', async () => {
     const id = await openApproval(api.tenant.ctx, [committee.userId]);
     const response = await api
       .http()
@@ -50,7 +50,9 @@ describe('POST /approvals/:id/decide', () => {
       .send({ decision: 'approved' })
       .expect(200);
 
-    expect(bodyOf(response, decisionSchema)).toEqual({ status: 'approved', output: { sent: true } });
+    expect(bodyOf(response, decisionSchema)).toEqual({ status: 'approved' });
+    // The action itself belongs to the workers (ADR 0015); the API only releases it.
+    expect(await approvals.get(api.tenant.ctx, id)).toMatchObject({ status: 'approved', executedAt: null });
   });
 
   it('refuses a second decision on the same approval', async () => {

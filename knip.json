@@ -6,9 +6,11 @@
       "entry": ["src/bin/*.ts"],
       "ignoreDependencies": ["@node-rs/argon2", "drizzle-orm", "pg", "pino"]
     },
+    "apps/mcp": {},
+    "apps/workers": {},
+    "packages/db": {},
     "packages/kernel": {},
-    "packages/shared": {},
-    "packages/db": {}
+    "packages/shared": {}
   },
   "ignoreExportsUsedInFile": true,
   "rules": {

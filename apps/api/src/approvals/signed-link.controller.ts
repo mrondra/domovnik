@@ -34,6 +34,6 @@ export class SignedLinkController {
   ): Promise<z.output<typeof decisionResultSchema>> {
     const id = approvalIdSchema.parse(principal.subjectId);
     const decided = await approvals.decide(principal.ctx, id, body.decision, body.comment);
-    return { status: decided.status, output: decided.output };
+    return { status: decided.status };
   }
 }

@@ -50,17 +50,33 @@ export const withTenant = async <T>(
 
 export interface SystemAccessOptions {
   readonly reason: string;
+  /**
+   * `routine` is cross-tenant access the system does constantly by design — the outbox relay polling
+   * every second. It is logged at `debug`, because a warning that fires on a timer stops being one.
+   */
+  readonly frequency?: 'routine' | 'exceptional' | undefined;
 }
+
+const OUTSIDE_RLS = 'Cross-tenant access outside RLS';
+
+const noteSystemAccess = (options: SystemAccessOptions): void => {
+  const bindings = { reason: options.reason };
+  if (options.frequency === 'routine') {
+    logger().debug(bindings, OUTSIDE_RLS);
+    return;
+  }
+  logger().warn(bindings, OUTSIDE_RLS);
+};
 
 /**
  * Cross-tenant escape hatch for migrations, seed and maintenance jobs. It uses the owner connection,
- * so RLS does not apply — hence the mandatory reason and the warning in the log.
+ * so RLS does not apply — hence the mandatory reason and the note in the log.
  */
 export const withSystem = async <T>(
   options: SystemAccessOptions,
   fn: (tx: TenantTransaction) => Promise<T>,
 ): Promise<T> => {
-  logger().warn({ reason: options.reason }, 'Cross-tenant access outside RLS');
+  noteSystemAccess(options);
 
   return administrativeDb().transaction(async (tx) => {
     await tx.execute(sql`select set_config('app.actor_type', 'system', true)`);

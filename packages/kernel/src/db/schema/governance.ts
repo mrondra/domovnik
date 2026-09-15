@@ -15,6 +15,8 @@ export const approval = tenantTable('approval', {
   decidedAt: timestamp('decided_at', { withTimezone: true }),
   comment: text('comment'),
   result: jsonb('result'),
+  /** Set once the deferred handler has run; the resume subscriber's idempotency key (ADR 0015). */
+  executedAt: timestamp('executed_at', { withTimezone: true }),
 });
 
 export const auditLog = tenantTable('audit_log', {
@@ -28,5 +30,7 @@ export const auditLog = tenantTable('audit_log', {
   actorId: uuid('actor_id'),
   correlationId: text('correlation_id').notNull(),
   agentRunId: uuid('agent_run_id'),
+  /** How the actor reached the system when it was not the web session, e.g. `api_token:<id>`. */
+  via: text('via'),
   occurredAt: timestamp('occurred_at', { withTimezone: true }).notNull().defaultNow(),
 });

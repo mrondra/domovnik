@@ -17,7 +17,9 @@ open transaction, so one service can call another without losing atomicity; a ne
 **different** tenant is an error.
 
 `withSystem({ reason }, fn)` is the only route to data without RLS — for migrations, seed and
-cross-tenant jobs. It demands a reason and logs a warning.
+cross-tenant jobs. It demands a reason and logs a warning. Access the system performs on a timer —
+the outbox relay polling every second — passes `frequency: 'routine'` and is logged at `debug`
+instead: a warning that fires on a schedule stops being read as one.
 
 `pingDatabase()` runs `select 1` on the application pool; it is what `GET /health` reports and says
 nothing about any tenant.

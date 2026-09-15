@@ -32,10 +32,17 @@ describe('subscriptions', () => {
       subscriber: 'invoice-processor',
     });
 
-    expect(subscription.queue).toBe(queueNameFor('finance.invoice.received', 'invoice-processor'));
+    expect(subscription.queue).toBe('finance.invoice.received/invoice-processor');
     expect(subscriptionsFor('finance.invoice.received')).toHaveLength(1);
     expect(subscriptionsFor('other')).toHaveLength(0);
     clearSubscriptions();
+  });
+
+  it('refuses a subscriber name the queue could not be called', () => {
+    // pg-boss would reject it at startup, far from whoever chose the name.
+    expect(() => queueNameFor('finance.invoice.received', 'agent:invoice-processor')).toThrow(
+      /nejde udělat název fronty/,
+    );
   });
 
   it('defaults the idempotency key to the event id', () => {

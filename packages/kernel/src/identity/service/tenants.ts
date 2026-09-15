@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { tenant } from '../../db/schema/index';
 import { withSystem } from '../../db/tenant';
 import { newId, tenantIdSchema, type TenantId } from '../../ids/index';
@@ -20,3 +21,13 @@ export const createTenant = async (input: CreateTenantInput): Promise<TenantId> 
   });
   return tenantId;
 };
+
+/**
+ * Cross-tenant by definition: the scheduler has no tenant of its own and has to fan a tick out to
+ * every active one (zadání §5). Nothing else in the system is allowed to ask this question.
+ */
+export const listActiveTenants = async (): Promise<readonly TenantId[]> =>
+  withSystem({ reason: 'scheduler tenant fan-out' }, async (tx) => {
+    const rows = await tx.select({ id: tenant.id }).from(tenant).where(eq(tenant.isActive, true));
+    return rows.map((row) => tenantIdSchema.parse(row.id));
+  });

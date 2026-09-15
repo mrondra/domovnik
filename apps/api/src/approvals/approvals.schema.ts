@@ -16,6 +16,7 @@ export const approvalDetailSchema = approvalSummarySchema.extend({
   evidence: z.unknown(),
   comment: z.string().nullable(),
   result: z.unknown(),
+  executedAt: z.iso.datetime().nullable(),
 });
 
 export const inboxQuerySchema = z.object({ status: approvalStatusSchema.optional() });
@@ -25,7 +26,5 @@ export const decisionSchema = z.object({
   comment: z.string().max(2000).optional(),
 });
 
-export const decisionResultSchema = z.object({
-  status: z.enum(['approved', 'rejected']),
-  output: z.unknown(),
-});
+/** The decision only. The action it releases runs in the workers, so there is no output yet (ADR 0015). */
+export const decisionResultSchema = z.object({ status: z.enum(['approved', 'rejected']) });
