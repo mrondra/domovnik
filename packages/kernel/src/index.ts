@@ -5,6 +5,7 @@ export * from './ids/index';
 export * from './context/index';
 export * from './db/index';
 export * from './identity/index';
+export * from './storage/index';
 export * from './audit/index';
 export * from './approvals/index';
 export * from './events/index';

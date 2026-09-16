@@ -48,6 +48,10 @@ export default defineConfig([
     rules: { 'no-restricted-imports': 'off' }, // the only place allowed to use the Anthropic SDKs
   },
   {
+    files: ['packages/kernel/src/storage/**'],
+    rules: { 'no-restricted-imports': 'off' }, // the only place allowed to use the S3 SDKs
+  },
+  {
     files: [
       'packages/features/*/api/*.module.ts',
       'apps/*/src/**/*.module.ts',

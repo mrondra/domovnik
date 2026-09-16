@@ -1,6 +1,8 @@
 export { applyTestEnv } from './env';
 export { startTestDb } from './database';
 export type { TestDatabase } from './database';
+export { startTestStorage } from './storage';
+export type { TestStorage } from './storage';
 export { withTestTenant } from './tenant';
 export type { TestTenant } from './tenant';
 export { recordLlm, replayLlm } from './replay/index';

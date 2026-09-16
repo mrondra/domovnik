@@ -13,6 +13,8 @@
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.3.267",
     "@anthropic-ai/sdk": "^0.124.0",
+    "@aws-sdk/client-s3": "^3.1134.0",
+    "@aws-sdk/s3-request-presigner": "^3.1134.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@node-rs/argon2": "^2.2.1",
     "drizzle-orm": "^0.45.2",
@@ -27,6 +29,7 @@
     "@testcontainers/postgresql": "^12.1.0",
     "@types/pg": "^8.23.1",
     "drizzle-kit": "^0.31.10",
+    "testcontainers": "^12.1.0",
     "vitest": "^5.0.0"
   }
 }

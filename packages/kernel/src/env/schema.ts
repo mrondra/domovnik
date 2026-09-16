@@ -28,9 +28,12 @@ export const envSchema = z.object({
   AGENT_TOKEN_BUDGET: z.coerce.number().int().positive().default(200_000),
 
   S3_ENDPOINT: z.url(),
+  S3_REGION: z.string().min(1).default('us-east-1'),
   S3_ACCESS_KEY: z.string().min(1),
   S3_SECRET_KEY: z.string().min(1),
   S3_BUCKET: z.string().min(1),
+  /** How long a presigned download link stays valid when the caller names no other lifetime. */
+  S3_PRESIGN_TTL_SECONDS: z.coerce.number().int().positive().default(900),
 });
 
 export type Env = z.infer<typeof envSchema>;

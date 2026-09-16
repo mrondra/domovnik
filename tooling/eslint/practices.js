@@ -64,6 +64,14 @@ export default defineConfig({
             name: '@anthropic-ai/sdk',
             message: 'Use the agent runtime / llm client from packages/kernel/src.',
           },
+          {
+            name: '@aws-sdk/client-s3',
+            message: 'Use the storage module from packages/kernel/src/storage.',
+          },
+          {
+            name: '@aws-sdk/s3-request-presigner',
+            message: 'Use the storage module from packages/kernel/src/storage.',
+          },
         ],
       },
     ],

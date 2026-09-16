@@ -48,6 +48,14 @@ module.exports = {
       to: { path: 'node_modules/@anthropic-ai' },
     },
     {
+      // One bucket for the whole platform, separated by a key prefix: the prefix check lives in
+      // `storage/keys.ts`, so a caller reaching for the SDK would be reaching past it.
+      name: 'no-direct-s3',
+      severity: 'error',
+      from: { pathNot: '^packages/kernel/src/storage' },
+      to: { path: 'node_modules/@aws-sdk/(client-s3|s3-request-presigner)/' },
+    },
+    {
       name: 'ui-no-service',
       severity: 'error',
       from: { path: '^packages/features/[^/]+/ui/' },
