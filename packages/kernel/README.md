@@ -28,8 +28,8 @@ Scope: `docs/tasks/001-kernel.md`. Decisions: ADR 0003, 0004, 0006, 0007, 0008, 
 | `llm/`       | direct model calls outside the agent loop, with record/replay                 |
 | `testing/`   | test helpers; a separate entry point, `@domovnik/kernel/testing`              |
 
-`discovery.ts` at the root loads tools, agents and seeds by directory convention; all three
-registries use it.
+`discovery.ts` at the root loads tools, agents, event subscribers and seeds by directory
+convention; all four registries use it.
 
 ## The four invariants this package exists for
 

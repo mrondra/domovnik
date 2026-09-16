@@ -19,6 +19,10 @@ Names follow `domain.entity.action`; domain events use the past tense
 Delivery is at-least-once; repeated work is cut off by a job id derived from
 `(queue, idempotencyKey)`, which pg-boss refuses to insert twice.
 
+A subscriber is a file: `subscribe()` runs when the module is imported, and `loadSubscribersFrom`
+imports `packages/features/*/subscribers/*.ts` at worker startup, so nothing lists the handlers.
+An agent trigger and `approval-resume` register the same way, just from their own code.
+
 There is one queue per event-and-subscriber pair, named `<event>/<subscriber>`
 (`finance.invoice.received/agent.invoice-processor`). The separator and the check on it are not
 cosmetic: pg-boss rejects a queue name outside `[A-Za-z0-9_-./]`, and a subscriber whose name cannot

@@ -8,11 +8,13 @@ export type { JobPublisher, OutboxRelay, OutboxRelayOptions } from './relay';
 export { agentLimits, createJobQueue, createPgBossPublisher, startEventWorkers } from './queue';
 export type { AgentLimits, EventWorkerLimits, JobQueue, QueueRetryPolicy } from './queue';
 export { dailyTick, monthlyTick } from './ticks';
+export { loadSubscribersFrom } from '../discovery';
 export {
   clearSubscriptions,
   deliveryContext,
   queueNameFor,
   registeredSubscriptions,
+  subscribe,
   subscriptionsFor,
 } from './subscribe';
 export type { DeliveredEvent, EventHandler, Subscription, SubscriptionOptions } from './subscribe';

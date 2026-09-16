@@ -35,7 +35,8 @@ a new queue and the jobs in the old one have nobody to take them.
 ## Running it
 
 `pnpm dev` runs it under `tsx`, and so does `pnpm start`. There is no bundle step here on purpose:
-feature tools and agents are discovered by directory convention at startup (zadání §6.1), which means
+feature tools, subscribers and agents are discovered by directory convention at startup (zadání §6.1),
+which means
 importing TypeScript sources at run time — something a self-contained bundle cannot do. The deployed
 image ships the workspace and runs the TypeScript loader, exactly as `packages/db` does for its
 migrations and seed.

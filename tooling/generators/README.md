@@ -9,6 +9,7 @@ refuses to overwrite, and runs its output through the repository's Prettier conf
 | `feature.ts`     | `pnpm gen:feature <name>` — a workspace package, registered with `apps/api`  |
 | `tool.ts`        | `pnpm gen:tool <feature> <name> [--approval]` — a tool and its tests         |
 | `agent.ts`       | `pnpm gen:agent <feature> <name>` — definition, prompt, replay fixture, test |
+| `subscriber.ts`  | `pnpm gen:subscriber <feature> <event> <name>` — an event handler and test   |
 | `adr.ts`         | `pnpm adr:new "<title>"` — the next number, from `docs/adr/template.md`      |
 | `lib/`           | argument parsing, name casing, Prettier, commit scopes, file writing         |
 | `templates/`     | the generated content, one module per generated area                         |

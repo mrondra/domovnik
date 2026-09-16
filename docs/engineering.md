@@ -124,4 +124,6 @@ Viz `AGENTS.md` §2. Doplnění:
 
 **Agent:** `pnpm gen:agent <feature> <name>` → definice + `prompt.md` → ověř, že spouštěcí event je agentní (dávkový, residuál) → replay test → volitelně eval fixture → `pnpm verify`.
 
+**Subscriber:** `pnpm gen:subscriber <feature> <event> <name>` → soubor `subscribers/<name>.ts`, který `subscribe()` zavolá při importu; `apps/workers` ho najde globem `packages/features/*/subscribers/*.ts`, nic ho neimportuje ručně. Handler dostane kontext tenantu eventu s aktérem `system` a volá service feature – sám do databáze nesahá. Doručení je at-least-once, takže handler musí být idempotentní; výchozí klíč je `eventId`. Jméno subscribera je půlka jména fronty (`<event>/<feature>.<name>`), takže se nepřejmenovává na lehkou váhu. Agent je subscriber taky – tohle je varianta bez LLM, a podle „kód první, agent na zbytek" je to ta preferovaná.
+
 **Adapter:** rozhraní v `adapters/<name>.adapter.ts` → `<name>.mock.ts` → contract test → reálná implementace (pokud existuje) → volba implementace přes DI podle env.

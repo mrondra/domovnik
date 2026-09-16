@@ -26,7 +26,7 @@ packages/kernel · packages/shared · packages/db · packages/features/<feature>
 Kostra feature (generuje `pnpm gen:feature <name>`):
 
 ```
-index.ts  schema.ts  domain/  service/  tools/  agents/  api/  ui/  adapters/  seed/  tests/
+index.ts  schema.ts  domain/  service/  tools/  agents/  subscribers/  api/  ui/  adapters/  seed/  tests/
 ```
 
 Hranice (vynucené `eslint-plugin-boundaries` + `dependency-cruiser`):
@@ -50,6 +50,7 @@ pnpm test:evals          # evaly agentů s reálným LLM – jen na vyžádání
 pnpm gen:feature <name>  # kostra feature
 pnpm gen:agent <feature> <name>
 pnpm gen:tool <feature> <name>
+pnpm gen:subscriber <feature> <event> <name>   # handler eventu bez agenta
 pnpm db:migrate | db:generate | db:seed
 pnpm api:modules          # přegeneruje seznam feature modulů pro apps/api (gen:feature ho volá sám)
 pnpm adr:new "<title>"

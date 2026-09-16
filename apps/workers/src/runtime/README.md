@@ -7,7 +7,7 @@ many at once**.
 | File                     | Responsibility                                                                |
 | ------------------------ | ----------------------------------------------------------------------------- |
 | `start.ts`               | composes the whole runtime and hands back one `stop()`                        |
-| `registry.ts`            | loads feature tools and agents by directory convention                        |
+| `registry.ts`            | loads feature tools, subscribers and agents by directory convention           |
 | `agent-subscriptions.ts` | turns every agent trigger into an event subscription                          |
 | `agent-runner.ts`        | the only place an agent is started; applies the per-agent/per-tenant limits   |
 | `limiter.ts`             | the concurrency gate those limits are made of                                 |
@@ -21,6 +21,10 @@ many at once**.
 A queue is created per subscription, so **every subscription must be registered before the queue
 opens**. `start.ts` therefore loads the registry, subscribes the agents and the approval resume, and
 only then calls `startEventWorkers`. An agent that registers later has a subscription nobody drains.
+
+The registry is what makes a feature's plain handlers part of that: a file in
+`packages/features/*/subscribers/` calls `subscribe()` as it is imported, and from there on it is
+the same subscription an agent trigger is — one queue, the same retry policy, the same idempotency.
 
 ## Where the limits actually live
 

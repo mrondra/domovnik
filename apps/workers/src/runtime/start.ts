@@ -20,6 +20,10 @@ export interface Runtime {
  * The whole worker process in one function: load what the features registered, decide who listens to
  * what, then open the queue. Subscriptions have to exist **before** `startEventWorkers`, because a
  * queue is created per subscription — one registered later has nothing draining it.
+ *
+ * That is why the registry comes first: a feature's `subscribers/*.ts` subscribe as they are
+ * imported, and `startEventWorkers` then opens a queue for every registered subscription alike —
+ * feature handler, agent trigger and approval resume.
  */
 export const startRuntime = async (): Promise<Runtime> => {
   const registry = await loadFeatureRegistry();
