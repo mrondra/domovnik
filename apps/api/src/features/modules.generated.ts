@@ -2,5 +2,6 @@
 // Nest needs its modules statically: a glob would survive `tsx` in dev and vanish in the bundle.
 
 import type { Type } from '@nestjs/common';
+import { SvjModule } from '../../../../packages/features/svj';
 
-export const featureModules: readonly Type[] = [];
+export const featureModules: readonly Type[] = [SvjModule];

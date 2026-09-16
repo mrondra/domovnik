@@ -15,6 +15,13 @@
       "when": 1789323237436,
       "tag": "0001_modern_lockjaw",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789550524922,
+      "tag": "0002_quick_the_liberteens",
+      "breakpoints": true
     }
   ]
 }

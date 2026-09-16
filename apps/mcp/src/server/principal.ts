@@ -31,6 +31,7 @@ export const authenticate = async (authorization: string | undefined): Promise<M
     ctx: createContext({
       tenantId: grant.tenantId,
       actor: { type: 'user', id: grant.ownerUserId, roles: grant.roles },
+      svjScope: grant.svjScope ?? undefined,
     }),
     tokenId: grant.id,
     allowedTools: grant.allowedTools,

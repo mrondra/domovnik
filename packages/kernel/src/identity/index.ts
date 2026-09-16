@@ -18,6 +18,7 @@ export {
   requireUser,
   revokeApiToken,
   revokeSession,
+  reachableSvj,
   rolesOf,
   verifyApiToken,
   verifySession,

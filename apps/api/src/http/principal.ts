@@ -49,6 +49,7 @@ const fromApiToken = async (token: string, correlationId: string, svjId?: SvjId)
       actor: { type: 'user', id: grant.ownerUserId, roles: grant.roles },
       correlationId,
       svjId,
+      svjScope: grant.svjScope ?? undefined,
     }),
     credential: 'api-token',
     allowedTools: grant.allowedTools,

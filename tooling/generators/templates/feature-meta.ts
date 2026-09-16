@@ -24,8 +24,9 @@ export const tsconfigJson = (): string =>
   `${JSON.stringify(
     {
       extends: '../../../tsconfig.base.json',
-      // `preserve` leaves JSX to the bundler; the UI stack itself arrives with apps/web.
-      compilerOptions: { noEmit: true, jsx: 'preserve' },
+      // `react-jsx`, not `preserve`: Next reads its own tsconfig, while Vitest reads this one and
+      // cannot emit preserved JSX — a unit test that reaches `ui/` would fail to parse (ADR 0017).
+      compilerOptions: { noEmit: true, jsx: 'react-jsx' },
       include: ['**/*.ts', '**/*.tsx'],
     },
     null,

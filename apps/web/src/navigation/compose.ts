@@ -26,9 +26,9 @@ export const featureNavigationFiles = async (root: string = repoRoot()): Promise
 };
 
 /**
- * Discovery is by file name, the import is from the feature's `index.ts`: `ui/navigation.ts` is a
- * feature's insides (ADR 0002), so the convention has to hold on both ends — a feature that owns
- * that file re-exports it as `navigation`.
+ * Discovery is by file name, the import is from the feature's `ui/index.ts` — the browser-facing
+ * front door (ADR 0017). The root `index.ts` is the server side and pulls Nest in with it, which a
+ * Next build cannot follow; `ui/navigation.ts` itself is the feature's insides and stays private.
  */
 export const describeNavigation = (entry: string): string => basename(dirname(dirname(entry)));
 
@@ -41,7 +41,7 @@ export const renderNavigation = (entries: readonly string[]): string => {
     '',
     "import type { NavigationItem } from '../../../../packages/shared/src/ui/navigation';",
     ...features.map(
-      (it) => `import { navigation as ${binding(it)} } from '../../../../packages/features/${it}';`,
+      (it) => `import { navigation as ${binding(it)} } from '../../../../packages/features/${it}/ui/index';`,
     ),
     '',
     `export const featureNavigation: readonly NavigationItem[] = [${features

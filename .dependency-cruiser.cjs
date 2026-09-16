@@ -21,16 +21,18 @@ module.exports = {
       to: { path: '^packages/(kernel|features|db)|^apps' },
     },
     {
+      // Two front doors, both public: `index.ts` is the server side, `ui/index.ts` the browser one
+      // (ADR 0017). Everything else behind them is the feature's own business.
       name: 'feature-via-index-only',
       severity: 'error',
       from: { path: '^packages/features/([^/]+)/' },
-      to: { path: '^packages/features/(?!$1/)[^/]+/(?!index\\.ts$).+' },
+      to: { path: '^packages/features/(?!$1/)[^/]+/(?!index\\.ts$|ui/index\\.ts$).+' },
     },
     {
       name: 'apps-no-feature-internals',
       severity: 'error',
       from: { path: '^apps/' },
-      to: { path: '^packages/features/[^/]+/(?!index\\.ts$)' },
+      to: { path: '^packages/features/[^/]+/(?!index\\.ts$|ui/index\\.ts$)' },
     },
     {
       name: 'no-direct-db-client',

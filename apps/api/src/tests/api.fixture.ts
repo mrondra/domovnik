@@ -20,9 +20,13 @@ export interface ApiHarness {
   stop(): Promise<void>;
 }
 
-/** The application under test is the one `main.ts` starts — same modules, same hook, same filter. */
-export const startApi = async (): Promise<ApiHarness> => {
-  const database = await startTestDb();
+/**
+ * The application under test is the one `main.ts` starts — same modules, same hook, same filter.
+ * A feature's own end-to-end test hands in its tables, because `startTestDb` pushes the kernel
+ * schema and whatever it is given; nothing here knows which features are installed.
+ */
+export const startApi = async (featureSchema: Record<string, unknown> = {}): Promise<ApiHarness> => {
+  const database = await startTestDb(featureSchema);
   const tenant = await withTestTenant();
   const app = await buildApp();
   await app.getHttpAdapter().getInstance().ready();

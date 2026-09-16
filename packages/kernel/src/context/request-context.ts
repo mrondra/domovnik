@@ -15,6 +15,8 @@ export interface RequestContext {
   readonly actor: Actor;
   readonly correlationId: string;
   readonly svjId?: SvjId | undefined;
+  /** What the credential confines the actor to; `undefined` is the whole tenant (ADR 0016). */
+  readonly svjScope?: readonly SvjId[] | undefined;
   readonly agentRunId?: AgentRunId | undefined;
 }
 
@@ -23,6 +25,7 @@ export interface CreateContextInput {
   readonly actor: Actor;
   readonly correlationId?: string;
   readonly svjId?: SvjId | undefined;
+  readonly svjScope?: readonly SvjId[] | undefined;
   readonly agentRunId?: AgentRunId | undefined;
 }
 
@@ -31,6 +34,7 @@ export const createContext = (input: CreateContextInput): RequestContext => ({
   actor: input.actor,
   correlationId: input.correlationId ?? uuidv7(),
   svjId: input.svjId,
+  svjScope: input.svjScope,
   agentRunId: input.agentRunId,
 });
 

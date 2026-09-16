@@ -1,10 +1,11 @@
 import { randomBytes } from 'node:crypto';
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import { getTableName, is, Table } from 'drizzle-orm';
 import { pushSchema } from 'drizzle-kit/api';
 import { runSql, withCredentials, withDatabaseName } from '../db/admin';
 import { administrativeDb, closeConnections } from '../db/client';
 import * as schema from '../db/schema/index';
-import { rlsPoliciesSql } from '../db/table';
+import { registeredTables, rlsPoliciesSql } from '../db/table';
 import { applyTestEnv } from './env';
 
 const PGVECTOR_IMAGE = 'pgvector/pgvector:pg16';
@@ -38,12 +39,19 @@ const startCluster = async (): Promise<BaseCluster> => {
 };
 
 /**
+ * The table registry is global and fills up as modules are imported, so a test that happens to pull
+ * a feature barrel in would otherwise ask for policies on tables this database never got.
+ */
+const pushedTableNames = (modules: Readonly<Record<string, unknown>>): ReadonlySet<string> =>
+  new Set(Object.values(modules).flatMap((value) => (is(value, Table) ? [getTableName(value)] : [])));
+
+/**
  * A fresh database per test file, plus a dedicated non-superuser role: RLS is bypassed for
  * superusers, so an isolation test connected as the owner would pass without proving anything.
  *
  * `featureSchema` carries the tables of the feature under test (`startTestDb({ demoRecord })`);
- * the kernel schema is always pushed, and every table built by `tenantTable`/`svjTable` gets its
- * RLS policy from the registry regardless of which package declared it.
+ * the kernel schema is always pushed, and every table pushed here gets its RLS policy from the
+ * registry regardless of which package declared it.
  */
 export const startTestDb = async (featureSchema: Record<string, unknown> = {}): Promise<TestDatabase> => {
   const cluster = await startCluster();
@@ -64,11 +72,13 @@ export const startTestDb = async (featureSchema: Record<string, unknown> = {}): 
   await closeConnections();
   applyTestEnv({ DATABASE_URL: appUrl, DATABASE_ADMIN_URL: adminUrl });
 
-  const push = await pushSchema({ ...schema, ...featureSchema }, administrativeDb());
+  const pushed = { ...schema, ...featureSchema };
+  const push = await pushSchema(pushed, administrativeDb());
   await push.apply();
 
+  const present = pushedTableNames(pushed);
   await runSql(adminUrl, [
-    ...rlsPoliciesSql(),
+    ...rlsPoliciesSql(registeredTables().filter((table) => present.has(table.name))),
     `GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO "${role}"`,
   ]);
 

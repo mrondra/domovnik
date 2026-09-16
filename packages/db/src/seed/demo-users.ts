@@ -17,17 +17,18 @@ const DISPLAY_NAMES: Readonly<Record<Role, string>> = {
   agent_author: 'Adam Autor',
 };
 
-const emailOf = (role: Role): string => `${role.replace('_', '-')}@${DOMAIN}`;
+/** The stable key of a demo user, which is also how a test recognises the kernel's own rows. */
+export const demoUserEmail = (role: Role): string => `${role.replace('_', '-')}@${DOMAIN}`;
 
 /** Idempotent by e-mail: one user per role, re-running the seed adds nobody. */
 export const seedDemoUsers = async (ctx: RequestContext): Promise<number> => {
   const present = await withTenant(ctx, (tx) => tx.select({ email: user.email }).from(user));
   const known = new Set(present.map((row) => row.email));
-  const missing = ROLES.filter((role) => !known.has(emailOf(role)));
+  const missing = ROLES.filter((role) => !known.has(demoUserEmail(role)));
 
   for (const role of missing) {
     await createUser(ctx, {
-      email: emailOf(role),
+      email: demoUserEmail(role),
       displayName: DISPLAY_NAMES[role],
       password: DEMO_PASSWORD,
       roles: [role],

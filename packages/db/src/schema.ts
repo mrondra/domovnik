@@ -2,3 +2,4 @@
 // Drizzle Kit reads this module, so a table only exists for migrations once it is listed here.
 
 export * from '../../kernel/src/db/schema/index';
+export * from '../../features/svj/schema';

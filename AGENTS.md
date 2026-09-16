@@ -31,7 +31,8 @@ index.ts  schema.ts  domain/  service/  tools/  agents/  api/  ui/  adapters/  s
 
 Hranice (vynucené `eslint-plugin-boundaries` + `dependency-cruiser`):
 
-- feature importuje z jiné feature jen přes `index.ts`
+- feature importuje z jiné feature jen přes `index.ts` (serverová strana) nebo `ui/index.ts`
+  (strana prohlížeče) – dvoje veřejné dveře, nic jiného (ADR 0017)
 - **`index.ts` je jen re-export** – žádná logika, žádné definice; ty patří do souboru vedle
 - **složka s `index.ts` má `README.md`** (anglicky) – k čemu je, co který soubor dělá, jaké pravidlo v ní platí
 - `kernel` nezná žádnou feature; `shared` nezná nic

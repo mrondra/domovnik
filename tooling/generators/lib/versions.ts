@@ -7,11 +7,23 @@ interface PackageManifest {
   readonly devDependencies?: Record<string, string>;
 }
 
-/** Nest arrives with the API layer; the feature declares it because it owns the module and service. */
-const NEST = { '@nestjs/common': '^12.0.1', 'reflect-metadata': '^0.2.2', rxjs: '^7.8.2' };
+/**
+ * Nest arrives with the API layer; the feature declares it because it owns the module, the service
+ * and its controllers. `@nestjs/swagger` is there because a feature describes its own endpoints —
+ * the `Endpoint` helper lives in `apps/api` and a feature may not import from an app (ADR 0002).
+ */
+const NEST = {
+  '@nestjs/common': '^12.0.1',
+  '@nestjs/swagger': '^12.0.1',
+  'reflect-metadata': '^0.2.2',
+  rxjs: '^7.8.2',
+};
 
-/** Without these a `.tsx` under `ui/` does not type check, and every feature is allowed one. */
-const REACT = { react: '^19.3.0' };
+/**
+ * A feature's `ui/` is app-router UI — the `*.client.tsx` convention in `tooling/eslint` says so —
+ * so it links with `next/link` and needs Next on top of React to type check.
+ */
+const REACT = { next: '^15.5.25', react: '^19.3.0' };
 const REACT_TYPES = { '@types/react': '^19.3.0' };
 
 export interface FeatureDependencies {

@@ -9,8 +9,16 @@ import requireDirectoryReadme from './rules/require-directory-readme.js';
 import requireUseClient from './rules/require-use-client.js';
 import forbidUseClient from './rules/forbid-use-client.js';
 
-/** From outside, a feature may only be imported through its index.ts. */
-const FEATURE_PUBLIC = { element: { type: 'feature', fileInternalPath: 'index.ts' } };
+/**
+ * From outside, a feature may only be imported through one of its two front doors: `index.ts` is the
+ * server side (Nest module, service, events), `ui/index.ts` the browser one (screens, navigation,
+ * the wire schemas). A Next build cannot follow the first and a Nest build cannot follow the second,
+ * which is why there are two (ADR 0017).
+ */
+const FEATURE_PUBLIC = [
+  { element: { type: 'feature', fileInternalPath: 'index.ts' } },
+  { element: { type: 'feature', fileInternalPath: 'ui/index.ts' } },
+];
 
 /**
  * Everywhere React components live: the UI kit, a feature's own screens and the shell that mounts
@@ -100,12 +108,15 @@ export default tseslint.config(
                     },
                   },
                 },
-                { to: FEATURE_PUBLIC },
+                ...FEATURE_PUBLIC.map((to) => ({ to })),
               ],
             },
             {
               from: [{ element: { type: 'app' } }],
-              allow: [{ to: { element: { type: ['kernel', 'shared', 'db'] } } }, { to: FEATURE_PUBLIC }],
+              allow: [
+                { to: { element: { type: ['kernel', 'shared', 'db'] } } },
+                ...FEATURE_PUBLIC.map((to) => ({ to })),
+              ],
             },
           ],
         },

@@ -10,10 +10,10 @@ describe('describeNavigation', () => {
 });
 
 describe('renderNavigation', () => {
-  it('imports a feature through its index, never through ui/', () => {
+  it('imports a feature through its ui barrel, never through the navigation file itself', () => {
     const rendered = renderNavigation(['packages/features/field-reports/ui/navigation.ts']);
     expect(rendered).toContain(
-      "import { navigation as fieldReportsNavigation } from '../../../../packages/features/field-reports';",
+      "import { navigation as fieldReportsNavigation } from '../../../../packages/features/field-reports/ui/index';",
     );
     expect(rendered).toContain('[...fieldReportsNavigation]');
   });

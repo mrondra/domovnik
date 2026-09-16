@@ -16,3 +16,22 @@ export const accessibleSvj = async (ctx: RequestContext, userId: UserId): Promis
     if (rows.some((row) => row.svjId === null)) return null;
     return [...new Set(rows.flatMap((row) => (row.svjId === null ? [] : [svjIdSchema.parse(row.svjId)])))];
   });
+
+const intersect = (
+  left: readonly SvjId[] | null,
+  right: readonly SvjId[] | undefined,
+): readonly SvjId[] | null => {
+  if (right === undefined) return left;
+  return left === null ? right : right.filter((svjId) => left.includes(svjId));
+};
+
+/**
+ * The whole answer, where `accessibleSvj` is only half of it: what the actor may reach, narrowed by
+ * what the credential they arrived with may reach (ADR 0016). Anything listing across SVJ asks this.
+ * `null` means every SVJ of the tenant — neither side narrowed anything.
+ */
+export const reachableSvj = async (ctx: RequestContext): Promise<readonly SvjId[] | null> => {
+  const actor = ctx.actor;
+  const byActor = actor.type === 'user' ? await accessibleSvj(ctx, actor.id) : null;
+  return intersect(byActor, ctx.svjScope);
+};

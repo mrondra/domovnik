@@ -38,7 +38,8 @@ Viz `AGENTS.md` §2. Doplnění:
 
 - Sdílená příprava pro testy (definice agenta, mock toolu, seed) žije v `*.fixture.ts` vedle testu. Produkční kód z fixtury importovat nesmí (hlídá `dependency-cruiser`).
 - **Každá složka s `index.ts` má `README.md`** (u `src/` ho zastupuje README v kořeni balíčku). Tři části, **anglicky** (README stojí u kódu, platí pro něj stejné pravidlo jako pro komentáře): k čemu složka je; tabulka soubor → odpovědnost; pravidlo, které v ní platí, a proč – tam patří i odkaz na ADR. Píše se pro někoho, kdo do složky přišel poprvé a potřebuje vědět, čeho se v ní držet, ne výčet funkcí, který stejně řekne `index.ts`. Vynuceno pravidlem `domovnik/require-directory-readme`.
-- `index.ts` feature exportuje: service rozhraní (jen ty metody, které ostatní potřebují), doménové typy/DTO, názvy eventů se schématy. **Neexportuje** schema tabulek, interní helpery, adaptery.
+- `index.ts` feature exportuje: Nest modul, service rozhraní (jen ty metody, které ostatní potřebují), doménové typy/DTO, názvy eventů se schématy. **Neexportuje** schema tabulek, interní helpery, adaptery.
+- Feature s UI má druhé veřejné dveře, `ui/index.ts`: screeny, `navigation` a zod schémata, kterými `apps/web` parsuje odpovědi API. Serverový barrel táhne Nest, který Next build nepřeloží, a naopak (ADR 0017). Feature bez UI druhé dveře nemá.
 - Feature nesmí číst tabulky jiné feature přímo přes Drizzle. Jediná výjimka: `packages/db` (migrace, seed) a `features/reports` + `features/copilot`, které mají read-only přístup přes explicitně exportované „read modely" (`index.ts` → `readModels`).
 - Cross-feature zápis vždy přes event nebo přes service druhé feature. Nikdy přes DB.
 - `shared` obsahuje jen věci bez domény (ui kit, date/money utils, test helpery). Když do `shared` chceš dát něco s názvem z domény, patří to do feature nebo kernelu.
