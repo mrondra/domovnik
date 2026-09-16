@@ -1,5 +1,6 @@
 const DIRECTIVE = 'use client';
 
+/** @param {import('estree').Program} program */
 const startsWithDirective = (program) => {
   const first = program.body[0];
   return (
@@ -14,6 +15,7 @@ const startsWithDirective = (program) => {
  * a reviewer sees that decision without opening the file. A `*.client.tsx` therefore always carries
  * it (docs/engineering.md §3); `forbid-use-client` guards the other half.
  */
+/** @type {import('eslint').Rule.RuleModule} */
 export default {
   meta: {
     type: 'problem',

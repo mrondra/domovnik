@@ -7,6 +7,7 @@ import { basename, dirname, join } from 'node:path';
  * the description does not have to travel with a refactor. A package's `src` is documented by the
  * README at the package root, where a reader looks for it.
  */
+/** @type {import('eslint').Rule.RuleModule} */
 export default {
   meta: {
     type: 'suggestion',

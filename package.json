@@ -11,7 +11,7 @@
     "depcruise": "depcruise apps packages --config .dependency-cruiser.cjs",
     "depcruise:graph": "depcruise apps packages --config .dependency-cruiser.cjs --output-type dot | dot -T svg > docs/dependency-graph.svg",
     "knip": "knip",
-    "test": "vitest run --project unit --project integration --passWithNoTests",
+    "test": "vitest run --project unit --project integration",
     "test:evals": "vitest run --project evals",
     "test:e2e": "pnpm --filter @domovnik/web test:e2e",
     "verify": "pnpm lint && pnpm typecheck && pnpm depcruise && pnpm knip && pnpm test",
@@ -29,6 +29,7 @@
   "devDependencies": {
     "@commitlint/cli": "^21.2.2",
     "@commitlint/config-conventional": "^21.2.2",
+    "@types/estree": "^1.0.9",
     "@types/node": "^24.10.1",
     "@vitest/coverage-v8": "^5.0.0",
     "@vitest/eslint-plugin": "^1.6.27",

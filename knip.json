@@ -2,21 +2,24 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignoreBinaries": ["dot"],
   "workspaces": {
+    "apps/*": {},
     "apps/api": {
       "entry": ["src/bin/*.ts"],
       "ignoreDependencies": ["@node-rs/argon2", "drizzle-orm", "pg", "pg-boss", "pino"]
     },
-    "apps/mcp": {},
     "apps/web": {
       "entry": ["src/bin/*.ts", "e2e/**/*.ts"]
     },
-    "apps/workers": {},
-    "packages/db": {},
+    "packages/db": {
+      "entry": ["src/bin/*.ts"]
+    },
+    "packages/features/*": {},
     "packages/kernel": {},
     "packages/shared": {}
   },
   "ignoreExportsUsedInFile": true,
   "rules": {
+    "files": "error",
     "unlisted": "error",
     "exports": "error",
     "types": "error",

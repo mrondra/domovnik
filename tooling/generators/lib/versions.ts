@@ -3,8 +3,8 @@ import { join } from 'node:path';
 import { GeneratorError } from './cli';
 
 interface PackageManifest {
-  readonly dependencies?: Record<string, string>;
-  readonly devDependencies?: Record<string, string>;
+  readonly dependencies?: Record<string, unknown>;
+  readonly devDependencies?: Record<string, unknown>;
 }
 
 /**
@@ -31,19 +31,25 @@ export interface FeatureDependencies {
   readonly devDependencies: Readonly<Record<string, string>>;
 }
 
-const pick = (source: Readonly<Record<string, string>> | undefined, name: string): string => {
+const pick = (source: Readonly<Record<string, unknown>> | undefined, name: string): string => {
   const version = source?.[name];
-  if (version === undefined) {
+  if (typeof version !== 'string') {
     throw new GeneratorError(`packages/kernel/package.json neuvádí ${name}, nevím jakou verzi vygenerovat.`);
   }
   return version;
 };
 
+/** `package.json` is input from disk, so nothing about its shape is known until it is checked. */
+const isPackageManifest = (value: unknown): value is PackageManifest =>
+  typeof value === 'object' && value !== null;
+
 /** Shared runtime versions are read from the kernel so a generated feature cannot drift from it. */
 export const featureDependencies = async (root: string): Promise<FeatureDependencies> => {
-  const kernel = JSON.parse(
-    await readFile(join(root, 'packages/kernel/package.json'), 'utf8'),
-  ) as PackageManifest;
+  const manifest = join(root, 'packages/kernel/package.json');
+  const kernel: unknown = JSON.parse(await readFile(manifest, 'utf8'));
+  if (!isPackageManifest(kernel)) {
+    throw new GeneratorError(`${manifest} není platný package.json.`);
+  }
 
   return {
     dependencies: {

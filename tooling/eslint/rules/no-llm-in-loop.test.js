@@ -1,6 +1,7 @@
 import noLlmInLoop from './no-llm-in-loop.js';
 import { ruleTester } from './rule-tester.js';
 
+/** @param {string} name */
 const message = (name) =>
   `LLM call "${name}" inside a loop. Batch the items and emit one agent event (ADR 0004).`;
 

@@ -1,5 +1,6 @@
 const DIRECTIVE = 'use client';
 
+/** @param {import('estree').Program} program */
 const leadingDirective = (program) => {
   const first = program.body[0];
   if (first?.type !== 'ExpressionStatement') return undefined;
@@ -13,6 +14,7 @@ const leadingDirective = (program) => {
  * server component, so the directive in it would move the boundary without renaming the file
  * (docs/engineering.md §3).
  */
+/** @type {import('eslint').Rule.RuleModule} */
 export default {
   meta: {
     type: 'problem',
