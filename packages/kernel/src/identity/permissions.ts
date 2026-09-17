@@ -10,7 +10,7 @@ const ROLE_PERMISSIONS: Readonly<Record<Role, readonly string[]>> = {
   manager: ['svj.*', 'ops.*', 'tasks.*', 'documents.*', 'comms.*', 'approval.decide'],
   finance: ['finance.*', 'svj.read', 'documents.read', 'approval.decide'],
   technician: ['ops.read', 'tasks.read', 'tasks.update', 'defects.*', 'field.*'],
-  committee: ['svj.read', 'finance.read', 'ops.read', 'approval.decide'],
+  committee: ['svj.read', 'finance.read', 'ops.read', 'documents.read', 'approval.decide'],
   owner: ['owner.self'],
   agent_author: ['agent.compose'],
 };
