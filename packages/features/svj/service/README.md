@@ -13,6 +13,7 @@ the tests all come through here.
 | `units.ts`        | creating and changing a unit; the two places that emit and audit            |
 | `unit-queries.ts` | reading units, one unit, and `getShareOfUnit`                               |
 | `departments.ts`  | departments of the management company — tenant-scoped, not SVJ-scoped       |
+| `ordinals.ts`     | `svjSequence` — the position `receivables` builds variable symbols from     |
 | `reach.ts`        | `reachable` / `reachableIds` — the access question every read asks first    |
 | `rows.ts`         | Drizzle row → domain type, including the branded ids and the share fraction |
 

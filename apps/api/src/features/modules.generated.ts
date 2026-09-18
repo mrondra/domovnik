@@ -3,6 +3,7 @@
 
 import type { Type } from '@nestjs/common';
 import { DocumentsModule } from '../../../../packages/features/documents';
+import { ReceivablesModule } from '../../../../packages/features/receivables';
 import { SvjModule } from '../../../../packages/features/svj';
 
-export const featureModules: readonly Type[] = [DocumentsModule, SvjModule];
+export const featureModules: readonly Type[] = [DocumentsModule, ReceivablesModule, SvjModule];
