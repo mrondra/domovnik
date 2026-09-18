@@ -18,6 +18,13 @@ export interface CreateInvoiceInput {
   readonly documentId: string;
   readonly source: string;
   readonly receivedAt: Date;
+  /**
+   * Minted by the caller when the file has to name the invoice before the invoice exists — the
+   * inbound mail step links the stored document to it (task 015). Otherwise a fresh one is made.
+   */
+  readonly id?: InvoiceId | undefined;
+  /** What was already known about the message the file arrived in, before any rule has run. */
+  readonly checks?: unknown;
 }
 
 export interface ListInvoicesInput {
@@ -35,7 +42,7 @@ export const invoiceNotFound = (invoiceId: InvoiceId): NotFoundError =>
 export const createInvoice = (ctx: RequestContext, input: CreateInvoiceInput): Promise<Invoice> =>
   withTenant(ctx, async (tx) => {
     await assertReachable(ctx, input.svjId);
-    const id = newId(invoiceIdSchema);
+    const id = input.id ?? newId(invoiceIdSchema);
 
     const rows = await tx
       .insert(invoice)
@@ -48,6 +55,7 @@ export const createInvoice = (ctx: RequestContext, input: CreateInvoiceInput): P
         documentId: input.documentId,
         receivedAt: input.receivedAt,
         source: input.source,
+        checks: input.checks ?? null,
       })
       .returning();
 

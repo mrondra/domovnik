@@ -18,6 +18,7 @@ import {
   type ListInvoicesInput,
 } from './invoice-records';
 import { createSupplier, findSupplierByIco, listSuppliers, type CreateSupplierInput } from './suppliers';
+import { receiveInvoiceMail, type ReceiveInvoiceMailInput, type ReceivedInvoice } from './receive';
 import { transition } from './transitions';
 
 /**
@@ -55,6 +56,10 @@ export class InvoicesService {
 
   budgetStatus(ctx: RequestContext, query: BudgetQuery): Promise<BudgetStatus> {
     return budgetStatus(ctx, query);
+  }
+
+  receiveInvoiceMail(ctx: RequestContext, input: ReceiveInvoiceMailInput): Promise<ReceivedInvoice> {
+    return receiveInvoiceMail(ctx, input);
   }
 
   createInvoice(ctx: RequestContext, input: CreateInvoiceInput): Promise<Invoice> {

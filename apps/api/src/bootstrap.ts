@@ -1,3 +1,4 @@
+import multipart from '@fastify/multipart';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { loadEnv } from '../../../packages/kernel/src/env/index';
@@ -13,6 +14,9 @@ import { buildOpenApiDocument, OPENAPI_PATH } from './openapi/document';
  */
 const SIGNED_LINK_PARAM_LENGTH = 1024;
 
+/** An invoice scan. Big enough for a scanned page, small enough that nobody uploads a film. */
+const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+
 const adapter = (): FastifyAdapter =>
   new FastifyAdapter({ routerOptions: { maxParamLength: SIGNED_LINK_PARAM_LENGTH } });
 
@@ -27,6 +31,7 @@ export const buildApp = async (): Promise<NestFastifyApplication> => {
     logger: false,
   });
 
+  await app.register(multipart, { limits: { fileSize: MAX_UPLOAD_BYTES, files: 4 } });
   registerRequestContext(app.getHttpAdapter().getInstance());
   app.useGlobalPipes(validationPipe());
 
