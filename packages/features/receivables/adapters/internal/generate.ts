@@ -9,7 +9,7 @@ import { variableSymbolsFor } from '../../service/vs';
 import { prescription, prescriptionItem, unitBalanceEntry } from '../../schema';
 import type { GeneratePrescriptionsInput } from '../receivables.adapter';
 import { withItems } from './prescriptions';
-import { asDay, asMoney } from './rows';
+import { asMoney } from './rows';
 
 /** `svj` hands its units out through the injectable class only, and that class holds no state. */
 const units = new SvjService();
@@ -30,7 +30,7 @@ const planFor = async (ctx: RequestContext, input: GeneratePrescriptionsInput): 
 
   return found.map((unit, index) => ({
     unit,
-    planned: applyPlan(input.plan, unit.floorArea),
+    planned: applyPlan(input.plan, { floorArea: unit.floorArea, kind: unit.kind }),
     variableSymbol: symbols[index] ?? '',
   }));
 };
@@ -67,7 +67,7 @@ export const generatePrescriptions = (
           month: input.period.month,
           variableSymbol: one.variableSymbol,
           totalAmount: asMoney(one.planned.total),
-          dueDate: asDay(dueDate),
+          dueDate,
           source: 'internal' as const,
         })),
       )

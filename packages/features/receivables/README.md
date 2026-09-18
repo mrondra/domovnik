@@ -29,3 +29,7 @@ Four decisions worth knowing before changing anything here:
   one, and the balance is their sum. Nothing is updated in place, so a statement always adds up.
 - Every SVJ is on the `internal` adapter until task 024 creates `accounting_link`.
   `adapters/README.md` says where that choice will come from.
+
+The seed writes prescriptions but no payments, so after `pnpm db:seed` every unit owes twelve months
+and `listDebtors` names all of them. That is expected: the movements arrive with the bank generator
+in task 021, so a balance is the result of payments rather than something the seed wrote down.

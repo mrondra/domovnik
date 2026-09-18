@@ -13,6 +13,7 @@ import { prescriptionsGenerated } from '../domain/events';
 import { formatPeriod } from '../domain/period';
 import { prescriptionPlanSchema } from '../domain/schemas';
 import type { Prescription } from '../domain/types';
+import { assertReachable } from './reach';
 
 /**
  * Raising a month of prescriptions is one transaction: the rows, the ledger entries, the audit row
@@ -24,6 +25,7 @@ export const generatePrescriptions = (
   input: GeneratePrescriptionsInput,
 ): Promise<readonly Prescription[]> =>
   withTenant(ctx, async () => {
+    await assertReachable(ctx, input.svjId);
     prescriptionPlanSchema.parse(input.plan);
     const adapter = await generatingAdapterFor(ctx, input.svjId);
     const created = await adapter.generatePrescriptions(ctx, input);
@@ -51,12 +53,16 @@ export const generatePrescriptions = (
 export const listPrescriptions = async (
   ctx: RequestContext,
   input: ListPrescriptionsInput,
-): Promise<readonly Prescription[]> =>
-  (await receivablesAdapterFor(ctx, input.svjId)).listPrescriptions(ctx, input);
+): Promise<readonly Prescription[]> => {
+  await assertReachable(ctx, input.svjId);
+  return (await receivablesAdapterFor(ctx, input.svjId)).listPrescriptions(ctx, input);
+};
 
 /** What `payments` (020) matches a bank transfer against. */
 export const findByVariableSymbol = async (
   ctx: RequestContext,
   input: FindByVariableSymbolInput,
-): Promise<Prescription | null> =>
-  (await receivablesAdapterFor(ctx, input.svjId)).findByVariableSymbol(ctx, input);
+): Promise<Prescription | null> => {
+  await assertReachable(ctx, input.svjId);
+  return (await receivablesAdapterFor(ctx, input.svjId)).findByVariableSymbol(ctx, input);
+};

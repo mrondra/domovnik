@@ -1,7 +1,7 @@
 import type { SvjId } from '../../../kernel/src/ids/index';
-import type { UnitId } from '../../svj/index';
+import type { UnitId, UnitKind } from '../../svj/index';
 import type { BalanceEntryId, PrescriptionId, PrescriptionItemId } from './ids';
-import type { Period } from './period';
+import type { IsoDay, Period } from './period';
 
 export type PrescriptionSource = 'internal' | 'pohoda';
 
@@ -27,7 +27,7 @@ export interface Prescription {
   readonly period: Period;
   readonly variableSymbol: string;
   readonly totalAmount: number;
-  readonly dueDate: Date;
+  readonly dueDate: IsoDay;
   readonly source: PrescriptionSource;
   readonly items: readonly PrescriptionItem[];
 }
@@ -35,7 +35,7 @@ export interface Prescription {
 export interface BalanceEntry {
   readonly id: BalanceEntryId;
   readonly unitId: UnitId;
-  readonly entryDate: Date;
+  readonly entryDate: IsoDay;
   readonly kind: BalanceEntryKind;
   /** A prescription is negative, a payment positive; the sum of these is the balance. */
   readonly amount: number;
@@ -57,6 +57,8 @@ export interface PrescriptionPlanItem {
   readonly label: string;
   readonly basis: PlanBasis;
   readonly rate: number;
+  /** A `per_unit` rate a given kind of unit pays instead of `rate` — a garage is not a flat. */
+  readonly rateByKind?: Partial<Record<UnitKind, number>> | undefined;
 }
 
 export interface PrescriptionPlan {

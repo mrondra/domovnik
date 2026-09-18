@@ -4,6 +4,7 @@ import { withTenant } from '../../../kernel/src/db/index';
 import { events } from '../../../kernel/src/events/index';
 import { receivablesAdapterFor, type RecordPaymentInput } from '../adapters/index';
 import { paymentRecorded } from '../domain/events';
+import { assertReachable } from './reach';
 
 /**
  * Money arriving against a unit. The adapter decides where the entry lands — our ledger today, a
@@ -11,6 +12,7 @@ import { paymentRecorded } from '../domain/events';
  */
 export const recordPayment = (ctx: RequestContext, input: RecordPaymentInput): Promise<void> =>
   withTenant(ctx, async () => {
+    await assertReachable(ctx, input.svjId);
     const adapter = await receivablesAdapterFor(ctx, input.svjId);
     await adapter.recordPayment(ctx, input);
 
@@ -19,7 +21,7 @@ export const recordPayment = (ctx: RequestContext, input: RecordPaymentInput): P
       entity: 'unit_balance_entry',
       entityId: input.reference.id,
       reason: `Zaznamenána platba ${input.reference.type}`,
-      after: { unitId: input.unitId, amount: input.amount, paidOn: input.paidOn.toISOString() },
+      after: { unitId: input.unitId, amount: input.amount, paidOn: input.paidOn },
     });
 
     await events.emit(

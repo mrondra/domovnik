@@ -3,7 +3,7 @@ import { withTenant } from '../../../../kernel/src/db/index';
 import { newRowId } from '../../../../kernel/src/ids/index';
 import { unitBalanceEntry } from '../../schema';
 import type { RecordPaymentInput } from '../receivables.adapter';
-import { asDay, asMoney } from './rows';
+import { asMoney } from './rows';
 
 /**
  * A payment is one more line in the ledger of the unit, never an update of a prescription: the
@@ -17,7 +17,7 @@ export const recordPayment = (ctx: RequestContext, input: RecordPaymentInput): P
       svjId: input.svjId,
       createdBy: ctx.actor.type === 'user' ? ctx.actor.id : null,
       unitId: input.unitId,
-      entryDate: asDay(input.paidOn),
+      entryDate: input.paidOn,
       kind: 'payment',
       amount: asMoney(input.amount),
       referenceType: input.reference.type,

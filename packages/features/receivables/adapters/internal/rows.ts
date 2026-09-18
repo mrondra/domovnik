@@ -37,11 +37,6 @@ export interface BalanceEntryRow {
 /** Drizzle returns `numeric` as a string, so the column decides the precision, not a float. */
 export const asMoney = (value: number): string => value.toFixed(2);
 
-/** And a `date` as `YYYY-MM-DD`, which is a day without a time zone and has to stay one. */
-export const asDay = (value: Date): string => value.toISOString().slice(0, 10);
-
-const dayOf = (value: string): Date => new Date(`${value}T00:00:00.000Z`);
-
 export const toPrescription = (row: PrescriptionRow, items: readonly PrescriptionItem[]): Prescription => ({
   id: prescriptionIdSchema.parse(row.id),
   svjId: svjIdSchema.parse(row.svjId),
@@ -49,7 +44,7 @@ export const toPrescription = (row: PrescriptionRow, items: readonly Prescriptio
   period: { year: row.year, month: row.month },
   variableSymbol: row.variableSymbol,
   totalAmount: Number(row.totalAmount),
-  dueDate: dayOf(row.dueDate),
+  dueDate: row.dueDate,
   source: prescriptionSourceSchema.parse(row.source),
   items,
 });
@@ -69,7 +64,7 @@ const referenceOf = (row: BalanceEntryRow): EntryReference | null =>
 export const toBalanceEntry = (row: BalanceEntryRow): BalanceEntry => ({
   id: balanceEntryIdSchema.parse(row.id),
   unitId: unitIdSchema.parse(row.unitId),
-  entryDate: dayOf(row.entryDate),
+  entryDate: row.entryDate,
   kind: balanceEntryKindSchema.parse(row.kind),
   amount: Number(row.amount),
   reference: referenceOf(row),

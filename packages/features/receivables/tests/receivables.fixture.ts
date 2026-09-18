@@ -15,7 +15,9 @@ import type { PrescriptionPlan } from '../domain/types';
  * well as this feature's — and those are not this feature's to import. The composed schema `pnpm
  * db:generate` writes is the one place that legitimately names every table there is.
  */
-export const startReceivablesDb = (): Promise<TestDatabase> => startTestDb({ ...composedSchema });
+export const TEST_SCHEMA: Record<string, unknown> = { ...composedSchema };
+
+export const startReceivablesDb = (): Promise<TestDatabase> => startTestDb(TEST_SCHEMA);
 
 /** Fond oprav per square metre, the advances per unit — the shape zadání kap. 4 describes. */
 export const DEMO_PLAN: PrescriptionPlan = {

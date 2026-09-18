@@ -1,7 +1,7 @@
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
 import type { UnitId } from '../../svj/index';
-import type { Period } from '../domain/period';
+import type { IsoDay, Period } from '../domain/period';
 import type { EntryReference, Prescription, PrescriptionPlan, UnitBalance } from '../domain/types';
 
 export type ReceivablesAdapterKind = 'internal' | 'pohoda';
@@ -20,7 +20,7 @@ export interface FindByVariableSymbolInput {
 export interface UnitBalanceInput {
   readonly svjId: SvjId;
   readonly unitId: UnitId;
-  readonly asOf?: Date | undefined;
+  readonly asOf?: IsoDay | undefined;
 }
 
 export interface ListDebtorsInput {
@@ -33,7 +33,7 @@ export interface RecordPaymentInput {
   readonly svjId: SvjId;
   readonly unitId: UnitId;
   readonly amount: number;
-  readonly paidOn: Date;
+  readonly paidOn: IsoDay;
   readonly reference: EntryReference;
 }
 

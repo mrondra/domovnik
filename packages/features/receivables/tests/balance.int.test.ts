@@ -21,7 +21,7 @@ import {
 } from './receivables.fixture';
 
 const PERIOD: Period = { year: 2026, month: 9 };
-const PAID_ON = new Date('2026-09-10T00:00:00.000Z');
+const PAID_ON = '2026-09-10';
 
 let database: TestDatabase;
 let ctx: RequestContext;

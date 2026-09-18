@@ -6,7 +6,7 @@ import type { Period } from '../../domain/period';
 import type { BalanceEntry, UnitBalance } from '../../domain/types';
 import { prescription, unitBalanceEntry } from '../../schema';
 import type { ListDebtorsInput, UnitBalanceInput } from '../receivables.adapter';
-import { asDay, toBalanceEntry } from './rows';
+import { toBalanceEntry } from './rows';
 
 const entriesOf = (ctx: RequestContext, input: UnitBalanceInput): Promise<readonly BalanceEntry[]> =>
   withTenant(ctx, async (tx) => {
@@ -14,9 +14,7 @@ const entriesOf = (ctx: RequestContext, input: UnitBalanceInput): Promise<readon
     const rows = await tx
       .select()
       .from(unitBalanceEntry)
-      .where(
-        input.asOf === undefined ? ofUnit : and(ofUnit, lte(unitBalanceEntry.entryDate, asDay(input.asOf))),
-      )
+      .where(input.asOf === undefined ? ofUnit : and(ofUnit, lte(unitBalanceEntry.entryDate, input.asOf)))
       .orderBy(asc(unitBalanceEntry.entryDate));
 
     return rows.map(toBalanceEntry);
