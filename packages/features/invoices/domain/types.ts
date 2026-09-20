@@ -58,7 +58,8 @@ export interface Invoice {
   readonly agentRunId: AgentRunId | null;
   readonly approvalId: ApprovalId | null;
   readonly accountingRef: string | null;
-  readonly receivedAt: Date;
+  /** An instant, not a day, written the way it crosses the wire (task 018). */
+  readonly receivedAt: string;
   readonly source: string;
 }
 

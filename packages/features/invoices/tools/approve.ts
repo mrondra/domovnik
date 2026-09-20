@@ -2,17 +2,8 @@ import { z } from 'zod';
 import { approvalIdSchema } from '../../../kernel/src/ids/index';
 import { defineTool } from '../../../kernel/src/tools/index';
 import { invoiceIdSchema } from '../domain/ids';
+import { approveInputSchema } from '../domain/proposal';
 import { approveInvoice, committeeOf, decideBy, requestApproval } from '../service/index';
-
-const SUMMARY_LIMIT = 600;
-
-export const approveInput = z.object({
-  invoiceId: z.uuid(),
-  /** Written for a committee member who is not an accountant, in Czech (zadání kap. 6). */
-  summary: z.string().min(1).max(SUMMARY_LIMIT),
-  recommendation: z.enum(['approve', 'reject', 'review']),
-  risks: z.array(z.string().min(1)).readonly(),
-});
 
 /**
  * A proposal, never an act: the policy always asks, so the handler runs only after the committee
@@ -28,7 +19,7 @@ export const invoiceApprove = defineTool({
     'Předloží fakturu výboru SVJ ke schválení: shrnutí pro laika, doporučení (approve, reject, ' +
     'review) a seznam rizik. Nic neschvaluje — založí návrh, o kterém rozhoduje výbor. ' +
     'Použij pro fakturu, která prošla kontrolami.',
-  input: approveInput,
+  input: approveInputSchema,
   output: z.object({ invoiceId: z.uuid(), status: z.string().min(1) }),
   permission: 'finance.approve',
   userComposable: false,

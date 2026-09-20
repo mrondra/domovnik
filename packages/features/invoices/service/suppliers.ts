@@ -3,7 +3,7 @@ import { audit } from '../../../kernel/src/audit/index';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import { withTenant } from '../../../kernel/src/db/index';
 import { newId } from '../../../kernel/src/ids/index';
-import { supplierIdSchema } from '../domain/ids';
+import { supplierIdSchema, type SupplierId } from '../domain/ids';
 import type { Supplier } from '../domain/types';
 import { supplier } from '../schema/index';
 import { toSupplier } from './rows';
@@ -62,4 +62,12 @@ export const listSuppliers = (ctx: RequestContext): Promise<readonly Supplier[]>
   withTenant(ctx, async (tx) => {
     const rows = await tx.select().from(supplier).orderBy(asc(supplier.name));
     return rows.map(toSupplier);
+  });
+
+/** One supplier by id, for a caller that already has the id off an invoice (task 018). */
+export const supplierById = (ctx: RequestContext, supplierId: SupplierId): Promise<Supplier | null> =>
+  withTenant(ctx, async (tx) => {
+    const rows = await tx.select().from(supplier).where(eq(supplier.id, supplierId)).limit(1);
+    const row = rows[0];
+    return row === undefined ? null : toSupplier(row);
   });

@@ -62,6 +62,6 @@ export const invoiceSchema = z.object({
   agentRunId: z.uuid().nullable(),
   approvalId: z.uuid().nullable(),
   accountingRef: z.string().nullable(),
-  receivedAt: z.date(),
+  receivedAt: z.iso.datetime(),
   source: z.string().min(1),
 });

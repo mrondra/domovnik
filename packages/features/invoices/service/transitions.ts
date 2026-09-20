@@ -15,7 +15,13 @@ type Columns = Partial<typeof invoice.$inferInsert>;
 const DEFAULT_REASON = 'Změna stavu faktury';
 
 /** Only the fields a step is allowed to fill in; `status` is the machine's, not the caller's. */
-const columnsOf = (patch: InvoicePatch): Columns => ({
+/**
+ * A step taken inside an agent run is stamped with it, so the invoice can say what decided about
+ * it and the detail screen can link to the trace (task 018). A step a person took overwrites
+ * nothing: `ctx.agentRunId` is only set while an agent is running.
+ */
+const columnsOf = (patch: InvoicePatch, ctx: RequestContext): Columns => ({
+  ...(ctx.agentRunId === undefined ? {} : { agentRunId: ctx.agentRunId }),
   ...(patch.supplierId === undefined ? {} : { supplierId: patch.supplierId }),
   ...(patch.contractId === undefined ? {} : { contractId: patch.contractId }),
   ...(patch.externalNumber === undefined ? {} : { externalNumber: patch.externalNumber }),
@@ -51,7 +57,7 @@ export const transition = (
 
     const rows = await tx
       .update(invoice)
-      .set({ ...columnsOf(patch), status: to, updatedAt: new Date() })
+      .set({ ...columnsOf(patch, ctx), status: to, updatedAt: new Date() })
       .where(eq(invoice.id, invoiceId))
       .returning();
 

@@ -16,14 +16,24 @@ const camel = (kebab: string): string =>
     .map((part, index) => (index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)))
     .join('');
 
-/** Sorted, so the composed file is the same on every machine and a diff means a real change. */
-export const featureNavigationFiles = async (root: string = repoRoot()): Promise<readonly string[]> => {
+/**
+ * The features that contribute a given file to the shell, sorted — so the composed barrel is the
+ * same on every machine and a diff means a real change. `approvals/evidence.compose.ts` discovers
+ * its own contributions the same way (task 018).
+ */
+export const featureFilesMatching = async (
+  pattern: string,
+  root: string = repoRoot(),
+): Promise<readonly string[]> => {
   const found: string[] = [];
-  for await (const entry of glob(FEATURE_NAVIGATION, { cwd: root })) {
+  for await (const entry of glob(pattern, { cwd: root })) {
     found.push(entry);
   }
   return found.sort((left, right) => left.localeCompare(right));
 };
+
+export const featureNavigationFiles = (root: string = repoRoot()): Promise<readonly string[]> =>
+  featureFilesMatching(FEATURE_NAVIGATION, root);
 
 /**
  * Discovery is by file name, the import is from the feature's `ui/index.ts` — the browser-facing

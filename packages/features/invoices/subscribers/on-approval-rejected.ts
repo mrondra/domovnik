@@ -1,12 +1,10 @@
-import { z } from 'zod';
 import { approvals, approvalDecided } from '../../../kernel/src/approvals/index';
 import { subscribe } from '../../../kernel/src/events/index';
 import { approvalIdSchema } from '../../../kernel/src/ids/index';
 import { invoiceIdSchema } from '../domain/ids';
+import { approveInputSchema } from '../domain/proposal';
 import { rejectInvoice } from '../service/index';
 import { invoiceApprove } from '../tools/approve';
-
-const approveInputSchema = z.object({ invoiceId: z.uuid() });
 
 /**
  * An approved decision resumes the tool handler in the kernel (ADR 0015); a rejected one resumes

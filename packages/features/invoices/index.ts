@@ -20,5 +20,6 @@ export {
 } from './domain/events';
 export { TRANSITIONS } from './domain/status';
 export type { InvoiceStatus } from './domain/status';
+export { invoiceIdSchema } from './domain/ids';
 export type { InvoiceId } from './domain/ids';
 export type { BudgetCategory, Contract, Invoice, Supplier } from './domain/types';

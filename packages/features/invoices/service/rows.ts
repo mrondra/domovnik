@@ -55,6 +55,6 @@ export const toInvoice = (row: InferSelectModel<typeof invoice>): Invoice => ({
   agentRunId: branded(agentRunIdSchema, row.agentRunId),
   approvalId: branded(approvalIdSchema, row.approvalId),
   accountingRef: row.accountingRef,
-  receivedAt: row.receivedAt,
+  receivedAt: row.receivedAt.toISOString(),
   source: row.source,
 });

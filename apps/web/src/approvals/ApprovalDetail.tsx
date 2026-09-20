@@ -6,12 +6,26 @@ import type { ApprovalDetail as Detail } from '../api/approvals';
 import { statusLabel, type DecisionInput } from './decision';
 import { DecisionForm } from './DecisionForm.client';
 import { Evidence } from './Evidence';
+import { evidenceRenderers } from './evidence.generated';
 import { toneOf } from './tone';
 
 export interface ApprovalDetailProps {
   readonly approval: Detail;
   readonly onDecide: (input: DecisionInput) => Promise<string | null>;
 }
+
+/**
+ * A feature may ship a reading of its own proposal (task 018). When it does, that is what the
+ * person deciding sees; the raw input stays for everything else, because a rendering that quietly
+ * leaves fields out would be worse than JSON.
+ */
+const proposal = (approval: Detail): ReactElement => {
+  const Renderer = evidenceRenderers[approval.toolName];
+  if (Renderer === undefined) return <Evidence label="Vstup akce" value={approval.input} />;
+
+  const rendered = <Renderer input={approval.input} />;
+  return rendered.props === null ? <Evidence label="Vstup akce" value={approval.input} /> : rendered;
+};
 
 const outcome = (approval: Detail): ReactElement => (
   <Text size="sm" tone="muted">
@@ -27,7 +41,7 @@ export const ApprovalDetail = ({ approval, onDecide }: ApprovalDetailProps): Rea
       actions={<Badge tone={toneOf(approval.status)}>{statusLabel(approval.status)}</Badge>}
     >
       <Stack gap="md">
-        <Evidence label="Vstup akce" value={approval.input} />
+        {proposal(approval)}
         <Evidence label="Evidence" value={approval.evidence} />
       </Stack>
     </Card>

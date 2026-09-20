@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import type { RequestContext } from '../../../kernel/src/context/index';
+import type { SvjId } from '../../../kernel/src/ids/index';
 import type { InvoiceId } from '../domain/ids';
 import type { InvoiceStatus } from '../domain/status';
 import type { BudgetStatus, Contract, Invoice, InvoicePatch, Supplier } from '../domain/types';
 import { budgetStatus, setBudgetLine, type BudgetLineInput, type BudgetQuery } from './budget';
+import { listContracts } from './contract-queries';
 import {
   createContract,
   findContractsForSupplier,
   type ContractsForSupplierInput,
   type CreateContractInput,
 } from './contracts';
+import { invoiceDetail, type InvoiceDetail } from './detail';
 import {
   createInvoice,
   getInvoice,
@@ -48,6 +51,14 @@ export class InvoicesService {
     input: ContractsForSupplierInput,
   ): Promise<readonly Contract[]> {
     return findContractsForSupplier(ctx, input);
+  }
+
+  listContracts(ctx: RequestContext, svjId: SvjId): Promise<readonly Contract[]> {
+    return listContracts(ctx, svjId);
+  }
+
+  invoiceDetail(ctx: RequestContext, invoiceId: InvoiceId): Promise<InvoiceDetail> {
+    return invoiceDetail(ctx, invoiceId);
   }
 
   setBudgetLine(ctx: RequestContext, input: BudgetLineInput): Promise<void> {

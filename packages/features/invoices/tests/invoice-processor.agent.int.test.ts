@@ -8,7 +8,7 @@ import { replayLlm, runAgentInTest } from '../../../kernel/src/testing/index';
 import { SvjService } from '../../svj/index';
 import { invoiceProcessor } from '../agents/invoice-processor/agent';
 import type { InvoiceId } from '../domain/ids';
-import { approveInput } from '../tools/approve';
+import { approveInputSchema } from '../domain/proposal';
 import { getInvoice } from '../service/index';
 import {
   CLEAN_INVOICE,
@@ -69,8 +69,8 @@ const approvalOn = async (invoiceId: InvoiceId): Promise<ApprovalDetail | null> 
   return invoice.approvalId === null ? null : approvals.get(ctx, invoice.approvalId);
 };
 
-const proposalOf = (approval: ApprovalDetail | null): z.output<typeof approveInput> =>
-  approveInput.parse(approval?.input);
+const proposalOf = (approval: ApprovalDetail | null): z.output<typeof approveInputSchema> =>
+  approveInputSchema.parse(approval?.input);
 
 describe('invoice-processor on an invoice that checked out', () => {
   it('proposes it to the committee and parks it there', async () => {
