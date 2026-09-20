@@ -1,0 +1,27 @@
+{
+  "value": {
+    "supplierName": "Zahradnictvi Novak s.r.o.",
+    "supplierIco": "29888777",
+    "supplierDic": "CZ29888777",
+    "externalNumber": "2026-0500",
+    "variableSymbol": "20260500",
+    "issuedOn": "2026-09-01",
+    "dueOn": "2026-09-30",
+    "amountTotal": 4200,
+    "amountVat": 729.75,
+    "currency": "CZK",
+    "bankAccount": "2801234567/2010",
+    "lines": [
+      {
+        "description": "Serez zivych plotu",
+        "quantity": null,
+        "unitPrice": null,
+        "amount": 4200
+      }
+    ]
+  },
+  "usage": {
+    "inputTokens": 1200,
+    "outputTokens": 380
+  }
+}

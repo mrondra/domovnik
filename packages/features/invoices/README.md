@@ -28,3 +28,10 @@ Three decisions worth knowing before changing anything here:
 
 The invoice arrives with nothing but a document and a status of `received`; receiving it is task
 015, reading it task 016, deciding about it task 017, and showing it task 018.
+
+**One thing the demo does on purpose that production need not.** `finance.invoice.extracted` is
+raised for every invoice that got through the checks, including the ones with `warnings: []`, and
+the agent (task 017) is given all of them. That is because what the agent produces is the summary
+the committee reads, not the decision — the decision is already made by the rules in
+`service/checks/`. In production an invoice with no warnings could go straight to an approval
+without a model ever seeing it, and only the ones with something to explain would need one.

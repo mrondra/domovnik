@@ -5,7 +5,7 @@ import type { SvjId } from '../../../kernel/src/ids/index';
 import type { InboundMail } from '../adapters/index';
 import { getInvoice, listInvoices, receiveInvoiceMail } from '../service/index';
 import { auditActions } from './audit.fixture';
-import { INVOICE_LINES, sampleInvoicePdf } from './fixtures/sample-invoice';
+import { INVOICE_LINES, sampleInvoicePdf } from './fixtures/sample-invoice.fixture';
 import { someSvj, startInvoicesWorld, withTestTenant, type InvoicesWorld } from './world.fixture';
 
 let world: InvoicesWorld;

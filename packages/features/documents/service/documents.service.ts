@@ -8,6 +8,7 @@ import type {
   ListDocumentsInput,
   StoreDocumentInput,
 } from '../domain/types';
+import { readDocument, type DocumentContent } from './content';
 import { documentDownloadUrl } from './links';
 import { findBySha256, getDocument, listDocuments } from './queries';
 import { storeDocument } from './store';
@@ -32,6 +33,10 @@ export class DocumentsService {
 
   findBySha256(ctx: RequestContext, input: FindBySha256Input): Promise<Document | null> {
     return findBySha256(ctx, input);
+  }
+
+  read(ctx: RequestContext, documentId: DocumentId): Promise<DocumentContent> {
+    return readDocument(ctx, documentId);
   }
 
   downloadUrl(ctx: RequestContext, documentId: DocumentId): Promise<DocumentDownloadLink> {

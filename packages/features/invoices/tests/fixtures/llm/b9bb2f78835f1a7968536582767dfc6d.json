@@ -1,0 +1,27 @@
+{
+  "value": {
+    "supplierName": "Uklid Praha s.r.o.",
+    "supplierIco": "27000111",
+    "supplierDic": "CZ27000111",
+    "externalNumber": "2026-0202",
+    "variableSymbol": "20260202",
+    "issuedOn": "2026-09-01",
+    "dueOn": "2026-09-30",
+    "amountTotal": 15000,
+    "amountVat": 2603.31,
+    "currency": "CZK",
+    "bankAccount": "2801234567/2010",
+    "lines": [
+      {
+        "description": "Uklid spolecnych prostor 10/2026 - druhy dum",
+        "quantity": null,
+        "unitPrice": null,
+        "amount": 15000
+      }
+    ]
+  },
+  "usage": {
+    "inputTokens": 1200,
+    "outputTokens": 380
+  }
+}

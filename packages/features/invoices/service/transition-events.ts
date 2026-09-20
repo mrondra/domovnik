@@ -1,8 +1,10 @@
 import { withSvj, type RequestContext } from '../../../kernel/src/context/index';
 import { DomainError } from '../../../kernel/src/errors/index';
 import { events } from '../../../kernel/src/events/index';
+import { codesOfSeverity } from '../domain/checks';
 import {
   invoiceApproved,
+  invoiceExtracted,
   invoiceNeedsReview,
   invoicePaid,
   invoicePosted,
@@ -57,8 +59,9 @@ const posted = (invoice: Invoice): ReturnType<typeof invoicePosted.create> => {
 };
 
 /**
- * Not every step is worth announcing: `extracted` and `pending_approval` are steps the platform
- * takes on its own and nobody is waiting for. The five that follow are.
+ * Not every step is worth announcing: `pending_approval` is one the platform takes on its own and
+ * nobody is waiting for. The six that follow are, and the two agentic ones carry the codes of the
+ * checks that decided them rather than a sentence — an agent matches on codes (task 016).
  */
 export const announce = async (
   ctx: RequestContext,
@@ -69,8 +72,14 @@ export const announce = async (
   const onSvj = withSvj(ctx, invoice.svjId);
   const both = { invoiceId: invoice.id, svjId: invoice.svjId };
 
+  if (to === 'extracted') {
+    const warnings = codesOfSeverity(invoice.checks, 'warning');
+    await events.emit(onSvj, invoiceExtracted.create({ ...both, warnings }));
+  }
   if (to === 'needs_review') {
-    await events.emit(onSvj, invoiceNeedsReview.create({ ...both, reasons: [reason] }));
+    const blocking = codesOfSeverity(invoice.checks, 'blocking');
+    const reasons = blocking.length > 0 ? blocking : [reason];
+    await events.emit(onSvj, invoiceNeedsReview.create({ ...both, reasons }));
   }
   if (to === 'approved') await events.emit(onSvj, approved(invoice));
   if (to === 'rejected') await events.emit(onSvj, invoiceRejected.create({ ...both, reason }));

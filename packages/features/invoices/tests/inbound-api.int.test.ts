@@ -9,7 +9,7 @@ import {
 } from '../../../../apps/api/src/tests/api.fixture';
 import { startTestStorage, type TestStorage } from '../../../kernel/src/testing/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
-import { INVOICE_LINES, sampleInvoicePdf } from './fixtures/sample-invoice';
+import { INVOICE_LINES, sampleInvoicePdf } from './fixtures/sample-invoice.fixture';
 import { someSvj } from './invoices.fixture';
 import { TEST_SCHEMA } from './world.fixture';
 

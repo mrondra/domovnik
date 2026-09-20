@@ -11,7 +11,17 @@ export const invoiceReceived = defineEvent(
 );
 
 /**
- * The one event of this feature an agent answers rather than a subscriber: the deterministic checks
+ * The agentic event of the happy path (task 017). The agent is given every extracted invoice, not
+ * only the ones with a warning on them, because what it writes is the summary the committee reads.
+ * In production an invoice with `warnings: []` could go straight to an approval without it.
+ */
+export const invoiceExtracted = defineEvent(
+  'finance.invoice.extracted',
+  z.object({ ...onInvoice, warnings: z.array(z.string().min(1)).readonly() }),
+);
+
+/**
+ * The other event a person, not a subscriber, answers: the deterministic checks
  * could not settle the invoice and say why (ADR 0004, task 016).
  */
 export const invoiceNeedsReview = defineEvent(

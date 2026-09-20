@@ -8,6 +8,16 @@ import * as schema from '../db/schema/index';
 import { registeredTables, rlsPoliciesSql } from '../db/table';
 import { applyTestEnv } from './env';
 
+/**
+ * `drizzle-kit/api` assigns `Array.prototype.random` on import, and an enumerable property on
+ * `Array.prototype` is something other libraries refuse to run next to — pdfjs, which `pdf-parse`
+ * is built on, throws on load rather than let `for...in` over an array misbehave. Hiding it keeps
+ * the function drizzle-kit calls and takes it out of everybody else's way.
+ */
+if (Object.prototype.propertyIsEnumerable.call(Array.prototype, 'random')) {
+  Object.defineProperty(Array.prototype, 'random', { enumerable: false });
+}
+
 const PGVECTOR_IMAGE = 'pgvector/pgvector:pg16';
 const APP_PASSWORD = 'test';
 
