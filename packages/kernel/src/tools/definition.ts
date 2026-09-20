@@ -1,5 +1,6 @@
 import type { z } from 'zod';
 import type { RequestContext } from '../context/index';
+import type { ApprovalId } from '../ids/index';
 
 export type ModelAlias = 'sonnet' | 'haiku';
 
@@ -25,6 +26,16 @@ export interface ToolDefinition<I extends z.ZodType = z.ZodType, O extends z.Zod
   readonly proposal?: boolean;
   readonly model?: ModelAlias;
   readonly handler: (ctx: RequestContext, input: z.output<I>) => Promise<z.input<O>>;
+  /**
+   * Called once the approval exists and before `executeTool` answers `pending_approval`, so the
+   * feature can record that its entity is now waiting on it. It is not the handler and must not do
+   * what the approval is being asked about — that runs on the decision (ADR 0015).
+   */
+  readonly onApprovalRequested?: (
+    ctx: RequestContext,
+    input: z.output<I>,
+    approvalId: ApprovalId,
+  ) => Promise<void>;
 }
 
 export const neverRequiresApproval = (): ApprovalPolicy => ({ required: false, approvers: [] });

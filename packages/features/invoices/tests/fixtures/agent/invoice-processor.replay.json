@@ -1,0 +1,177 @@
+{
+  "exchanges": [
+    {
+      "name": "session-title",
+      "when": { "contains": ["naming a coding session"] },
+      "message": {
+        "id": "msg_title",
+        "model": "claude-sonnet-5",
+        "content": [{ "type": "text", "text": "{\"title\":\"Faktura k rozhodnutí\"}" }],
+        "stopReason": "end_turn",
+        "inputTokens": 10,
+        "outputTokens": 5
+      }
+    },
+    {
+      "name": "reads-the-clean-invoice",
+      "when": {
+        "contains": ["11111111-1111-7111-8111-111111111111"],
+        "missing": ["tool_result"]
+      },
+      "message": {
+        "id": "msg_get_clean",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_get_clean",
+            "name": "mcp__domovnik__invoice_get",
+            "input": { "invoiceId": "11111111-1111-7111-8111-111111111111" }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1200,
+        "outputTokens": 40
+      }
+    },
+    {
+      "name": "proposes-the-clean-invoice",
+      "when": {
+        "contains": ["11111111-1111-7111-8111-111111111111", "tool_result"],
+        "missing": ["mcp__domovnik__invoice_approve\",\"input\""]
+      },
+      "message": {
+        "id": "msg_approve_clean",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_approve_clean",
+            "name": "mcp__domovnik__invoice_approve",
+            "input": {
+              "invoiceId": "11111111-1111-7111-8111-111111111111",
+              "summary": "Úklid společných prostor za září 2026 od Úklid Praha s.r.o., 15 000 Kč včetně DPH, splatnost 30. 9. 2026. Odpovídá smlouvě i obvyklé měsíční částce a vejde se do rozpočtu na úklid.",
+              "recommendation": "approve",
+              "risks": []
+            }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1800,
+        "outputTokens": 120
+      }
+    },
+    {
+      "name": "reads-the-deviating-invoice",
+      "when": {
+        "contains": ["22222222-2222-7222-8222-222222222222"],
+        "missing": ["tool_result"]
+      },
+      "message": {
+        "id": "msg_get_deviating",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_get_deviating",
+            "name": "mcp__domovnik__invoice_get",
+            "input": { "invoiceId": "22222222-2222-7222-8222-222222222222" }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1200,
+        "outputTokens": 40
+      }
+    },
+    {
+      "name": "proposes-the-deviating-invoice-for-a-look",
+      "when": {
+        "contains": ["22222222-2222-7222-8222-222222222222", "tool_result"],
+        "missing": ["mcp__domovnik__invoice_approve\",\"input\""]
+      },
+      "message": {
+        "id": "msg_approve_deviating",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_approve_deviating",
+            "name": "mcp__domovnik__invoice_approve",
+            "input": {
+              "invoiceId": "22222222-2222-7222-8222-222222222222",
+              "summary": "Úklid společných prostor za září 2026 od Úklid Praha s.r.o., 19 500 Kč včetně DPH. Smlouva sjednává 15 000 Kč měsíčně, faktura je o 30 % vyšší a uvádí mimořádný úklid. Doporučuji ověřit u výboru, zda byl objednán.",
+              "recommendation": "review",
+              "risks": [
+                "Fakturováno o 4 500 Kč více, než sjednává smlouva.",
+                "Mimořádný úklid není ve smlouvě."
+              ]
+            }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1900,
+        "outputTokens": 140
+      }
+    },
+    {
+      "name": "reads-the-blocked-invoice",
+      "when": {
+        "contains": ["33333333-3333-7333-8333-333333333333"],
+        "missing": ["tool_result"]
+      },
+      "message": {
+        "id": "msg_get_blocked",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_get_blocked",
+            "name": "mcp__domovnik__invoice_get",
+            "input": { "invoiceId": "33333333-3333-7333-8333-333333333333" }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1200,
+        "outputTokens": 40
+      }
+    },
+    {
+      "name": "hands-the-blocked-invoice-back",
+      "when": {
+        "contains": ["33333333-3333-7333-8333-333333333333", "tool_result"],
+        "missing": ["mcp__domovnik__invoice_flagReview\",\"input\""]
+      },
+      "message": {
+        "id": "msg_flag_blocked",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_flag_blocked",
+            "name": "mcp__domovnik__invoice_flagReview",
+            "input": {
+              "invoiceId": "33333333-3333-7333-8333-333333333333",
+              "note": "Faktura je od Zahradnictví Novák s.r.o., které není v adresáři dodavatelů. Než se dá schválit, je potřeba dodavatele založit a ověřit, kdo práci objednal.",
+              "missing": ["dodavatel v adresáři", "smlouva nebo objednávka na sesazení živých plotů"]
+            }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1300,
+        "outputTokens": 110
+      }
+    },
+    {
+      "name": "says-what-it-did",
+      "when": { "contains": ["tool_result"] },
+      "message": {
+        "id": "msg_final",
+        "model": "claude-sonnet-5",
+        "content": [{ "type": "text", "text": "Fakturu jsem předal výboru." }],
+        "stopReason": "end_turn",
+        "inputTokens": 2000,
+        "outputTokens": 20
+      }
+    }
+  ]
+}

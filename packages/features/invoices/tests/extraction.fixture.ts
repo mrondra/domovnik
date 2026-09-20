@@ -6,6 +6,7 @@ import type { Invoice } from '../domain/types';
 import {
   createContract,
   createSupplier,
+  findSupplierByIco,
   getInvoice,
   processReceivedInvoice,
   receiveInvoiceMail,
@@ -30,9 +31,17 @@ export const CONTRACT_AMOUNT = 15_000;
 export const BUDGET = 200_000;
 export const YEAR = 2026;
 
-/** The supplier is the management company's, not one SVJ's, so every house below shares it. */
-export const seedCleaningSupplier = (ctx: RequestContext): Promise<SupplierId> =>
-  createSupplier(ctx, { name: 'Úklid Praha s.r.o.', ico: CLEANING_ICO }).then((one) => one.id);
+/**
+ * The supplier is the management company's, not one SVJ's — the IČO is unique per tenant, so a
+ * second house asking for the same company has to get the same row.
+ */
+export const seedCleaningSupplier = async (ctx: RequestContext): Promise<SupplierId> => {
+  const existing = await findSupplierByIco(ctx, CLEANING_ICO);
+  if (existing !== null) return existing.id;
+
+  const created = await createSupplier(ctx, { name: 'Úklid Praha s.r.o.', ico: CLEANING_ICO });
+  return created.id;
+};
 
 export const seedContract = async (
   ctx: RequestContext,

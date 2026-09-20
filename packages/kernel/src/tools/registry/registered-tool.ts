@@ -1,6 +1,7 @@
 import type { z } from 'zod';
 import type { RequestContext } from '../../context/index';
 import { ValidationError } from '../../errors/index';
+import type { ApprovalId } from '../../ids/index';
 import type { ApprovalPolicy, ModelAlias, ToolDefinition } from '../definition';
 
 /**
@@ -19,6 +20,12 @@ export interface RegisteredTool {
   readonly model?: ModelAlias | undefined;
   readonly approval: (ctx: RequestContext, input: unknown) => Promise<ApprovalPolicy>;
   readonly handler: (ctx: RequestContext, input: unknown) => Promise<unknown>;
+  /** Runs when the approval exists, before the caller is told to wait; never the handler itself. */
+  readonly onApprovalRequested?: (
+    ctx: RequestContext,
+    input: unknown,
+    approvalId: ApprovalId,
+  ) => Promise<void>;
 }
 
 const parseOrThrow = <S extends z.ZodType>(
@@ -51,6 +58,13 @@ export const erase = <I extends z.ZodType, O extends z.ZodType>(
     proposal: definition.proposal ?? false,
     model: definition.model,
     approval: async (ctx, input) => definition.approval(ctx, parseInput(input)),
+    ...(definition.onApprovalRequested === undefined
+      ? {}
+      : {
+          onApprovalRequested: async (ctx, input, approvalId) => {
+            await definition.onApprovalRequested?.(ctx, parseInput(input), approvalId);
+          },
+        }),
     handler: async (ctx, input) =>
       parseOrThrow(
         definition.output,

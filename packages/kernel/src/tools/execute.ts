@@ -38,6 +38,7 @@ export const executeTool = async (
       approvers: policy.approvers,
       deadline: policy.deadline,
     });
+    await tool.onApprovalRequested?.(ctx, input, approvalId);
     logger().info({ tool: name, approvalId }, 'Tool čeká na schválení');
     return { status: 'pending_approval', approvalId };
   }
