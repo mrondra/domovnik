@@ -38,6 +38,7 @@ export default {
         'copilot',
         'agent-builder',
         'api-tokens',
+        'demo',
       ],
     ],
     'subject-case': [2, 'always', 'lower-case'],

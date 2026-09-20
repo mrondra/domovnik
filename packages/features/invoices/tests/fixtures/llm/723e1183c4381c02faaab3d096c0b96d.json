@@ -1,0 +1,27 @@
+{
+  "value": {
+    "supplierName": "Zahradnictvi Zeleny dum s.r.o.",
+    "supplierIco": "29663415",
+    "supplierDic": "CZ29663415",
+    "externalNumber": "2026-0330",
+    "variableSymbol": "20260330",
+    "issuedOn": "2026-09-01",
+    "dueOn": "2026-09-30",
+    "amountTotal": 12400,
+    "amountVat": 2152.07,
+    "currency": "CZK",
+    "bankAccount": "3301234572/2010",
+    "lines": [
+      {
+        "description": "Serez zivych plotu a odvoz odpadu",
+        "quantity": null,
+        "unitPrice": null,
+        "amount": 12400
+      }
+    ]
+  },
+  "usage": {
+    "inputTokens": 1400,
+    "outputTokens": 420
+  }
+}

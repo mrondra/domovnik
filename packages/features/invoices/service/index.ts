@@ -1,5 +1,6 @@
 export { InvoicesService } from './invoices.service';
 export { budgetStatus, setBudgetLine } from './budget';
+export { listContracts } from './contract-queries';
 export { createContract, findContractsForSupplier } from './contracts';
 export {
   approveInvoice,

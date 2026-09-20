@@ -1,0 +1,27 @@
+{
+  "value": {
+    "supplierName": "Strechy Novotny s.r.o.",
+    "supplierIco": "27770541",
+    "supplierDic": "CZ27770541",
+    "externalNumber": "2026-0455",
+    "variableSymbol": "20260455",
+    "issuedOn": "2026-09-01",
+    "dueOn": "2026-09-30",
+    "amountTotal": 480000,
+    "amountVat": 83305.79,
+    "currency": "CZK",
+    "bankAccount": "3201234571/2010",
+    "lines": [
+      {
+        "description": "Rekonstrukce ploche strechy - 2. etapa",
+        "quantity": null,
+        "unitPrice": null,
+        "amount": 480000
+      }
+    ]
+  },
+  "usage": {
+    "inputTokens": 1400,
+    "outputTokens": 420
+  }
+}

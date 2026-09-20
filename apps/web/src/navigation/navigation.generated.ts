@@ -2,7 +2,12 @@
 // Next needs the list statically: a glob would survive `next dev` and vanish in the build.
 
 import type { NavigationItem } from '../../../../packages/shared/src/ui/navigation';
+import { navigation as demoNavigation } from '../../../../packages/features/demo/ui/index';
 import { navigation as invoicesNavigation } from '../../../../packages/features/invoices/ui/index';
 import { navigation as svjNavigation } from '../../../../packages/features/svj/ui/index';
 
-export const featureNavigation: readonly NavigationItem[] = [...invoicesNavigation, ...svjNavigation];
+export const featureNavigation: readonly NavigationItem[] = [
+  ...demoNavigation,
+  ...invoicesNavigation,
+  ...svjNavigation,
+];

@@ -2,12 +2,14 @@
 // Nest needs its modules statically: a glob would survive `tsx` in dev and vanish in the bundle.
 
 import type { Type } from '@nestjs/common';
+import { DemoModule } from '../../../../packages/features/demo';
 import { DocumentsModule } from '../../../../packages/features/documents';
 import { InvoicesModule } from '../../../../packages/features/invoices';
 import { ReceivablesModule } from '../../../../packages/features/receivables';
 import { SvjModule } from '../../../../packages/features/svj';
 
 export const featureModules: readonly Type[] = [
+  DemoModule,
   DocumentsModule,
   InvoicesModule,
   ReceivablesModule,

@@ -1,0 +1,33 @@
+{
+  "value": {
+    "supplierName": "Vytahy Benes a syn s.r.o.",
+    "supplierIco": "26488124",
+    "supplierDic": "CZ26488124",
+    "externalNumber": "2026-1120",
+    "variableSymbol": "20261120",
+    "issuedOn": "2026-09-01",
+    "dueOn": "2026-09-30",
+    "amountTotal": 13230,
+    "amountVat": 2296.12,
+    "currency": "CZK",
+    "bankAccount": "2901234568/2010",
+    "lines": [
+      {
+        "description": "Servis vytahu 09/2026",
+        "quantity": null,
+        "unitPrice": null,
+        "amount": 9800
+      },
+      {
+        "description": "Vymena lanoveho vodice mimo smlouvu",
+        "quantity": null,
+        "unitPrice": null,
+        "amount": 3430
+      }
+    ]
+  },
+  "usage": {
+    "inputTokens": 1400,
+    "outputTokens": 420
+  }
+}

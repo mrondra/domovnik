@@ -7,15 +7,24 @@ import { clearSeeds, defineSeed, type SeedContext } from '../../../kernel/src/se
 import { demoUserEmail } from './demo-users';
 import { DEMO_TENANT_NAME } from './demo-tenant';
 import { runSeed } from './index';
+import { startTestStorage, type TestStorage } from '../../../kernel/src/testing/index';
 import { startMigratedDb, type MigratedDatabase } from '../database.fixture';
 
 let database: MigratedDatabase;
+let storage: TestStorage;
 
+/**
+ * Object storage as well as a database: a feature seed writes files now — `invoices` puts the demo
+ * invoices where the `demo` feature can find them — so `runSeed` needs somewhere to put them
+ * (task 019). Storage comes up second, because `startTestDb` reuses any `DATABASE_URL` it finds.
+ */
 beforeAll(async () => {
   database = await startMigratedDb();
-}, 180_000);
+  storage = await startTestStorage();
+}, 300_000);
 
 afterAll(async () => {
+  await storage.stop();
   await database.stop();
 });
 

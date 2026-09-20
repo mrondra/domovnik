@@ -7,6 +7,8 @@ export {
   findSupplierByIco,
   getInvoice,
   listInvoices,
+  processReceivedInvoice,
+  receiveInvoiceMail,
   transition,
 } from './service/index';
 
@@ -18,6 +20,7 @@ export {
   invoiceReceived,
   invoiceRejected,
 } from './domain/events';
+export { codesOfSeverity } from './domain/checks';
 export { TRANSITIONS } from './domain/status';
 export type { InvoiceStatus } from './domain/status';
 export { invoiceIdSchema } from './domain/ids';

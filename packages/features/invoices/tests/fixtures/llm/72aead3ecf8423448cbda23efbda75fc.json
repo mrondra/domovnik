@@ -1,0 +1,27 @@
+{
+  "value": {
+    "supplierName": "Ciste domy s.r.o.",
+    "supplierIco": "27130452",
+    "supplierDic": "CZ27130452",
+    "externalNumber": "2026-0901",
+    "variableSymbol": "20260901",
+    "issuedOn": "2026-09-01",
+    "dueOn": "2026-09-30",
+    "amountTotal": 8500,
+    "amountVat": 1475.21,
+    "currency": "CZK",
+    "bankAccount": "2801234567/2010",
+    "lines": [
+      {
+        "description": "Uklid spolecnych prostor 09/2026",
+        "quantity": null,
+        "unitPrice": null,
+        "amount": 8500
+      }
+    ]
+  },
+  "usage": {
+    "inputTokens": 1400,
+    "outputTokens": 420
+  }
+}
