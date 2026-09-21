@@ -57,6 +57,13 @@
       "when": 1789971564625,
       "tag": "0007_sturdy_kid_colt",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790002588485,
+      "tag": "0008_salty_hex",
+      "breakpoints": true
     }
   ]
 }

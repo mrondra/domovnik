@@ -2,6 +2,7 @@
 // Drizzle Kit reads this module, so a table only exists for migrations once it is listed here.
 
 export * from '../../kernel/src/db/schema/index';
+export * from '../../features/accounting-sync/schema';
 export * from '../../features/demo/schema';
 export * from '../../features/documents/schema';
 export * from '../../features/invoices/schema';
