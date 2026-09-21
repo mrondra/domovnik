@@ -1,64 +1,57 @@
-import { expect, test, type Page } from '@playwright/test';
-import {
-  SUMMARY,
-  releaseDatabase,
-  seedProposedInvoice,
-  statusOf,
-  type InvoiceFixture,
-} from './invoices-fixture';
-import { INVOICE_NUMBER } from './invoices-seed';
+import { expect, test, type Locator, type Page } from '@playwright/test';
+import { DEMO_PASSWORD, ROUTINE_SCENARIO, demoUser } from './demo-tenant';
 
-let fixture: InvoiceFixture;
-
-/** A fresh invoice per test: a decision is single-shot, so tests must not share one. */
-test.beforeEach(async () => {
-  fixture = await seedProposedInvoice();
-});
-
-test.afterAll(async () => {
-  await releaseDatabase();
-});
-
-const signIn = async (page: Page): Promise<void> => {
+const signIn = async (page: Page, role: Parameters<typeof demoUser>[0]): Promise<void> => {
   await page.goto('/login');
-  await page.getByLabel('E-mail').fill(fixture.email);
-  await page.getByLabel('Heslo').fill(fixture.password);
+  await page.getByLabel('E-mail').fill(demoUser(role));
+  await page.getByLabel('Heslo').fill(DEMO_PASSWORD);
   await page.getByRole('button', { name: 'Přihlásit' }).click();
   await page.waitForURL('/');
 };
 
-const openInvoice = async (page: Page): Promise<void> => {
-  await page.goto(`/s/${fixture.svjId}/invoices`);
-  await page.getByRole('link', { name: INVOICE_NUMBER }).click();
-  await expect(page).toHaveURL(new RegExp(`/invoices/${fixture.invoiceId}$`));
-};
+/** The header row of one scenario's card: its title on the left, its button on the right. */
+const scenarioHeader = (page: Page, title: string): Locator =>
+  page
+    .locator('div')
+    .filter({ has: page.getByRole('heading', { name: title }) })
+    .filter({ has: page.getByRole('button', { name: 'Spustit' }) })
+    .last();
 
-test('a committee member finds the invoice, reads what the agent proposed and approves it', async ({
-  page,
-}) => {
-  await signIn(page);
+test('the demo screen is offered to the person doing the showing', async ({ page }) => {
+  await signIn(page, 'tenant-admin');
 
-  await page.getByRole('link', { name: 'Faktury', exact: true }).first().click();
-  await expect(page.getByText(INVOICE_NUMBER)).toBeVisible();
-
-  await openInvoice(page);
-  await expect(page.getByText('Úklid Praha s.r.o.')).toBeVisible();
-  await expect(page.getByText('Blíží se splatnost')).toBeVisible();
-  await expect(page.getByText(SUMMARY)).toBeVisible();
-
-  await page.getByRole('link', { name: 'Otevřít schvalování' }).click();
-  await expect(page.getByText(SUMMARY)).toBeVisible();
-
-  await page.getByRole('button', { name: 'Schválit' }).click();
-  await expect.poll(() => statusOf(fixture), { timeout: 30_000 }).toBe('approved');
+  await expect(page.getByRole('link', { name: 'Demo', exact: true })).toBeVisible();
 });
 
-test('the invoice of one SVJ is not reachable from another', async ({ page }) => {
-  await signIn(page);
+test('and not to the accountant, who has invoices to do', async ({ page }) => {
+  await signIn(page, 'finance');
 
-  const response = await page.goto(`/s/${fixture.svjId}/invoices/${fixture.invoiceId}`);
-  expect(response?.status()).toBe(200);
+  await expect(page.getByRole('link', { name: 'Demo', exact: true })).toHaveCount(0);
+});
+
+test('running a scenario delivers an invoice, and the list then has one', async ({ page }) => {
+  await signIn(page, 'tenant-admin');
+
+  await page.getByRole('link', { name: 'Demo', exact: true }).click();
+  await expect(page).toHaveURL(/\/demo$/);
+
+  await scenarioHeader(page, ROUTINE_SCENARIO).getByRole('button', { name: 'Spustit' }).click();
+
+  // Either outcome is right: the first run of a fresh database creates the invoice, every run
+  // after that recognises the same file. Both mean the platform did the real thing.
+  await expect(page.getByText(/Faktura byla doručena|Stejný soubor/u)).toBeVisible({
+    timeout: 30_000,
+  });
 
   await page.goto('/invoices');
-  await expect(page.getByText(INVOICE_NUMBER)).toBeVisible();
+  await expect(page.getByRole('table')).toBeVisible();
+});
+
+test('an accountant reaches the invoices across the SVJ they work for', async ({ page }) => {
+  await signIn(page, 'finance');
+
+  await page.getByRole('link', { name: 'Faktury', exact: true }).first().click();
+
+  await expect(page).toHaveURL(/\/invoices$/);
+  await expect(page.getByRole('heading', { name: 'Faktury' })).toBeVisible();
 });

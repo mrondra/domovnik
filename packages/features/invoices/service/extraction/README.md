@@ -16,6 +16,12 @@ deciding, deterministically, whether anyone needs to look at it.
 **The rule:** one model call per invoice, never one per line. A line only means anything next to the
 rest of the document, and a call in a loop is slower, dearer and worse (`no-llm-in-loop`, AGENTS.md §7).
 
+The prompt is a TypeScript module rather than the `prompt.md` an agent's prompt is. This code is
+reachable from `apps/api`, which ships as a bundle, and `promptFromFile` resolves `import.meta.url`
+— inside a bundle there is no file to resolve to, and the application would not start. An agent's
+prompt stays a `.md` because the agent runtime runs in `apps/workers`, under `tsx`, with the real
+files on disk.
+
 Everything the model returns is treated as a claim, not a fact: a date in the wrong shape is dropped
 rather than coerced, an empty string is the same as nothing, and a number is never recomputed. The
 rules in `../checks/` are what decides, and they are deterministic.

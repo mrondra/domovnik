@@ -8,9 +8,9 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "generate": "tsx --env-file-if-exists=../../.env src/bin/generate.ts",
-    "migrate": "tsx --env-file-if-exists=../../.env src/bin/migrate.ts",
-    "seed": "tsx --env-file-if-exists=../../.env src/bin/seed.ts"
+    "generate": "tsx --tsconfig ../../tsconfig.base.json --env-file-if-exists=../../.env src/bin/generate.ts",
+    "migrate": "tsx --tsconfig ../../tsconfig.base.json --env-file-if-exists=../../.env src/bin/migrate.ts",
+    "seed": "tsx --tsconfig ../../tsconfig.base.json --env-file-if-exists=../../.env src/bin/seed.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2"

@@ -5,7 +5,18 @@
     "apps/*": {},
     "apps/api": {
       "entry": ["src/bin/*.ts"],
-      "ignoreDependencies": ["@node-rs/argon2", "drizzle-orm", "pg", "pg-boss", "pino"]
+      "ignoreDependencies": [
+        "@anthropic-ai/sdk",
+        "@aws-sdk/client-s3",
+        "@aws-sdk/s3-request-presigner",
+        "@node-rs/argon2",
+        "drizzle-orm",
+        "langfuse",
+        "pdf-parse",
+        "pg",
+        "pg-boss",
+        "pino"
+      ]
     },
     "apps/web": {
       "entry": ["src/bin/*.ts", "e2e/**/*.ts"]
