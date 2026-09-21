@@ -1,5 +1,5 @@
 export { navigation } from './navigation';
 export { DemoScreen } from './DemoScreen';
 
-export { scenarioListView, scenarioResultView } from './wire';
-export type { ScenarioResultView, ScenarioView } from './wire';
+export { resetResultView, scenarioListView, scenarioResultView } from './wire';
+export type { ResetResultView, ScenarioResultView, ScenarioView } from './wire';

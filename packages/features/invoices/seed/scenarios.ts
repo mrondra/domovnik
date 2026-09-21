@@ -1,7 +1,7 @@
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
 import { putObject, storageKeyFor } from '../../../kernel/src/storage/index';
-import { listScenarios, registerScenario } from '../../demo/index';
+import { registerScenario } from '../../demo/index';
 import { DEMO_SCENARIOS } from './data/invoices';
 import type { DemoScenario } from './data/scenario-shape';
 import { supplierNamed } from './data/suppliers';
@@ -55,16 +55,21 @@ const storeInvoice = async (
   return stored.key;
 };
 
+/**
+ * Idempotent by the key, not by what is already there: the object key and the scenario code are
+ * both derived from the scenario, so a second run overwrites the same file and updates the same
+ * row. That matters — a demonstration seeded months ago would otherwise keep a file the generator
+ * has since improved, and the recorded extraction answers would no longer be about it (task 026).
+ */
 export const seedScenarios = async (
   ctx: RequestContext,
   houses: readonly { readonly id: SvjId; readonly name: string }[],
 ): Promise<void> => {
-  const present = new Set((await listScenarios(ctx)).map((one) => one.code));
   const storedKeys = new Map<string, string>();
 
   for (const scenario of DEMO_SCENARIOS) {
     const house = houses[scenario.house];
-    if (house === undefined || present.has(scenario.code)) continue;
+    if (house === undefined) continue;
 
     const source = scenario.repeats ?? scenario.code;
     const key = storedKeys.get(source) ?? (await storeInvoice(ctx, source, scenario, house.name));

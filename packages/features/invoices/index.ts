@@ -3,6 +3,7 @@ export {
   InvoicesService,
   budgetStatus,
   createInvoice,
+  demoReset as resetInvoices,
   findContractsForSupplier,
   findPayableByVariableSymbol,
   findSupplierByIco,

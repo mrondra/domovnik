@@ -1,6 +1,8 @@
 import {
+  resetResultView,
   scenarioListView,
   scenarioResultView,
+  type ResetResultView,
   type ScenarioResultView,
   type ScenarioView,
 } from '../../../../packages/features/demo/ui/index';
@@ -15,3 +17,6 @@ export const runScenario = (code: string): Promise<ApiResult<ScenarioResultView>
     method: 'POST',
     body: {},
   });
+
+export const resetDemo = (): Promise<ApiResult<ResetResultView>> =>
+  callApi('/demo/reset', resetResultView, { method: 'POST', body: {} });

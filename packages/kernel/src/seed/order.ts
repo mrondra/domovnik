@@ -1,5 +1,5 @@
-import { DomainError } from '../../../kernel/src/errors/index';
-import type { SeedModule } from '../../../kernel/src/seed/index';
+import { DomainError } from '../errors/index';
+import type { SeedModule } from './types';
 
 type Visit = 'visiting' | 'done';
 

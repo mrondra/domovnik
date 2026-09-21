@@ -50,3 +50,51 @@ souborů), **Rozhraní** (názvy tabulek, sloupců, eventů, toolů, signatury �
 | 024 | accounting-sync: `AccountingAdapter` + `PohodaMockAdapter` + contract testy       | 014           |
 | 025 | accounting-sync: subscribery (posting, likvidace), sync_conflict, agent guard, UI | 024, 009, 023 |
 | 026 | fáze 1 end-to-end: demo scénář, Playwright, akceptace fáze                        | vše           |
+
+## Stav po 026
+
+Fáze 1 je hotová a předvedete ji podle `docs/demo-scenar.md`. Celý řetězec — faktura e-mailem →
+přečtení → návrh agenta → schválení výborem → zápis do (mock) Pohody → výpis → likvidace → rozdíl
+proti Pohodě — projíždí `apps/web/e2e/phase1.e2e.ts` při každém `pnpm test:e2e`, offline.
+
+### Akceptační kritéria fáze 1 (zadání kap. 11) → čím jsou doložená
+
+| Kritérium                                                                   | Kde se to ověřuje                                                                                                                                           |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Doručení faktury vede bez zásahu k `Approval` s údaji, smlouvou a rozpočtem | `features/invoices/tests/extraction.int.test.ts`, `invoice-processor.agent.int.test.ts`, `apps/web/e2e/phase1.e2e.ts` (kroky 1–3)                           |
+| Schválení zapíše fakturu do (mock) Pohody                                   | `features/accounting-sync/tests/posting.int.test.ts`, e2e krok 4                                                                                            |
+| Import odpovídající transakce fakturu zlikviduje **bez agenta**             | `features/payments/tests/expense.int.test.ts` (párování pravidlem), `features/accounting-sync/tests/liquidate.int.test.ts` (likvidace), e2e krok 5          |
+| Import výpisu spustí **právě jeden** běh `payment-matcher` nad residuálem   | `features/payments/tests/import.int.test.ts` („asks about the rest exactly once"), `payment-matcher.agent.int.test.ts` („reads the whole batch in one run") |
+| `withTenant`: dotaz mimo wrapper vyhodí výjimku, cizí tenant nic nevidí     | `kernel/src/db/tenant.int.test.ts`, `rls.int.test.ts` každé feature                                                                                         |
+| Změna faktury přímo v Pohodě je konflikt                                    | `features/accounting-sync/tests/conflicts.int.test.ts`, `guard.agent.int.test.ts`, e2e krok 7                                                               |
+| Každý krok dohledatelný v `agent_run`; audit má actora a důvod              | `kernel/src/agents/runtime/runtime.int.test.ts`, audit testy jednotlivých features                                                                          |
+| Nový agent = jeden adresář bez změny jádra                                  | `kernel/src/agents/definition.test.ts` + tři agenti (`invoice-processor`, `payment-matcher`, `accounting-sync-guard`) přidaní právě takhle                  |
+| Agent nesmí zavolat tool mimo svou definici ani mimo scope SVJ              | `kernel/src/tools/execute.int.test.ts`, `kernel/src/identity/svj-access.int.test.ts`, `kernel/src/agents/runtime/limits.int.test.ts`                        |
+
+### Co zůstalo otevřené pro fázi 2
+
+- **Příkaz k úhradě.** Zadání kap. 11 ho čeká po schválení faktury; fáze 1 fakturu zapíše do Pohody
+  a čeká na výpis. Platební příkaz (formát, podpis, banka) nemá ADR ani úkol.
+- **Úkoly.** Konflikt i návrh agenta dnes končí jako `Approval`. Úkoly (`task`) přijdou ve fázi 2 a
+  teprve ony jsou to, co zadání u konfliktu popisuje.
+- **Ověření XML na POHODA Start.** Předpoklad z kap. 8 a ADR 0005 nebyl splněn; `mserver` adapter
+  proto existuje jen jako klient a `adapters/resolve.ts` přes něj odmítne SVJ obsloužit. Co přesně
+  je neověřené, je vypsané v `features/accounting-sync/adapters/pohoda/xml/README.md`.
+- **`ReceivablesAdapter` pro Pohodu.** Fáze 1 má `internal`; `pohoda_other_receivables` je v enumu
+  a nemá implementaci.
+- **Langfuse.** Tracing je zapojený, ale žádný test neověřuje, co do něj doteče — bez klíčů se jen
+  tiše vypne.
+- **Řady, předkontace a členění DPH v Pohodě.** Mock je respektuje tvarem dokladu, hodnoty jsou
+  konstanty z configu; reálná instalace bude mít vlastní.
+
+### Odchylky a rozhodnutí, která nejsou v ADR
+
+| Co                                                                   | Proč                                                                                                                |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `onApprovalRequested` v definici toolu (kernel, 017)                 | feature si potřebuje poznamenat, že její entita čeká na schválení, dřív než `executeTool` vrátí `pending_approval`  |
+| `usersWithRole` v kernelu (022)                                      | approval se adresuje roli („finance"), ne konkrétnímu člověku                                                       |
+| `orderSeedModules` přesunuté z `packages/db` do kernelu (026)        | pořadí podle `dependsOn` čte i reset dema a testy; `dependsOn` je pole kernelového `SeedModule`                     |
+| `finance.payment.matched` verze 2 (`amount`, `bookedOn`)             | `accounting-sync` nesmí číst tabulky plateb, jen události; starší událost subscriber přeskočí                       |
+| Reset dema nesází seed znovu                                         | maže jen to, co ukázka vyrobila, takže není co sázet — a feature nesmí sáhnout do `packages/db`, kde seed runner je |
+| Uzavření konfliktu zapisuje rozhodnutí, ne novou hodnotu do faktury  | do Pohody se nepíše (ADR 0005) a `transition` neumí krok na stejný stav; opravu naší kopie dělá člověk              |
+| E2E nahrazuje model lokálním stubem (`apps/web/e2e/agent-replay.ts`) | nahrané fixtury jsou z testovacího světa, ne ze seedu; `pnpm test:e2e` má běžet bez sítě a bez účtu                 |

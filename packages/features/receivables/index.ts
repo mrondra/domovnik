@@ -1,6 +1,7 @@
 export { ReceivablesModule } from './api/receivables.module';
 export {
   ReceivablesService,
+  demoReset as resetReceivables,
   findByVariableSymbol,
   generatePrescriptions,
   listDebtors,

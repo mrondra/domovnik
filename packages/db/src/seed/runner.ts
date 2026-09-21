@@ -1,7 +1,7 @@
 import { logger } from '../../../kernel/src/logger/index';
+import { orderSeedModules } from '../../../kernel/src/seed/index';
 import { seedDemoTenant } from './demo-tenant';
 import { discoverSeedModules } from './discovery';
-import { orderSeedModules } from './order';
 
 /**
  * The demo tenant is provisioned first — it is what every other seed writes into. Feature seeds then

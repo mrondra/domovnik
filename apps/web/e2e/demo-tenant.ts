@@ -12,3 +12,12 @@ export const demoUser = (role: 'tenant-admin' | 'finance' | 'committee'): string
 
 /** The scenario the demo screen offers for an ordinary invoice; `invoices/seed` registers it. */
 export const ROUTINE_SCENARIO = 'Běžná měsíční faktura za úklid';
+
+/** The house the walkthrough is about: the routine invoice and its statement both belong to it. */
+export const WALKTHROUGH_HOUSE = 'Kotlářská 14';
+
+/**
+ * Its chair. An invoice is approved by the committee of that one house, not by whoever happens to
+ * have the role — which is the whole point of `svj_id` on a role row (task 007).
+ */
+export const WALKTHROUGH_CHAIR = 'vybor-kotlarska@demo.domovnik.test';

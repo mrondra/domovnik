@@ -1,4 +1,5 @@
 export { InvoicesService } from './invoices.service';
+export { demoReset } from './demo-reset';
 export { budgetStatus, setBudgetLine } from './budget';
 export { listContracts } from './contract-queries';
 export { createContract, findContractsForSupplier } from './contracts';

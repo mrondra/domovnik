@@ -1,13 +1,17 @@
 # seed
 
-The contract a feature's demo data implements. The kernel holds the shape and the registry only;
-the runner that orders the modules and executes them lives in `packages/db`, which is the layer
-allowed to see every feature at once.
+The contract a feature's demo data implements. The kernel holds the shape, the registry and the
+order the modules run in; what runs them — over every feature at once, against a real database —
+lives in `packages/db`.
 
-| File          | Contents                                                   |
-| ------------- | ---------------------------------------------------------- |
-| `types.ts`    | `SeedModule` — what a feature declares — and `SeedContext` |
-| `registry.ts` | `defineSeed`, `registeredSeeds`, `clearSeeds`              |
+| File          | Contents                                                       |
+| ------------- | -------------------------------------------------------------- |
+| `types.ts`    | `SeedModule` — what a feature declares — and `SeedContext`     |
+| `registry.ts` | `defineSeed`, `registeredSeeds`, `clearSeeds`                  |
+| `order.ts`    | `dependsOn` resolved into an order; a cycle is a build mistake |
+
+`order.ts` lives here because `dependsOn` is this module's own field, and more than one caller has
+to read it the same way: `pnpm db:seed` over a whole database, and a test that seeds one tenant.
 
 A feature declares its seed next to its data, and declaring it is what registers it:
 

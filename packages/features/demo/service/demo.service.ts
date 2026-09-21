@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import type { RequestContext } from '../../../kernel/src/context/index';
-import type { Scenario, ScenarioResult } from '../domain/types';
+import type { ResetResult, Scenario, ScenarioResult } from '../domain/types';
 import { listScenarios } from './registry';
+import { resetDemo } from './reset';
 import { runScenario } from './run';
 
 /**
@@ -16,5 +17,9 @@ export class DemoService {
 
   run(ctx: RequestContext, code: string): Promise<ScenarioResult> {
     return runScenario(ctx, code);
+  }
+
+  reset(ctx: RequestContext): Promise<ResetResult> {
+    return resetDemo(ctx);
   }
 }

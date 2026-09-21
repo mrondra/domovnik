@@ -25,6 +25,10 @@ export const transactionsUnmatched = defineEvent(
  * `amount` and `bookedOn` travel with the decision because what happens next is outside this
  * feature: `accounting-sync` liquidates the invoice in Pohoda and needs to know how much was paid
  * and when, and it may not read this feature's tables — only its events (task 025).
+ *
+ * Version 2 is that pair of fields. A version-1 event is still in some outbox somewhere and cannot
+ * be answered — it never said how much was paid — so a subscriber skips it rather than failing on
+ * it for ever (task 026).
  */
 export const paymentMatched = defineEvent(
   'finance.payment.matched',
@@ -37,4 +41,5 @@ export const paymentMatched = defineEvent(
     amount: z.number(),
     bookedOn: z.iso.date(),
   }),
+  { version: 2 },
 );

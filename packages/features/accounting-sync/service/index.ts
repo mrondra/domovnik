@@ -1,5 +1,6 @@
 export { AccountingSyncService } from './accounting-sync.service';
 export { getConflict, listConflicts, resolveConflict } from './conflict-decisions';
+export { demoReset } from './demo-reset';
 export { detectAcrossTenant, detectConflicts } from './detect';
 export { listJobs } from './jobs';
 export { linkOf, linkSvj, requireLink } from './links';

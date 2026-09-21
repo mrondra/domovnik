@@ -2,6 +2,7 @@ export { AccountingSyncModule } from './api/accounting-sync.module';
 export {
   AccountingSyncService,
   accountingStatus,
+  demoReset as resetAccountingSync,
   detectConflicts,
   fetchStatements,
   getConflict,

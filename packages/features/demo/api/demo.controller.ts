@@ -4,7 +4,7 @@ import type { z } from 'zod';
 import { requireContext } from '../../../kernel/src/context/index';
 import { ForbiddenError } from '../../../kernel/src/errors/index';
 import { DemoService } from '../service/index';
-import { scenarioListResponse, scenarioRunResponse } from './demo.schema';
+import { resetResponse, scenarioListResponse, scenarioRunResponse } from './demo.schema';
 
 const OK = 200;
 const ADMIN = 'tenant_admin';
@@ -17,23 +17,31 @@ const ADMIN = 'tenant_admin';
  * feature may not import from an app (ADR 0002).
  */
 @ApiTags('demo')
-@Controller('demo/scenarios')
+@Controller('demo')
 export class DemoController {
   constructor(private readonly demo: DemoService) {}
 
-  @Get()
+  @Get('scenarios')
   @ApiOperation({ summary: 'Připravené demo scénáře (demo)' })
   @ApiResponse({ status: OK, description: 'Seznam scénářů', standardSchema: scenarioListResponse })
   list(): Promise<z.output<typeof scenarioListResponse>> {
     return this.demo.list(requireAdmin());
   }
 
-  @Post(':code/run')
+  @Post('scenarios/:code/run')
   @HttpCode(OK)
   @ApiOperation({ summary: 'Spustí demo scénář (demo)' })
   @ApiResponse({ status: OK, description: 'Výsledek scénáře', standardSchema: scenarioRunResponse })
   run(@Param('code') code: string): Promise<z.output<typeof scenarioRunResponse>> {
     return this.demo.run(requireAdmin(), code);
+  }
+
+  @Post('reset')
+  @HttpCode(OK)
+  @ApiOperation({ summary: 'Vrátí tenanta do stavu po seedu (demo)' })
+  @ApiResponse({ status: OK, description: 'Kolik řádků reset smazal', standardSchema: resetResponse })
+  reset(): Promise<z.output<typeof resetResponse>> {
+    return this.demo.reset(requireAdmin());
   }
 }
 

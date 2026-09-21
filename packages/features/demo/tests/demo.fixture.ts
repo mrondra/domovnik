@@ -1,7 +1,7 @@
 import * as composedSchema from '../../../db/src/schema';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { TenantId } from '../../../kernel/src/ids/index';
-import { loadSeedsFrom, registeredSeeds } from '../../../kernel/src/seed/index';
+import { loadSeedsFrom, orderSeedModules, registeredSeeds } from '../../../kernel/src/seed/index';
 import {
   applyTestEnv,
   startTestDb,
@@ -52,13 +52,15 @@ export const useRecordedLlm = (): void => {
 const SEED_FILES = new URL('../../*/seed/*.seed.ts', import.meta.url).pathname;
 
 /**
- * The feature seeds, found the same way `pnpm db:seed` finds them. A test may not reach into
- * another feature's source (docs/engineering.md §2), and the glob is the door that is open.
+ * The feature seeds, found and ordered the same way `pnpm db:seed` finds and orders them: a seed
+ * that needs units in place declares it, and the order of a directory listing is not an order. A
+ * test may not reach into another feature's source (docs/engineering.md §2); the glob is the door
+ * that is open.
  */
 const runFeatureSeeds = async (tenant: { tenantId: TenantId; ctx: RequestContext }): Promise<void> => {
   await loadSeedsFrom([SEED_FILES]);
 
-  for (const seed of registeredSeeds()) {
+  for (const seed of orderSeedModules(registeredSeeds())) {
     await seed.run({ tenantId: tenant.tenantId, ctx: tenant.ctx });
   }
 };

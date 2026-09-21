@@ -1,9 +1,11 @@
 export { DocumentsModule } from './api/documents.module';
 export {
   DocumentsService,
+  demoReset as resetDocuments,
   documentDownloadUrl,
   findBySha256,
   getDocument,
+  listDocuments,
   readDocument,
   storeDocument,
 } from './service/index';

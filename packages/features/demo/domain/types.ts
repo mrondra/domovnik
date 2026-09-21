@@ -46,6 +46,11 @@ export const scenarioResultSchema = z.object({
 
 export type ScenarioResult = z.output<typeof scenarioResultSchema>;
 
+/** What a reset threw away, so the person who pressed the button sees that it did something. */
+export const resetResultSchema = z.object({ removed: z.int().nonnegative() });
+
+export type ResetResult = z.output<typeof resetResultSchema>;
+
 export interface RegisterScenarioInput {
   readonly code: string;
   readonly title: string;
