@@ -1,0 +1,124 @@
+{
+  "exchanges": [
+    {
+      "name": "session-title",
+      "when": { "contains": ["naming a coding session"] },
+      "message": {
+        "id": "msg_title",
+        "model": "claude-sonnet-5",
+        "content": [{ "type": "text", "text": "{\"title\":\"Nespárované platby\"}" }],
+        "stopReason": "end_turn",
+        "inputTokens": 10,
+        "outputTokens": 5
+      }
+    },
+    {
+      "name": "reads-the-whole-batch",
+      "when": {
+        "contains": ["mcp__domovnik__payment_listUnmatched"],
+        "missing": ["tool_result"]
+      },
+      "message": {
+        "id": "msg_list",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_list",
+            "name": "mcp__domovnik__payment_listUnmatched",
+            "input": { "svjId": "SVJ_ID" }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1200,
+        "outputTokens": 40
+      }
+    },
+    {
+      "name": "asks-what-the-typo-could-be",
+      "when": {
+        "contains": ["tool_result", "TYPO_ID"],
+        "missing": ["mcp__domovnik__payment_candidates\",\"input\""]
+      },
+      "message": {
+        "id": "msg_cand_typo",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_cand_typo",
+            "name": "mcp__domovnik__payment_candidates",
+            "input": { "transactionId": "TYPO_ID" }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1300,
+        "outputTokens": 40
+      }
+    },
+    {
+      "name": "proposes-the-typo",
+      "when": { "contains": ["symbol_typo"], "missing": ["payment_proposeMatch\",\"input\""] },
+      "message": {
+        "id": "msg_propose_typo",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_propose_typo",
+            "name": "mcp__domovnik__payment_proposeMatch",
+            "input": {
+              "transactionId": "TYPO_ID",
+              "targetType": "prescription",
+              "targetId": "TYPO_TARGET",
+              "amount": 3300,
+              "reason": "Variabilní symbol má prohozené poslední dvě číslice; částka i datum sedí na předpis této jednotky."
+            }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1500,
+        "outputTokens": 90
+      }
+    },
+    {
+      "name": "marks-the-bank-charge",
+      "when": { "contains": ["Poplatek za vedeni uctu"], "missing": ["payment_markIgnored\",\"input\""] },
+      "message": {
+        "id": "msg_ignore_fee",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_ignore_fee",
+            "name": "mcp__domovnik__payment_markIgnored",
+            "input": {
+              "transactionId": "FEE_ID",
+              "reason": "Poplatek za vedení účtu; není k čemu ho párovat."
+            }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1400,
+        "outputTokens": 60
+      }
+    },
+    {
+      "name": "says-what-it-did",
+      "when": { "contains": ["tool_result"] },
+      "message": {
+        "id": "msg_final",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "text",
+            "text": "Navrhl jsem spárovat jednu platbu s překlepem ve variabilním symbolu a označil jeden bankovní poplatek. Zbytek nechávám člověku: nejde z podkladů rozhodnout."
+          }
+        ],
+        "stopReason": "end_turn",
+        "inputTokens": 1800,
+        "outputTokens": 60
+      }
+    }
+  ]
+}

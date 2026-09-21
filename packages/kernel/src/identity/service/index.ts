@@ -1,6 +1,6 @@
 export { createTenant, listActiveTenants } from './tenants';
 export type { CreateTenantInput } from './tenants';
-export { createUser, requireUser, rolesOf } from './users';
+export { createUser, requireUser, rolesOf, usersWithRole } from './users';
 export { accessibleSvj, reachableSvj } from './svj-access';
 export type { CreateUserInput } from './users';
 export { authenticate } from './authentication';

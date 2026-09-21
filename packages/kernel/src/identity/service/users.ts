@@ -48,6 +48,18 @@ export const rolesOf = async (ctx: RequestContext, userId: UserId): Promise<read
     return rows.map((row) => row.role);
   });
 
+/**
+ * Everyone in this tenant who holds a role, whatever SVJ their row is scoped to. It is what a
+ * feature asks when an approval is addressed to a job rather than to a person — the accountants,
+ * the managers — and there is nowhere else that knows (task 022).
+ */
+export const usersWithRole = (ctx: RequestContext, role: Role): Promise<readonly UserId[]> =>
+  withTenant(ctx, async (tx) => {
+    const rows = await tx.select({ userId: userRole.userId }).from(userRole).where(eq(userRole.role, role));
+
+    return [...new Set(rows.map((row) => userIdSchema.parse(row.userId)))];
+  });
+
 export const requireUser = async (ctx: RequestContext, userId: UserId): Promise<{ email: string }> =>
   withTenant(ctx, async (tx) => {
     const rows = await tx.select({ email: user.email }).from(user).where(eq(user.id, userId)).limit(1);

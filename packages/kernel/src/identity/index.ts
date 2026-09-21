@@ -20,6 +20,7 @@ export {
   revokeSession,
   reachableSvj,
   rolesOf,
+  usersWithRole,
   verifyApiToken,
   verifySession,
 } from './service/index';

@@ -29,5 +29,11 @@ Three decisions worth knowing before changing anything here:
 - **An `approved` invoice is not paid, however exact the amount.** `paid` follows the accounting
   entry, and that is `posted`. Marking it here would put us out of step with Pohoda.
 
+The agent never invents a target. `payment.candidates` is computed by code — a symbol one slip of
+the fingers away, a unit whose whole debt is exactly what arrived, two or three months added up, an
+invoice of the right amount — and `payment.proposeMatch` refuses anything that is not on that list,
+both when it is proposed and again when it is approved. A wrong pairing is therefore a bug in
+`matching/` that can be fixed and tested.
+
 Importing the same statement twice adds nothing: the bank's own id for a movement is unique per
 account, and only rows that were really written go through the rules.

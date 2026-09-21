@@ -78,10 +78,12 @@ export const seedPaidHouse = async (
           month: index + 1,
         }));
 
+  // A unit's variable symbol is the same every month, so the first month raised is enough to
+  // read them off — whichever months this house was given (task 022).
   let raised: readonly { readonly variableSymbol: string }[] = [];
   for (const period of periods) {
     const month = await generatePrescriptions(ctx, { svjId: created.id, period, plan: PLAN });
-    if (period.month === PERIOD.month) raised = month;
+    if (raised.length === 0) raised = month;
   }
   const account = await createBankAccount(ctx, {
     svjId: created.id,
