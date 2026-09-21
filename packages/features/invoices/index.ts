@@ -4,6 +4,7 @@ export {
   budgetStatus,
   createInvoice,
   findContractsForSupplier,
+  findPayableByVariableSymbol,
   findSupplierByIco,
   getInvoice,
   listInvoices,

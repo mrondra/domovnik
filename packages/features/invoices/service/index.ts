@@ -13,6 +13,7 @@ export {
 export { invoiceDossier } from './dossier';
 export { supplierHistory } from './history';
 export { createInvoice, getInvoice, listInvoices } from './invoice-records';
+export { findPayableByVariableSymbol } from './payable';
 export { createSupplier, findSupplierByIco, listSuppliers } from './suppliers';
 export { processReceivedInvoice } from './extraction/index';
 export { receiveInvoiceMail } from './receive';

@@ -5,6 +5,7 @@ import type { Type } from '@nestjs/common';
 import { DemoModule } from '../../../../packages/features/demo';
 import { DocumentsModule } from '../../../../packages/features/documents';
 import { InvoicesModule } from '../../../../packages/features/invoices';
+import { PaymentsModule } from '../../../../packages/features/payments';
 import { ReceivablesModule } from '../../../../packages/features/receivables';
 import { SvjModule } from '../../../../packages/features/svj';
 
@@ -12,6 +13,7 @@ export const featureModules: readonly Type[] = [
   DemoModule,
   DocumentsModule,
   InvoicesModule,
+  PaymentsModule,
   ReceivablesModule,
   SvjModule,
 ];

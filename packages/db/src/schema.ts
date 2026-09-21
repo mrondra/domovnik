@@ -5,5 +5,6 @@ export * from '../../kernel/src/db/schema/index';
 export * from '../../features/demo/schema';
 export * from '../../features/documents/schema';
 export * from '../../features/invoices/schema';
+export * from '../../features/payments/schema';
 export * from '../../features/receivables/schema';
 export * from '../../features/svj/schema';
