@@ -21,6 +21,11 @@ export const transactionsUnmatched = defineEvent(
   z.object({ svjId: z.uuid(), transactionIds: z.array(z.uuid()).min(1).readonly() }),
 );
 
+/**
+ * `amount` and `bookedOn` travel with the decision because what happens next is outside this
+ * feature: `accounting-sync` liquidates the invoice in Pohoda and needs to know how much was paid
+ * and when, and it may not read this feature's tables — only its events (task 025).
+ */
 export const paymentMatched = defineEvent(
   'finance.payment.matched',
   z.object({
@@ -29,5 +34,7 @@ export const paymentMatched = defineEvent(
     targetType: z.enum(['prescription', 'invoice']),
     targetId: z.uuid(),
     method: z.enum(['vs_amount', 'vs_only', 'agent', 'manual']),
+    amount: z.number(),
+    bookedOn: z.iso.date(),
   }),
 );

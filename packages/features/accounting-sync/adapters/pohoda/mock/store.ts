@@ -57,6 +57,26 @@ export const recall = (ctx: RequestContext, svjId: SvjId, ref: string): Promise<
         };
   });
 
+/** Everything of one kind this house was told, newest first; the reading side filters it. */
+export const recallKind = (
+  ctx: RequestContext,
+  svjId: SvjId,
+  kind: string,
+): Promise<readonly StoredDocument[]> =>
+  withTenant(ctx, async (tx) => {
+    const rows = await tx
+      .select()
+      .from(pohodaMockStore)
+      .where(and(eq(pohodaMockStore.svjId, svjId), eq(pohodaMockStore.kind, kind)));
+
+    return rows.map((row) => ({
+      ref: row.ref,
+      kind: row.kind,
+      xml: row.xml,
+      state: jsonObject.parse(row.state),
+    }));
+  });
+
 export const amend = (
   ctx: RequestContext,
   svjId: SvjId,

@@ -1,0 +1,94 @@
+{
+  "exchanges": [
+    {
+      "name": "session-title",
+      "when": { "contains": ["naming a coding session"] },
+      "message": {
+        "id": "msg_title",
+        "model": "claude-sonnet-5",
+        "content": [{ "type": "text", "text": "{\"title\":\"Rozdíly proti Pohodě\"}" }],
+        "stopReason": "end_turn",
+        "inputTokens": 10,
+        "outputTokens": 5
+      }
+    },
+    {
+      "name": "reads-the-conflict",
+      "when": { "contains": ["CONFLICT_ID"], "missing": ["tool_result"] },
+      "message": {
+        "id": "msg_get",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_get",
+            "name": "mcp__domovnik__accounting_getConflict",
+            "input": { "conflictId": "CONFLICT_ID" }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1200,
+        "outputTokens": 40
+      }
+    },
+    {
+      "name": "reads-the-invoice",
+      "when": { "contains": ["amountTotal"], "missing": ["invoice_get\",\"input\""] },
+      "message": {
+        "id": "msg_invoice",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_invoice",
+            "name": "mcp__domovnik__invoice_get",
+            "input": { "invoiceId": "INVOICE_ID" }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1300,
+        "outputTokens": 40
+      }
+    },
+    {
+      "name": "proposes-taking-theirs",
+      "when": { "contains": ["INVOICE_ID"], "missing": ["proposeResolution\",\"input\""] },
+      "message": {
+        "id": "msg_propose",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_propose",
+            "name": "mcp__domovnik__accounting_proposeResolution",
+            "input": {
+              "conflictId": "CONFLICT_ID",
+              "resolution": "take_theirs",
+              "note": "V Pohodě je částka o 1 200 Kč nižší než u nás; tam ji účetní opravuje podle papírového dokladu, takže navrhuji převzít hodnotu z Pohody."
+            }
+          }
+        ],
+        "stopReason": "tool_use",
+        "inputTokens": 1500,
+        "outputTokens": 90
+      }
+    },
+    {
+      "name": "says-what-it-did",
+      "when": { "contains": ["tool_result"] },
+      "message": {
+        "id": "msg_final",
+        "model": "claude-sonnet-5",
+        "content": [
+          {
+            "type": "text",
+            "text": "Prošel jsem jeden rozdíl: u faktury se liší celková částka. Navrhuji převzít hodnotu z Pohody a nechávám to schválit účetní."
+          }
+        ],
+        "stopReason": "end_turn",
+        "inputTokens": 1800,
+        "outputTokens": 60
+      }
+    }
+  ]
+}

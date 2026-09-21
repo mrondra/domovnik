@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { TenantId } from '../../../kernel/src/ids/index';
+import { listScenarios } from '../../demo/index';
 import { SvjService, readModels } from '../../svj/index';
 import { accountingLinksSeed } from '../seed/accounting-links.seed';
 import { linkOf, linkSvj } from '../service/index';
@@ -48,12 +49,39 @@ describe('the accounting-sync seed', () => {
     });
   });
 
+  it('reads that house’s statements out of the accounting, the way production will', async () => {
+    const link = await linkOf(ctx, await houseNamed('Kotlářská'));
+
+    expect(link?.config).toMatchObject({ bankSource: 'pohoda' });
+  });
+
+  it('offers showing what happens when somebody edits an invoice in Pohoda', async () => {
+    const scenarios = await listScenarios(ctx);
+
+    expect(scenarios.filter((one) => one.kind === 'pohoda_mutation')).toHaveLength(1);
+    expect(scenarios.every((one) => one.description.length > 40)).toBe(true);
+  });
+
   it('leaves a house somebody repointed as they left it', async () => {
     const svjId = await houseNamed('Kotlářská');
-    await linkSvj(ctx, { svjId, companyIco: '26134586', accountingAdapter: 'mserver' });
+    await linkSvj(ctx, {
+      svjId,
+      companyIco: '26134586',
+      accountingAdapter: 'mserver',
+      config: { bankSource: 'pohoda' },
+    });
 
     await runSeed();
 
     await expect(linkOf(ctx, svjId)).resolves.toMatchObject({ accountingAdapter: 'mserver' });
+  });
+
+  it('fills in a setting a house was linked before there was one', async () => {
+    const svjId = await houseNamed('Kotlářská');
+    await linkSvj(ctx, { svjId, companyIco: '26134586' });
+
+    await runSeed();
+
+    await expect(linkOf(ctx, svjId)).resolves.toMatchObject({ config: { bankSource: 'pohoda' } });
   });
 });

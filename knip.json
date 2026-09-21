@@ -11,6 +11,7 @@
         "@aws-sdk/s3-request-presigner",
         "@node-rs/argon2",
         "drizzle-orm",
+        "fast-xml-parser",
         "langfuse",
         "pdf-parse",
         "pg",

@@ -4,7 +4,7 @@ import { audit } from '../../../kernel/src/audit/index';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import { withTenant } from '../../../kernel/src/db/index';
 import { NotFoundError } from '../../../kernel/src/errors/index';
-import { newRowId, type SvjId } from '../../../kernel/src/ids/index';
+import { newRowId, svjIdSchema, type SvjId } from '../../../kernel/src/ids/index';
 import { accountingLink } from '../schema/index';
 import type { AccountingLink, AccountingAdapterKind, ReceivablesAdapterKind } from '../domain/types';
 
@@ -65,6 +65,22 @@ export const linkOf = (ctx: RequestContext, svjId: SvjId): Promise<AccountingLin
           lastSyncAt: row.lastSyncAt,
           config: jsonObject.parse(row.config),
         };
+  });
+
+/** Every house that has an accounting unit; the daily sweep asks nothing about the others. */
+export const linkedSvj = (ctx: RequestContext): Promise<readonly SvjId[]> =>
+  withTenant(ctx, async (tx) => {
+    const rows = await tx.select({ svjId: accountingLink.svjId }).from(accountingLink);
+    return rows.map((row) => svjIdSchema.parse(row.svjId));
+  });
+
+/** When the two sides were last compared, which is what the status screen shows (task 025). */
+export const touchSync = (ctx: RequestContext, svjId: SvjId): Promise<void> =>
+  withTenant(ctx, async (tx) => {
+    await tx
+      .update(accountingLink)
+      .set({ lastSyncAt: new Date(), updatedAt: new Date() })
+      .where(eq(accountingLink.svjId, svjId));
   });
 
 export const requireLink = async (ctx: RequestContext, svjId: SvjId): Promise<AccountingLink> => {

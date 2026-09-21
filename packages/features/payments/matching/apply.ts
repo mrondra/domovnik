@@ -88,6 +88,8 @@ export const applyMatch = (
         targetType: decision.targetType,
         targetId: decision.targetId,
         method: decision.method,
+        amount: decision.amount,
+        bookedOn: movement.bookedOn,
       }),
     );
   });

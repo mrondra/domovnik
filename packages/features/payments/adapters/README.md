@@ -6,10 +6,12 @@ Where a bank statement comes from (zadání kap. 8).
 | ----------------- | ------------------------------------------------------------ |
 | `bank.adapter.ts` | the port: an account and a stretch of time in, movements out |
 | `synthetic/`      | the demo bank, derived from what the house was asked to pay  |
-| `resolve.ts`      | which implementation is in use                               |
+| `pohoda-bank.ts`  | the statement as the accounting holds it (zadání kap. 8)     |
+| `resolve.ts`      | which implementation serves which house                      |
 | `index.ts`        | the public face of this directory                            |
 
-**The rule:** nothing outside this directory names an implementation — ask `bankAdapter()`.
+**The rule:** nothing outside this directory names an implementation — ask `bankAdapterFor()`.
+Which one a house gets is written in its accounting link (`config.bankSource`), not in code.
 
 The generated statement is not invented. It is a function of the prescriptions the house was sent
 and the invoices it has posted, bent by a profile: one house pays like a textbook, one is where the

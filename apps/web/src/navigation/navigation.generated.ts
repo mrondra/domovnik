@@ -2,6 +2,7 @@
 // Next needs the list statically: a glob would survive `next dev` and vanish in the build.
 
 import type { NavigationItem } from '../../../../packages/shared/src/ui/navigation';
+import { navigation as accountingSyncNavigation } from '../../../../packages/features/accounting-sync/ui/index';
 import { navigation as demoNavigation } from '../../../../packages/features/demo/ui/index';
 import { navigation as invoicesNavigation } from '../../../../packages/features/invoices/ui/index';
 import { navigation as paymentsNavigation } from '../../../../packages/features/payments/ui/index';
@@ -9,6 +10,7 @@ import { navigation as receivablesNavigation } from '../../../../packages/featur
 import { navigation as svjNavigation } from '../../../../packages/features/svj/ui/index';
 
 export const featureNavigation: readonly NavigationItem[] = [
+  ...accountingSyncNavigation,
   ...demoNavigation,
   ...invoicesNavigation,
   ...paymentsNavigation,

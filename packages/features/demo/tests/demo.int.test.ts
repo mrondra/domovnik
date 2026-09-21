@@ -45,6 +45,12 @@ describe('the scenarios the seed prepared', () => {
     expect(scenarios.some((one) => one.kind === 'bank_sync')).toBe(true);
   });
 
+  it('offers showing a change somebody made in the accounting itself', async () => {
+    const scenarios = await listScenarios(ctx);
+
+    expect(scenarios.some((one) => one.kind === 'pohoda_mutation')).toBe(true);
+  });
+
   it('refuses a scenario nobody prepared', async () => {
     await expect(runScenario(ctx, 'neexistuje')).rejects.toBeInstanceOf(NotFoundError);
   });
@@ -77,6 +83,16 @@ describe('running a scenario', () => {
 
     expect(invoice.status).toBe('needs_review');
     expect(codesOfSeverity(invoice.checks, 'blocking')).toContain('supplier_unknown');
+  });
+
+  it('says plainly that there is nothing in the accounting to change yet', async () => {
+    const mutation = (await listScenarios(ctx)).find((one) => one.kind === 'pohoda_mutation');
+    if (mutation === undefined) throw new RangeError('pohoda_mutation');
+
+    const result = await runScenario(ctx, mutation.code);
+
+    expect(result.outcome).toBe('conflict');
+    expect(result.message).toContain('není žádná faktura');
   });
 
   it('recognises the file it has already delivered', async () => {

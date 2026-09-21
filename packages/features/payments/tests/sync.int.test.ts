@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
 import { listDebtors } from '../../receivables/index';
-import { bankAdapter } from '../adapters/index';
+import { bankAdapterFor } from '../adapters/index';
 import type { BankAccountId } from '../domain/ids';
 import { syncBankAccount } from '../service/index';
 import {
@@ -54,9 +54,10 @@ const sync = (house: House) => syncBankAccount(ctx, { bankAccountId: house.bankA
 describe('the generated statement', () => {
   it('is the same statement every time it is asked for', async () => {
     const house = houseAt(0);
+    const adapter = await bankAdapterFor(ctx, house.svjId);
     const [first, again] = await Promise.all([
-      bankAdapter().fetchTransactions(ctx, { bankAccountId: house.bankAccountId, ...RANGE }),
-      bankAdapter().fetchTransactions(ctx, { bankAccountId: house.bankAccountId, ...RANGE }),
+      adapter.fetchTransactions(ctx, { bankAccountId: house.bankAccountId, ...RANGE }),
+      adapter.fetchTransactions(ctx, { bankAccountId: house.bankAccountId, ...RANGE }),
     ]);
 
     expect(again).toStrictEqual(first);

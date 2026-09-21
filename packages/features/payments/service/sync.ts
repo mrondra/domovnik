@@ -1,6 +1,6 @@
 import type { RequestContext } from '../../../kernel/src/context/index';
 import { withTenant } from '../../../kernel/src/db/index';
-import { bankAdapter } from '../adapters/index';
+import { bankAdapterFor } from '../adapters/index';
 import type { BankAccountId } from '../domain/ids';
 import type { ImportResult, IsoDay } from '../domain/types';
 import { getBankAccount } from './accounts';
@@ -20,7 +20,8 @@ export interface SyncBankAccountInput {
 export const syncBankAccount = (ctx: RequestContext, input: SyncBankAccountInput): Promise<ImportResult> =>
   withTenant(ctx, async () => {
     const account = await getBankAccount(ctx, input.bankAccountId);
-    const transactions = await bankAdapter().fetchTransactions(ctx, input);
+    const adapter = await bankAdapterFor(ctx, account.svjId);
+    const transactions = await adapter.fetchTransactions(ctx, input);
 
     return importTransactions(ctx, {
       svjId: account.svjId,

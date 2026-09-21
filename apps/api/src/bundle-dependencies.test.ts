@@ -24,9 +24,13 @@ const FROM_KERNEL = [
   'uuid',
 ] as const;
 
-/** Reached through a feature the API serves: `invoices` reads the text layer of a PDF. */
+/**
+ * Reached through a feature the API serves: `invoices` reads the text layer of a PDF, and
+ * `accounting-sync` reads what Pohoda answered (task 025).
+ */
 const FROM_FEATURES: Readonly<Record<string, string>> = {
   'pdf-parse': '../../../packages/features/invoices/package.json',
+  'fast-xml-parser': '../../../packages/features/accounting-sync/package.json',
 };
 
 interface Manifest {

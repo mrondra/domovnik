@@ -10,6 +10,7 @@ export {
   listInvoices,
   processReceivedInvoice,
   receiveInvoiceMail,
+  supplierById,
   transition,
 } from './service/index';
 

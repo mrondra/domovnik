@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /** What a scenario does when it is run. One kind per thing the demo can show (task 019). */
-export const scenarioKindSchema = z.enum(['inbound_invoice', 'bank_sync']);
+export const scenarioKindSchema = z.enum(['inbound_invoice', 'bank_sync', 'pohoda_mutation']);
 
 export type ScenarioKind = z.output<typeof scenarioKindSchema>;
 
@@ -20,6 +20,12 @@ export const bankSyncPayloadSchema = z.object({
   months: z.int().positive(),
 });
 
+/** Somebody changing an invoice in Pohoda itself: which house, and by how much (task 025). */
+export const pohodaMutationPayloadSchema = z.object({
+  svjId: z.uuid(),
+  amountChange: z.number(),
+});
+
 export const scenarioSchema = z.object({
   id: z.uuid(),
   code: z.string().min(1),
@@ -32,7 +38,7 @@ export type Scenario = z.output<typeof scenarioSchema>;
 
 export const scenarioResultSchema = z.object({
   code: z.string().min(1),
-  outcome: z.enum(['created', 'duplicate', 'imported']),
+  outcome: z.enum(['created', 'duplicate', 'imported', 'conflict']),
   message: z.string().min(1),
   /** What the scenario produced, when it produced something a person can go and look at. */
   invoiceId: z.uuid().nullable(),

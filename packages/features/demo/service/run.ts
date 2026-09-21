@@ -1,4 +1,5 @@
 import { buffer as readToEnd } from 'node:stream/consumers';
+import type { z } from 'zod';
 import { audit } from '../../../kernel/src/audit/index';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import { withTenant } from '../../../kernel/src/db/index';
@@ -7,6 +8,7 @@ import { svjIdSchema } from '../../../kernel/src/ids/index';
 import { receiveInvoiceMail } from '../../invoices/index';
 import { inboundInvoicePayloadSchema, scenarioKindSchema, type ScenarioResult } from '../domain/types';
 import { runBankSync } from './bank-sync';
+import { runPohodaMutation } from './pohoda-mutation';
 import { scenarioOf } from './registry';
 
 const FILENAME = 'faktura.pdf';
@@ -52,6 +54,14 @@ const deliverInvoice = async (
       };
 };
 
+type Runner = (ctx: RequestContext, code: string, payload: unknown) => Promise<ScenarioResult>;
+
+const RUNNERS: Readonly<Record<z.output<typeof scenarioKindSchema>, Runner>> = {
+  inbound_invoice: deliverInvoice,
+  bank_sync: runBankSync,
+  pohoda_mutation: runPohodaMutation,
+};
+
 /**
  * Runs one scenario. It is audited like anything else a person does — a demonstration that leaves
  * no trace is indistinguishable from data somebody invented (ADR 0011).
@@ -59,10 +69,7 @@ const deliverInvoice = async (
 export const runScenario = (ctx: RequestContext, code: string): Promise<ScenarioResult> =>
   withTenant(ctx, async () => {
     const { kind, payload } = await scenarioOf(ctx, code);
-    const result =
-      scenarioKindSchema.parse(kind) === 'bank_sync'
-        ? await runBankSync(ctx, code, payload)
-        : await deliverInvoice(ctx, code, payload);
+    const result = await RUNNERS[scenarioKindSchema.parse(kind)](ctx, code, payload);
 
     await audit.record(ctx, {
       action: 'demo.scenario.run',

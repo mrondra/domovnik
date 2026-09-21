@@ -1,14 +1,21 @@
 import type { RequestContext } from '../../../../../kernel/src/context/index';
 import type { SvjId } from '../../../../../kernel/src/ids/index';
-import type { FetchStatementsInput, LiquidateInput, PostInvoiceInput } from '../../../domain/types';
+import type {
+  BankStatementLine,
+  FetchStatementsInput,
+  LiquidateInput,
+  PostInvoiceInput,
+} from '../../../domain/types';
 import type { AccountingAdapter, UpsertSupplierInput } from '../../accounting.adapter';
-import { bankStatementRequest, liquidation, receivedInvoice } from '../xml/builders';
+import { liquidation, receivedInvoice } from '../xml/builders';
 import { asInvoice } from './invoice-state';
 import { packFor, refFor } from './refs';
-import { statementsFor } from './statements';
+import { readStatements, writeStatements } from './statement-door';
 import { amend, recall, remember } from './store';
 
 export interface PohodaMock extends AccountingAdapter {
+  /** What the bank told the accounting. In the demo it is the generated statement (task 025). */
+  rememberStatements(ctx: RequestContext, svjId: SvjId, lines: readonly BankStatementLine[]): Promise<void>;
   /** Changing an invoice the way somebody would in Pohoda itself, which is what 025 detects. */
   mutateInvoice(
     ctx: RequestContext,
@@ -65,22 +72,7 @@ export const pohodaMock: PohodaMock = {
     });
   },
 
-  fetchBankStatements: async (ctx, input: FetchStatementsInput) => {
-    const ref = refFor('lstk', `${input.accountIco}:${input.from}:${input.to}`);
-    await remember(ctx, input.svjId, {
-      ref,
-      kind: 'statement-request',
-      xml: packFor({
-        ico: input.accountIco,
-        note: `Výpis ${input.from} – ${input.to}`,
-        id: ref,
-        body: bankStatementRequest(input),
-      }),
-      state: { from: input.from, to: input.to },
-    });
-
-    return statementsFor(input);
-  },
+  fetchBankStatements: (ctx, input: FetchStatementsInput) => readStatements(ctx, input),
 
   fetchInvoice: async (ctx, svjId: SvjId, accountingRef: string) => {
     const stored = await recall(ctx, svjId, accountingRef);
@@ -97,6 +89,8 @@ export const pohodaMock: PohodaMock = {
     });
     return { accountingRef: ref };
   },
+
+  rememberStatements: (ctx, svjId, lines) => writeStatements(ctx, svjId, lines),
 
   mutateInvoice: (ctx, svjId, accountingRef, patch) => amend(ctx, svjId, accountingRef, patch),
 };

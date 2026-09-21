@@ -1,1 +1,1 @@
-export { bankAdapter } from './resolve';
+export { bankAdapterFor } from './resolve';
