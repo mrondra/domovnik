@@ -5,6 +5,7 @@ import type { BankAccountId } from '../domain/ids';
 import type { BankAccount, BankTransaction, ImportResult } from '../domain/types';
 import { createBankAccount, getBankAccount, listBankAccounts, type CreateBankAccountInput } from './accounts';
 import { importTransactions, type ImportTransactionsInput } from './import';
+import { syncBankAccount, type SyncBankAccountInput } from './sync';
 import { listTransactions } from './transactions';
 
 /**
@@ -27,6 +28,10 @@ export class PaymentsService {
 
   importTransactions(ctx: RequestContext, input: ImportTransactionsInput): Promise<ImportResult> {
     return importTransactions(ctx, input);
+  }
+
+  syncBankAccount(ctx: RequestContext, input: SyncBankAccountInput): Promise<ImportResult> {
+    return syncBankAccount(ctx, input);
   }
 
   listTransactions(

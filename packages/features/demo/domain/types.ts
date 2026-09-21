@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /** What a scenario does when it is run. One kind per thing the demo can show (task 019). */
-export const scenarioKindSchema = z.enum(['inbound_invoice']);
+export const scenarioKindSchema = z.enum(['inbound_invoice', 'bank_sync']);
 
 export type ScenarioKind = z.output<typeof scenarioKindSchema>;
 
@@ -11,6 +11,13 @@ export const inboundInvoicePayloadSchema = z.object({
   svjId: z.uuid(),
   from: z.string().min(1),
   subject: z.string().min(1),
+});
+
+/** Reading a statement: which account, and how far back. The movements are derived, not stored. */
+export const bankSyncPayloadSchema = z.object({
+  bankAccountId: z.uuid(),
+  svjId: z.uuid(),
+  months: z.int().positive(),
 });
 
 export const scenarioSchema = z.object({
@@ -25,7 +32,7 @@ export type Scenario = z.output<typeof scenarioSchema>;
 
 export const scenarioResultSchema = z.object({
   code: z.string().min(1),
-  outcome: z.enum(['created', 'duplicate']),
+  outcome: z.enum(['created', 'duplicate', 'imported']),
   message: z.string().min(1),
   /** What the scenario produced, when it produced something a person can go and look at. */
   invoiceId: z.uuid().nullable(),

@@ -36,10 +36,15 @@ export const listScenarios = (ctx: RequestContext): Promise<readonly Scenario[]>
     }));
   });
 
-export const scenarioPayload = (ctx: RequestContext, code: string): Promise<unknown> =>
+export interface StoredScenario {
+  readonly kind: string;
+  readonly payload: unknown;
+}
+
+export const scenarioOf = (ctx: RequestContext, code: string): Promise<StoredScenario> =>
   withTenant(ctx, async (tx) => {
     const rows = await tx
-      .select({ payload: demoScenario.payload })
+      .select({ kind: demoScenario.kind, payload: demoScenario.payload })
       .from(demoScenario)
       .where(eq(demoScenario.code, code))
       .limit(1);
@@ -51,5 +56,5 @@ export const scenarioPayload = (ctx: RequestContext, code: string): Promise<unkn
         details: { scenario: code },
       });
     }
-    return row.payload;
+    return row;
   });

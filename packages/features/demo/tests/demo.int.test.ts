@@ -36,9 +36,13 @@ describe('the scenarios the seed prepared', () => {
   it('each says what it is meant to show', async () => {
     const scenarios = await listScenarios(ctx);
 
-    expect(scenarios).toHaveLength(5);
+    const invoices = scenarios.filter((one) => one.kind === 'inbound_invoice');
+
+    expect(invoices).toHaveLength(5);
     expect(scenarios.every((one) => one.description.length > 40)).toBe(true);
     expect(scenarios.map((one) => one.code)).toContain('invoice-duplicate');
+    // `payments` registers one of its own per bank account (task 021).
+    expect(scenarios.some((one) => one.kind === 'bank_sync')).toBe(true);
   });
 
   it('refuses a scenario nobody prepared', async () => {

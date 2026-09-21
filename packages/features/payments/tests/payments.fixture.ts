@@ -39,7 +39,11 @@ let sequence = 0;
  * arrive on. Identical amounts are what make the acceptance case readable: a movement either fits
  * or it does not, for a reason the test states rather than one the data hides.
  */
-export const seedPaidHouse = async (ctx: RequestContext, unitCount: number): Promise<PaidHouse> => {
+export const seedPaidHouse = async (
+  ctx: RequestContext,
+  unitCount: number,
+  months = 1,
+): Promise<PaidHouse> => {
   sequence += 1;
   const svj = new SvjService();
   const created = await svj.createSvj(ctx, {
@@ -65,7 +69,20 @@ export const seedPaidHouse = async (ctx: RequestContext, unitCount: number): Pro
     });
   }
 
-  const raised = await generatePrescriptions(ctx, { svjId: created.id, period: PERIOD, plan: PLAN });
+  // One month by default; a whole year when the test is about a year of statements (task 021).
+  const periods =
+    months === 1
+      ? [PERIOD]
+      : Array.from({ length: months }, (_unused, index) => ({
+          year: PERIOD.year,
+          month: index + 1,
+        }));
+
+  let raised: readonly { readonly variableSymbol: string }[] = [];
+  for (const period of periods) {
+    const month = await generatePrescriptions(ctx, { svjId: created.id, period, plan: PLAN });
+    if (period.month === PERIOD.month) raised = month;
+  }
   const account = await createBankAccount(ctx, {
     svjId: created.id,
     number: String(2_800_000_000 + sequence),

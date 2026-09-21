@@ -5,8 +5,9 @@ import { withTenant } from '../../../kernel/src/db/index';
 import { getObject, storageKeySchema } from '../../../kernel/src/storage/index';
 import { svjIdSchema } from '../../../kernel/src/ids/index';
 import { receiveInvoiceMail } from '../../invoices/index';
-import { inboundInvoicePayloadSchema, type ScenarioResult } from '../domain/types';
-import { scenarioPayload } from './registry';
+import { inboundInvoicePayloadSchema, scenarioKindSchema, type ScenarioResult } from '../domain/types';
+import { runBankSync } from './bank-sync';
+import { scenarioOf } from './registry';
 
 const FILENAME = 'faktura.pdf';
 
@@ -57,7 +58,11 @@ const deliverInvoice = async (
  */
 export const runScenario = (ctx: RequestContext, code: string): Promise<ScenarioResult> =>
   withTenant(ctx, async () => {
-    const result = await deliverInvoice(ctx, code, await scenarioPayload(ctx, code));
+    const { kind, payload } = await scenarioOf(ctx, code);
+    const result =
+      scenarioKindSchema.parse(kind) === 'bank_sync'
+        ? await runBankSync(ctx, code, payload)
+        : await deliverInvoice(ctx, code, payload);
 
     await audit.record(ctx, {
       action: 'demo.scenario.run',
