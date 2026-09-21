@@ -4,10 +4,14 @@
 import type { NavigationItem } from '../../../../packages/shared/src/ui/navigation';
 import { navigation as demoNavigation } from '../../../../packages/features/demo/ui/index';
 import { navigation as invoicesNavigation } from '../../../../packages/features/invoices/ui/index';
+import { navigation as paymentsNavigation } from '../../../../packages/features/payments/ui/index';
+import { navigation as receivablesNavigation } from '../../../../packages/features/receivables/ui/index';
 import { navigation as svjNavigation } from '../../../../packages/features/svj/ui/index';
 
 export const featureNavigation: readonly NavigationItem[] = [
   ...demoNavigation,
   ...invoicesNavigation,
+  ...paymentsNavigation,
+  ...receivablesNavigation,
   ...svjNavigation,
 ];

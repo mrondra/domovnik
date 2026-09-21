@@ -3,6 +3,7 @@
 
 import type { ComponentType } from 'react';
 import { approvalEvidenceRenderers as invoicesEvidence } from '../../../../packages/features/invoices/ui/index';
+import { approvalEvidenceRenderers as paymentsEvidence } from '../../../../packages/features/payments/ui/index';
 
 export interface EvidenceRendererProps {
   readonly input: unknown;
@@ -10,4 +11,5 @@ export interface EvidenceRendererProps {
 
 export const evidenceRenderers: Readonly<Record<string, ComponentType<EvidenceRendererProps>>> = {
   ...invoicesEvidence,
+  ...paymentsEvidence,
 };

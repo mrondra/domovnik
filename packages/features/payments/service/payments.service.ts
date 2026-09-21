@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
-import type { BankAccountId } from '../domain/ids';
+import type { BankAccountId, BankTransactionId } from '../domain/ids';
 import type { BankAccount, BankTransaction, ImportResult } from '../domain/types';
 import { createBankAccount, getBankAccount, listBankAccounts, type CreateBankAccountInput } from './accounts';
 import { importTransactions, type ImportTransactionsInput } from './import';
+import { browseTransactions, type BrowseTransactionsInput } from './browse';
+import { transactionDetail, type TransactionDetail } from './detail';
+import { matchManually, type ManualMatchInput } from './manual';
+import { setMatchStatus } from './residual';
 import { syncBankAccount, type SyncBankAccountInput } from './sync';
 import { listTransactions } from './transactions';
 
@@ -32,6 +36,30 @@ export class PaymentsService {
 
   syncBankAccount(ctx: RequestContext, input: SyncBankAccountInput): Promise<ImportResult> {
     return syncBankAccount(ctx, input);
+  }
+
+  browseTransactions(
+    ctx: RequestContext,
+    input: BrowseTransactionsInput,
+  ): Promise<readonly BankTransaction[]> {
+    return browseTransactions(ctx, input);
+  }
+
+  transactionDetail(ctx: RequestContext, transactionId: BankTransactionId): Promise<TransactionDetail> {
+    return transactionDetail(ctx, transactionId);
+  }
+
+  matchManually(ctx: RequestContext, input: ManualMatchInput): Promise<void> {
+    return matchManually(ctx, input);
+  }
+
+  setMatchStatus(
+    ctx: RequestContext,
+    transactionId: BankTransactionId,
+    status: Parameters<typeof setMatchStatus>[2],
+    reason: string,
+  ): Promise<void> {
+    return setMatchStatus(ctx, transactionId, status, reason);
   }
 
   listTransactions(
