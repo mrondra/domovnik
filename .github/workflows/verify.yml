@@ -1,5 +1,10 @@
 name: verify
-on: [push, pull_request]
+# Větev s otevřeným PR jinak spustí workflow dvakrát (push i pull_request)
+# a obojí testuje totéž. Push proto hlídá jen main, zbytek řeší pull_request.
+on:
+  push:
+    branches: [main]
+  pull_request:
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -11,6 +16,11 @@ jobs:
         options: --health-cmd pg_isready --health-interval 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
+        # Gitleaks skenuje historii commitů (`git log -p <sha>..<sha>`), ale
+        # výchozí mělký klon (fetch-depth: 1) je nemá — skončí na
+        # "fatal: ambiguous argument" a scanned ~0 bytes.
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with: { node-version-file: .nvmrc, cache: pnpm }
@@ -42,4 +52,9 @@ jobs:
           S3_SECRET_KEY: unused
           S3_BUCKET: unused
 
+      # Při pull_request si gitleaks tahá seznam commitů přes API, takže
+      # bez tokenu skončí na "GITHUB_TOKEN is now required to scan pull
+      # requests". Při push ho nepotřebuje, proto to padalo jen na PR.
       - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

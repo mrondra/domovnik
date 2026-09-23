@@ -18,4 +18,10 @@ commit-msg:
 pre-push:
   commands:
     verify:
-      run: pnpm verify
+      # `verify:fast` = všechno kromě integration testů. Ty potřebují
+      # testcontainers, jsou nejpomalejší a občas spadnou na timeoutu
+      # portů, aniž by se čehokoli týkaly. CI (.github/workflows/verify.yml)
+      # pouští plné `pnpm verify` na push i pull_request proti postgresu
+      # jako službě, takže se integration vrstva stejně ověří — jen
+      # spolehlivěji a bez osmiminutové daně na každý push.
+      run: pnpm verify:fast
