@@ -16,6 +16,11 @@ jobs:
         options: --health-cmd pg_isready --health-interval 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
+        # Gitleaks skenuje historii commitů (`git log -p <sha>..<sha>`), ale
+        # výchozí mělký klon (fetch-depth: 1) je nemá — skončí na
+        # "fatal: ambiguous argument" a scanned ~0 bytes.
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with: { node-version-file: .nvmrc, cache: pnpm }
