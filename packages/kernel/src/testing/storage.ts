@@ -3,7 +3,14 @@ import { AdapterError } from '../errors/index';
 import { resetStorageClient } from '../storage/index';
 import { applyTestEnv } from './env';
 
-const IMAGE = 'minio/minio';
+/**
+ * From quay.io, not from Docker Hub: MinIO stopped publishing there, so `minio/minio` now answers
+ * a pull with „access denied" — on a machine with the old image cached the tests kept passing and
+ * CI, which has no cache, could not start a single one of them. The tag is pinned for the same
+ * reason `docker-compose.yml` pins it: a test that depends on what `latest` means today is a test
+ * that breaks on a Tuesday.
+ */
+const IMAGE = 'quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z';
 const PORT = 9000;
 const ROOT_USER = 'domovnik';
 const ROOT_PASSWORD = 'domovnik123';
