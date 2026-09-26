@@ -17,37 +17,38 @@ services:
       retries: 5
 
   minio:
-    # Docker Hub už MinIO nevydává; obrazy jsou na quay.io a tag je připnutý, aby se prostředí
-    # nezměnilo pod rukama (stejný tag drží i testcontainer v packages/kernel/src/testing).
-    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+    # Chainguard, protože MinIO své vlastní obrazy stáhlo: `docker pull minio/minio` odpoví
+    # „repository does not exist" a quay.io 401 — na každý tag i na digest toho, který jsme měli
+    # připnutý. Na stroji s obrazem v cache to není vidět, čerstvý klon a CI nerozjedou nic.
+    #
+    # Tag je `latest` schválně, i když to jde proti pravidlu připínat: free tier nic jiného
+    # nevydává a starý digest do pár týdnů zmizí, takže by pin shnil rychleji, než se tag hne.
+    # Kupujeme si za to obraz, který někdo pořád záplatuje. Stejný obraz drží i testcontainer
+    # v packages/kernel/src/testing/storage.ts.
+    image: cgr.dev/chainguard/minio:latest
+    # Konzole tu není mapovaná: z komunitního MinIA ji vyhodili, port by jen mátl.
     ports:
       - '9000:9000'
-      - '9001:9001'
     environment:
       MINIO_ROOT_USER: domovnik
       MINIO_ROOT_PASSWORD: domovnik123
     volumes:
       - miniodata:/data
-    command: server /data --console-address ":9001"
-    healthcheck:
-      test: ['CMD', 'mc', 'ready', 'local']
-      interval: 5s
-      timeout: 3s
-      retries: 5
+    command: ['server', '/data']
+    # Healthcheck tu chybí zámyslem: v obrazu není curl, wget ani nc, takže by ho neměl čím
+    # udělat. Pořadí řeší minio-init níž svou restart policy.
 
   minio-init:
-    # Tentýž obraz jako server: `mc` je v něm (běží na něm i healthcheck výš),
-    # takže se netahá druhý obraz a není co držet v synchronizaci.
-    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+    # `mc` od stejného vydavatele. Obraz je distroless — žádný shell, takže žádné
+    # `mc alias set … && mc mb`: přihlášení nese MC_HOST_<alias> a čekání na server řeší
+    # restart policy, ne smyčka v shellu.
+    image: cgr.dev/chainguard/minio-client:latest
     depends_on:
-      minio:
-        condition: service_healthy
-    entrypoint: >
-      /bin/sh -c "
-      mc alias set local http://minio:9000 domovnik domovnik123 &&
-      mc mb --ignore-existing local/domovnik &&
-      exit 0
-      "
+      - minio
+    environment:
+      MC_HOST_local: http://domovnik:domovnik123@minio:9000
+    command: ['mb', '--ignore-existing', 'local/domovnik']
+    restart: on-failure
 
   langfuse-postgres:
     image: postgres:16

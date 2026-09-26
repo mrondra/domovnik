@@ -1,16 +1,20 @@
-import { GenericContainer, Wait, type StartedTestContainer } from 'testcontainers';
+import { CreateBucketCommand, S3Client } from '@aws-sdk/client-s3';
+import { GenericContainer, Wait } from 'testcontainers';
 import { AdapterError } from '../errors/index';
 import { resetStorageClient } from '../storage/index';
 import { applyTestEnv } from './env';
 
 /**
- * From quay.io, not from Docker Hub: MinIO stopped publishing there, so `minio/minio` now answers
- * a pull with „access denied" — on a machine with the old image cached the tests kept passing and
- * CI, which has no cache, could not start a single one of them. The tag is pinned for the same
- * reason `docker-compose.yml` pins it: a test that depends on what `latest` means today is a test
- * that breaks on a Tuesday.
+ * Chainguard, because MinIO's own images are gone: `docker pull minio/minio` answers „repository
+ * does not exist" and quay.io answers 401 — for every tag, and for the digest of the tag this file
+ * used to pin. A machine with the old image cached does not notice; CI, which has no cache, cannot
+ * start a single test. That is how it broke.
+ *
+ * The tag is `latest` and that is deliberate, though it argues against the rule of pinning: the
+ * free tier publishes nothing else, and an old digest is garbage-collected within weeks, so a pin
+ * would rot faster than the tag moves. What we buy for it is an image someone still patches.
  */
-const IMAGE = 'quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z';
+const IMAGE = 'cgr.dev/chainguard/minio:latest';
 const PORT = 9000;
 const ROOT_USER = 'domovnik';
 const ROOT_PASSWORD = 'domovnik123';
@@ -22,19 +26,30 @@ export interface TestStorage {
   stop(): Promise<void>;
 }
 
-/** `mc` ships inside the MinIO image; compose creates its bucket the same way. */
-const createBucket = async (container: StartedTestContainer): Promise<void> => {
-  const script = [
-    `mc alias set local http://localhost:${String(PORT)} ${ROOT_USER} ${ROOT_PASSWORD}`,
-    `mc mb --ignore-existing local/${BUCKET}`,
-  ].join(' && ');
-  const result = await container.exec(['sh', '-c', script]);
-  if (result.exitCode !== 0) {
+/**
+ * Over the S3 API, not with `mc` inside the container: the image is distroless in places and what
+ * ships in it is not ours to depend on. The bucket is made with the same protocol the tests use,
+ * so if this call works the tests can talk to the container at all.
+ */
+const createBucket = async (endpoint: string): Promise<void> => {
+  const admin = new S3Client({
+    endpoint,
+    region: 'us-east-1',
+    forcePathStyle: true,
+    // gitleaks:allow — fixed credentials of a throwaway container, never a real secret.
+    credentials: { accessKeyId: ROOT_USER, secretAccessKey: ROOT_PASSWORD },
+  });
+  try {
+    await admin.send(new CreateBucketCommand({ Bucket: BUCKET }));
+  } catch (cause) {
     throw new AdapterError(`Bucket ${BUCKET} se nepodařilo vytvořit`, {
       code: 'test_bucket_failed',
       retryable: false,
-      details: { output: result.output },
+      details: { endpoint },
+      cause,
     });
+  } finally {
+    admin.destroy();
   }
 };
 
@@ -50,9 +65,9 @@ export const startTestStorage = async (): Promise<TestStorage> => {
     .withWaitStrategy(Wait.forHttp('/minio/health/live', PORT))
     .start();
 
-  await createBucket(container);
-
   const endpoint = `http://${container.getHost()}:${String(container.getMappedPort(PORT))}`;
+  await createBucket(endpoint);
+
   applyTestEnv({
     S3_ENDPOINT: endpoint,
     S3_REGION: 'us-east-1',

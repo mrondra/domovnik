@@ -50,9 +50,11 @@ module.exports = {
     {
       // One bucket for the whole platform, separated by a key prefix: the prefix check lives in
       // `storage/keys.ts`, so a caller reaching for the SDK would be reaching past it.
+      // `testing/storage.ts` provisions the bucket a test writes into; the storage module
+      // deliberately offers no such call, because nothing in production creates buckets.
       name: 'no-direct-s3',
       severity: 'error',
-      from: { pathNot: '^packages/kernel/src/storage' },
+      from: { pathNot: '^packages/kernel/src/(storage|testing/storage\\.ts)' },
       to: { path: 'node_modules/@aws-sdk/(client-s3|s3-request-presigner)/' },
     },
     {

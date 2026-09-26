@@ -20,8 +20,8 @@ when a Postgres is running (docker compose, the CI service) and starts a testcon
 role** — Postgres does not enforce RLS against a superuser or against the table owner, so an
 isolation test connected as the owner would pass without proving anything (ADR 0013).
 
-`startTestStorage()` starts a MinIO testcontainer, creates the bucket, points the `S3_*` variables
-at it and drops the memoised S3 client. There is one bucket and no RLS in object storage, so what
+`startTestStorage()` starts a MinIO testcontainer whose image creates the bucket before it reports
+healthy, points the `S3_*` variables at it and drops the memoised S3 client. There is one bucket and no RLS in object storage, so what
 the storage tests prove is the key prefix — `putObject` on another tenant's key is a
 `ForbiddenError`.
 

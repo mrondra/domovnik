@@ -48,8 +48,11 @@ export default defineConfig([
     rules: { 'no-restricted-imports': 'off' }, // the only place allowed to use the Anthropic SDKs
   },
   {
-    files: ['packages/kernel/src/storage/**'],
-    rules: { 'no-restricted-imports': 'off' }, // the only place allowed to use the S3 SDKs
+    files: ['packages/kernel/src/storage/**', 'packages/kernel/src/testing/storage.ts'],
+    // The only places allowed to use the S3 SDKs. The fixture is here because it provisions the
+    // bucket a test writes into, which is not something the storage module offers — and should
+    // not be: nothing in production creates buckets.
+    rules: { 'no-restricted-imports': 'off' },
   },
   {
     files: [
