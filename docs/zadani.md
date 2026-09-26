@@ -1,12 +1,13 @@
 # Domovník – AI-native platforma pro správu nemovitostí (zadání dema)
 
-**Verze:** 0.6
+**Verze:** 0.7
 **Změny v 0.2:** napojení na Pohodu místo vlastních financí, MCP tokeny s výběrem toolů, uživatelsky definovaní agenti
 **Změny v 0.3:** rozdělení účetní integrace na `AccountingAdapter` (jisté agendy Pohody) a `ReceivablesAdapter` (předpisy a saldo vlastníků, více implementací); ověření XML přes POHODA Start
 **Změny v 0.4:** uzavřeny otevřené otázky – Drizzle, vlastní auth, Gemini pro přepis, schvalování v UI i e-mailem, název Domovník
 **Změny v 0.5:** monorepo přestavěno na feature-based (vertical slices) architekturu
 **Změny v 0.6:** princip „kód první, agent na zbytek“, batch eventy, `withTenant` pojistka pro RLS, schvalování z e-mailu přes POST, limity agent runtime, zpřesnění Pohody
-**Datum:** 2026-09-09
+**Změny v 0.7:** doplněny features `demo`, `suppliers`, `comms` (fáze 2), agent `quote-evaluator`, fáze 2 rozšířena o úkoly vzniklé z fáze 1 (zpětné doplnění po úkolu 027 – backfill ADR za odchylky fáze 1)
+**Datum:** 2026-09-26
 **Stav:** uzavřený rozsah, připraveno k detailnímu návrhu fáze 1
 
 ---
@@ -59,7 +60,7 @@ Kód je organizován podle **features (vertical slices)**, ne podle technických
     /inspections      /defects          /tasks            /quotes
     /field-reports    /fleet            /comms            /assemblies
     /dunning          /accounting-sync  /reports          /copilot
-    /agent-builder    /api-tokens
+    /agent-builder    /api-tokens       /demo             /suppliers
 ```
 
 **Kostra každé feature** (prázdné složky se vynechají):
@@ -90,7 +91,9 @@ Kód je organizován podle **features (vertical slices)**, ne podle technických
 
 Finance jsou záměrně rozděleny na `invoices`, `payments`, `receivables` a `accounting-sync` – každá má jinou životnost a jiné adaptery.
 
-**Mapování features na kapitoly zadání:** `svj` (kap. 4 Tenant/SVJ), `invoices`/`payments`/`receivables`/`accounting-sync` (Finance, kap. 8 Pohoda), `owners`/`cadastre` (vlastníci, katastr), `documents`/`knowledge` (dokumenty a znalosti), `inspections`/`defects`/`tasks`/`quotes`/`field-reports`/`fleet` (Provoz), `comms`/`assemblies`/`dunning` (komunikace a governance), `reports`/`copilot` (přehledy), `agent-builder` (kap. 6.4), `api-tokens` (kap. 9).
+**Mapování features na kapitoly zadání:** `svj` (kap. 4 Tenant/SVJ), `invoices`/`payments`/`receivables`/`accounting-sync` (Finance, kap. 8 Pohoda), `owners`/`cadastre` (vlastníci, katastr), `documents`/`knowledge` (dokumenty a znalosti), `inspections`/`defects`/`tasks`/`quotes`/`field-reports`/`fleet` (Provoz), `comms`/`assemblies`/`dunning` (komunikace a governance), `reports`/`copilot` (přehledy), `agent-builder` (kap. 6.4), `api-tokens` (kap. 9), `demo` (kap. 10 – scénáře a reset ukázky), `suppliers` (dodavatelé a smlouvy, kap. 8 – vyčleněno z `invoices`, fáze 2).
+
+Tři features nemají vlastní kapitolu, protože vznikly refaktorem/backfillem po fázi 1 (úkol 027): `demo` drží spouštění scénářů a reset ukázky (dřív součást `invoices`/`payments`/`accounting-sync`); `suppliers` drží dodavatele a smlouvy vyčleněné z `invoices`, protože je potřebují i `inspections`/`quotes` (fáze 2); `comms` je ve fázi 2 jen odchozí pošta (simulovaný adapter), příchozí pošta zůstává ve fázi 1 v `invoices` a sjednotí se až ve fázi 3.
 
 ### 3.2 Infrastruktura
 
@@ -289,6 +292,7 @@ Systémoví agenti mohou být použiti jako šablona („duplikovat a upravit") 
 | `accounting-sync-guard`    | `finance.sync.conflict`, denní tik                                                      | stav synchronizace, rozdíly                            | úkol pro finance s popisem konfliktu (např. faktura v Pohodě změněna mimo aplikaci)                                                             |
 | `debt-collector`           | měsíční tik                                                                             | saldo vlastníků, historie komunikace                   | návrh upomínek (`Approval` správce)                                                                                                             |
 | `inspection-planner`       | `ops.inspection.due_soon`                                                               | kalendář revizí, dodavatelé, poptávky                  | poptávka technikům (`Approval`), naplánování termínu                                                                                            |
+| `quote-evaluator`          | `ops.quote_request.ready_for_decision`                                                  | porovnání nabídek, dodavatelé                          | doporučení přidělení zakázky (`Approval` výboru) podle `quote.compare`                                                                          |
 | `inspection-report-reader` | `ops.inspection.report_uploaded`                                                        | extrakce zprávy, závady                                | `defect` + `task` s prioritou a odhadem                                                                                                         |
 | `field-dispatcher`         | `field.report.submitted`                                                                | klasifikace, oddělení, úkoly                           | rozpad hlášení technika na úkoly pro údržbu/finance/úklid                                                                                       |
 | `owner-support`            | `comms.message.received`                                                                | KB SVJ, saldo, dokumenty, revize                       | draft odpovědi (`Approval` správce; jednoduché dotazy `act` dle konfigurace)                                                                    |
@@ -355,7 +359,8 @@ Seed obsahuje: 12 měsíců bankovních pohybů, sadu faktur (PDF), smlouvy, pl�
 
 ### Fáze 2 – Provoz
 
-- Revize: `inspection-planner`, `inspection-report-reader`; poptávky dodavatelů.
+- Revize: `inspection-planner`, `inspection-report-reader`, `quote-evaluator`; poptávky dodavatelů.
+- Úkoly vzniklé z fáze 1 (`needs_review`, konflikt, selhání agenta) – tabulka `task`, subscribery na `finance.invoice.needs_review`, `finance.sync.conflict`, `agent.run.failed` zakládají úkol pro odpovědné oddělení místo tichého stavu bez další akce.
 - Terén: PWA hlášení, `field-dispatcher`; oddělení a úkoly.
 - Vozový park: `fleet-manager`.
 - UI: kalendář revizí, úkoly per oddělení, technik mobil.
