@@ -11,3 +11,7 @@ coverage
 test-results
 playwright-report
 docs/dependency-graph.svg
+
+# Kontrakt úkolu agenta (agent-rig). Žije jen ve worktree, nikdy se necommituje.
+# Musí být tady, ne v .git/info/exclude: prettier a spol. čtou .gitignore.
+.task/
