@@ -89,6 +89,7 @@ pnpm adr:new "<title>"
 - [ ] Veřejný API feature (`index.ts`) obsahuje jen to, co ostatní opravdu potřebují
 - [ ] Žádná změna rozhodnutí z ADR/zadání; pokud byla nutná, existuje schválené ADR
 - [ ] Commit: conventional commits, jeden logický celek
+- [ ] Každé rozhodnutí mimo zadání a ADR má ADR se statusem Proposed a je uvedené v reportu úkolu; tabulka „odchylky bez ADR" se nezakládá.
 
 ## 7. Co nikdy nedělat
 
