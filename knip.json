@@ -36,5 +36,12 @@
     "exports": "error",
     "types": "error",
     "dependencies": "error"
-  }
+  },
+  // knip si cestu k hookům zjišťuje přes `git rev-parse --git-path hooks`. V git
+  // worktree to ukáže do hlavního repa, glob se vydá mimo pracovní adresář a v
+  // sandboxu agenta narazí — načež celé hledání konfigurace vrátí prázdno a knip
+  // hlásí jako nepoužité soubory, které se používají. Tady mu řekneme, kde
+  // hledat, takže se cesta k hookům vůbec nepočítá. Nic se neztrácí: generované
+  // soubory v .git/hooks nenesou nic, co by nebylo v lefthook.yml.
+  "lefthook": { "config": ["lefthook.yml"] }
 }
