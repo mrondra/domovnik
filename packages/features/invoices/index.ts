@@ -4,14 +4,12 @@ export {
   InvoicesService,
   budgetStatus,
   createInvoice,
-  findContractsForSupplier,
+  demoReset as resetInvoices,
   findPayableByVariableSymbol,
-  findSupplierByIco,
   getInvoice,
   listInvoices,
   processReceivedInvoice,
   receiveInvoiceMail,
-  supplierById,
   transition,
 } from './service/index';
 
@@ -28,4 +26,4 @@ export { TRANSITIONS } from './domain/status';
 export type { InvoiceStatus } from './domain/status';
 export { invoiceIdSchema } from './domain/ids';
 export type { InvoiceId } from './domain/ids';
-export type { BudgetCategory, Contract, Invoice, Supplier } from './domain/types';
+export type { BudgetCategory, Invoice } from './domain/types';

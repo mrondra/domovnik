@@ -1,15 +1,16 @@
 # invoices
 
-Incoming invoices and everything they are matched against: the suppliers of the management company,
-the contracts an SVJ has with them, and the budget the spending is counted towards. Pohoda stays the
-source of truth for the accounting itself (ADR 0005); what lives here is the process in front of it.
+Incoming invoices and what they are matched against: the address book of suppliers and the
+contracts an SVJ has with them (`packages/features/suppliers`, ADR 0023), and the budget the
+spending is counted towards. Pohoda stays the source of truth for the accounting itself (ADR 0005);
+what lives here is the process in front of it.
 
 | File / directory | Contents                                                                       |
 | ---------------- | ------------------------------------------------------------------------------ |
-| `schema.ts`      | re-exports `schema/`, which is where the five tables actually live             |
+| `schema.ts`      | re-exports `schema/`, which is where the three tables actually live            |
 | `domain/`        | the types, the zod shapes, the six events and the status machine               |
 | `service/`       | the only place that writes; every step audited, the five that matter announced |
-| `api/`           | the Nest module `apps/api` discovers; no controller before task 018            |
+| `api/`           | the Nest module `apps/api` discovers                                           |
 | `tests/`         | the RLS isolation tests, the machine's own table test, and the service tests   |
 | `index.ts`       | the public face: what other features and apps may import                       |
 
@@ -21,8 +22,9 @@ Three decisions worth knowing before changing anything here:
 - An invoice only ever moves through `transition`, which checks `domain/status.ts` first. The status
   is the machine's and not the caller's, so a controller, a tool and an agent all get the same
   answer to "may this happen now?".
-- A supplier is tenant-wide and a contract is not. The same lift service invoices several houses;
-  what it agreed with one of them, and what it billed them, belongs to that house.
+- A supplier and a contract live in `packages/features/suppliers`, reached only through its
+  `index.ts` (task 029): the same lift service invoices several houses, and `inspections`/`quotes`
+  need the same address book without depending on this whole feature.
 - `extraction` and `checks` are kept as they were — what the model read, and what the deterministic
   rules made of it — so a decision taken months ago can still be explained (ADR 0004, task 016).
 

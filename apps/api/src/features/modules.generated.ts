@@ -8,6 +8,7 @@ import { DocumentsModule } from '../../../../packages/features/documents';
 import { InvoicesModule } from '../../../../packages/features/invoices';
 import { PaymentsModule } from '../../../../packages/features/payments';
 import { ReceivablesModule } from '../../../../packages/features/receivables';
+import { SuppliersModule } from '../../../../packages/features/suppliers';
 import { SvjModule } from '../../../../packages/features/svj';
 
 export const featureModules: readonly Type[] = [
@@ -17,5 +18,6 @@ export const featureModules: readonly Type[] = [
   InvoicesModule,
   PaymentsModule,
   ReceivablesModule,
+  SuppliersModule,
   SvjModule,
 ];

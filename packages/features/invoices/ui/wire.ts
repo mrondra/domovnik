@@ -1,11 +1,15 @@
 import { z } from 'zod';
 import { checkSchema } from '../domain/checks';
 import { approveInputSchema } from '../domain/proposal';
-import { budgetStatusSchema, contractSchema, invoiceSchema } from '../domain/schemas';
+import { budgetStatusSchema, invoiceSchema } from '../domain/schemas';
 
 /**
  * What the browser side of this feature sees. It is the same zod the API answers with — the screens
  * fetch nothing themselves (ADR 0017), so this is what `apps/web` parses before handing it in.
+ *
+ * `supplierView`/`contractView` are defined here rather than imported from `suppliers`: that
+ * feature's public door also exports its Nest module, which the Next.js build cannot compile
+ * (ADR 0017) — a UI-only door for a feature with no screens of its own is not worth the split.
  */
 export const supplierView = z.object({
   id: z.uuid(),
@@ -14,6 +18,18 @@ export const supplierView = z.object({
   dic: z.string().nullable(),
   bankAccount: z.string().nullable(),
   email: z.string().nullable(),
+});
+
+export const contractView = z.object({
+  id: z.uuid(),
+  svjId: z.uuid(),
+  supplierId: z.uuid(),
+  subject: z.string().min(1),
+  budgetCategory: z.string().min(1),
+  monthlyAmount: z.number().nullable(),
+  validFrom: z.iso.date(),
+  validTo: z.iso.date().nullable(),
+  documentId: z.uuid().nullable(),
 });
 
 export const agentRunView = z.object({
@@ -34,7 +50,7 @@ export const invoiceDetailView = z.object({
   extraction: z.unknown(),
   checks: z.unknown(),
   supplier: supplierView.nullable(),
-  contract: contractSchema.nullable(),
+  contract: contractView.nullable(),
   budget: budgetStatusSchema.nullable(),
   agentRun: agentRunView.nullable(),
   approval: proposalView.nullable(),

@@ -2,7 +2,7 @@ import { DomainError } from '../../../../kernel/src/errors/index';
 import { withChecksum } from './ico';
 
 export interface DemoSupplier {
-  /** The stable key the seed upserts by, and what the scenarios refer to. */
+  /** The stable key the seed upserts by, and what contracts and demo scenarios refer to. */
   readonly code: string;
   readonly name: string;
   readonly ico: string;

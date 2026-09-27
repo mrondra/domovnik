@@ -1,4 +1,5 @@
 node_modules
+.pnpm-store
 dist
 .next
 # Written by `next build`/`next dev`; its references point into .next, which is ignored too.

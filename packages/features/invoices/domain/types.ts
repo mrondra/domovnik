@@ -1,32 +1,10 @@
 import type { AgentRunId, ApprovalId, SvjId } from '../../../kernel/src/ids/index';
+import type { BudgetCategory, ContractId, SupplierId } from '../../suppliers/index';
 import type { IsoDay } from './day';
-import type { ContractId, InvoiceId, SupplierId } from './ids';
+import type { InvoiceId } from './ids';
 import type { InvoiceStatus } from './status';
 
-/** The budget categories of zadání kap. 4; a contract and an invoice both name one of these. */
-export type BudgetCategory =
-  'uklid' | 'vytah' | 'energie' | 'opravy' | 'revize' | 'sprava' | 'pojisteni' | 'ostatni';
-
-export interface Supplier {
-  readonly id: SupplierId;
-  readonly name: string;
-  readonly ico: string;
-  readonly dic: string | null;
-  readonly bankAccount: string | null;
-  readonly email: string | null;
-}
-
-export interface Contract {
-  readonly id: ContractId;
-  readonly svjId: SvjId;
-  readonly supplierId: SupplierId;
-  readonly subject: string;
-  readonly budgetCategory: BudgetCategory;
-  readonly monthlyAmount: number | null;
-  readonly validFrom: IsoDay;
-  readonly validTo: IsoDay | null;
-  readonly documentId: string | null;
-}
+export type { BudgetCategory };
 
 /** What is left of the budget after everything already approved is counted against it. */
 export interface BudgetStatus {

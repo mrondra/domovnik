@@ -1,9 +1,9 @@
 import { and, eq, ne } from 'drizzle-orm';
 import type { RequestContext } from '../../../../kernel/src/context/index';
 import { withTenant } from '../../../../kernel/src/db/index';
+import type { Supplier } from '../../../suppliers/index';
 import type { Check } from '../../domain/checks';
 import type { InvoiceId } from '../../domain/ids';
-import type { Supplier } from '../../domain/types';
 import { invoice } from '../../schema/index';
 import type { ExtractedInvoice } from '../extraction/schema';
 

@@ -1,17 +1,9 @@
 import { applyTestEnv } from '../../../kernel/src/testing/index';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
-import type { SupplierId } from '../domain/ids';
+import { createContract, createSupplier, findSupplierByIco, type SupplierId } from '../../suppliers/index';
 import type { Invoice } from '../domain/types';
-import {
-  createContract,
-  createSupplier,
-  findSupplierByIco,
-  getInvoice,
-  processReceivedInvoice,
-  receiveInvoiceMail,
-  setBudgetLine,
-} from '../service/index';
+import { getInvoice, processReceivedInvoice, receiveInvoiceMail, setBudgetLine } from '../service/index';
 import { CLEANING_ICO, scenarioNamed } from './fixtures/invoice-scenarios.fixture';
 import { scenarioPdf } from './fixtures/scenario-pdf.fixture';
 

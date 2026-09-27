@@ -1,9 +1,10 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import { agentRunIdSchema, approvalIdSchema, svjIdSchema } from '../../../kernel/src/ids/index';
-import { contractIdSchema, invoiceIdSchema, supplierIdSchema } from '../domain/ids';
+import { contractIdSchema, supplierIdSchema } from '../../suppliers/index';
+import { invoiceIdSchema } from '../domain/ids';
 import { budgetCategorySchema, invoiceStatusSchema } from '../domain/schemas';
-import type { Contract, Invoice, Supplier } from '../domain/types';
-import { contract, invoice, supplier } from '../schema/index';
+import type { Invoice } from '../domain/types';
+import { invoice } from '../schema/index';
 
 /** Drizzle returns `numeric` as a string, so the column decides the precision, not a float. */
 export const asMoney = (value: number): string => value.toFixed(2);
@@ -13,27 +14,6 @@ const money = (value: string | null): number | null => (value === null ? null : 
 /** The branded ids are rebuilt here, once, and a null column stays null all the way through. */
 const branded = <T>(schema: { parse(value: unknown): T }, value: string | null): T | null =>
   value === null ? null : schema.parse(value);
-
-export const toSupplier = (row: InferSelectModel<typeof supplier>): Supplier => ({
-  id: supplierIdSchema.parse(row.id),
-  name: row.name,
-  ico: row.ico,
-  dic: row.dic,
-  bankAccount: row.bankAccount,
-  email: row.email,
-});
-
-export const toContract = (row: InferSelectModel<typeof contract>): Contract => ({
-  id: contractIdSchema.parse(row.id),
-  svjId: svjIdSchema.parse(row.svjId),
-  supplierId: supplierIdSchema.parse(row.supplierId),
-  subject: row.subject,
-  budgetCategory: budgetCategorySchema.parse(row.budgetCategory),
-  monthlyAmount: money(row.monthlyAmount),
-  validFrom: row.validFrom,
-  validTo: row.validTo,
-  documentId: row.documentId,
-});
 
 export const toInvoice = (row: InferSelectModel<typeof invoice>): Invoice => ({
   id: invoiceIdSchema.parse(row.id),

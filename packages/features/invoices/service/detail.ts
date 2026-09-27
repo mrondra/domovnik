@@ -5,11 +5,10 @@ import type { RequestContext } from '../../../kernel/src/context/index';
 import type { ApprovalId } from '../../../kernel/src/ids/index';
 import { schema, withTenant } from '../../../kernel/src/db/index';
 import type { InvoiceId } from '../domain/ids';
-import type { Supplier } from '../domain/types';
 import { documentDownloadUrl, documentIdSchema } from '../../documents/index';
+import { supplierById, type Supplier } from '../../suppliers/index';
 import { approveInputSchema, type ApproveInput } from '../domain/proposal';
 import { invoiceDossier, type InvoiceDossier } from './dossier';
-import { supplierById } from './suppliers';
 
 export interface AgentRunView {
   readonly id: string;

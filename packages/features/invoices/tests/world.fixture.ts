@@ -1,4 +1,7 @@
 import * as composedSchema from '../../../db/src/schema';
+import type { RequestContext } from '../../../kernel/src/context/index';
+import type { TenantId } from '../../../kernel/src/ids/index';
+import { loadSeedsFrom, orderSeedModules, registeredSeeds } from '../../../kernel/src/seed/index';
 import {
   startTestDb,
   startTestStorage,
@@ -33,6 +36,28 @@ export const startInvoicesWorld = async (): Promise<InvoicesWorld> => {
       await database.stop();
     },
   };
+};
+
+const SEED_DIRS = ['svj', 'suppliers', 'invoices'];
+const SEED_FILES = SEED_DIRS.map((name) => new URL(`../../${name}/seed/*.seed.ts`, import.meta.url).pathname);
+
+/**
+ * The feature seeds this one depends on (`dependsOn: ['suppliers', 'svj']`), found and ordered the
+ * same way `pnpm db:seed` finds and orders them. A test may not reach into another feature's source
+ * (docs/engineering.md §2) — the glob is the door that is open (mirrors `demo/tests/demo.fixture`).
+ * Narrowed to this feature's own dependency chain, not every feature's seed: this suite asserts
+ * exactly what the `invoices` seed produces, and a seed from an unrelated feature would add
+ * scenarios/data this test never asked for.
+ */
+export const runFeatureSeeds = async (tenant: {
+  readonly tenantId: TenantId;
+  readonly ctx: RequestContext;
+}): Promise<void> => {
+  await loadSeedsFrom(SEED_FILES);
+
+  for (const seed of orderSeedModules(registeredSeeds())) {
+    await seed.run({ tenantId: tenant.tenantId, ctx: tenant.ctx });
+  }
 };
 
 export { someSvj } from './invoices.fixture';

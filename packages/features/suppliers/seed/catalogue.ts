@@ -1,14 +1,7 @@
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
 import type { SupplierId } from '../domain/ids';
-import {
-  createContract,
-  createSupplier,
-  findSupplierByIco,
-  listContracts,
-  setBudgetLine,
-} from '../service/index';
-import { DEMO_BUDGETS } from './data/budget';
+import { createContract, createSupplier, findSupplierByIco, listContracts } from '../service/index';
 import { DEMO_CONTRACTS } from './data/contracts';
 import { DEMO_SUPPLIERS, supplierNamed } from './data/suppliers';
 
@@ -56,23 +49,6 @@ export const seedContracts = async (
       budgetCategory: demo.budgetCategory,
       monthlyAmount: demo.monthlyAmount ?? undefined,
       validFrom: `${String(new Date().getUTCFullYear())}-01-01`,
-    });
-  }
-};
-
-/** Idempotent by `(tenant, svj, year, category)`; a second plan for a line is a correction. */
-export const seedBudget = async (
-  ctx: RequestContext,
-  svjId: SvjId,
-  house: number,
-  year: number,
-): Promise<void> => {
-  for (const demo of DEMO_BUDGETS[house] ?? []) {
-    await setBudgetLine(ctx, {
-      svjId,
-      year,
-      category: demo.category,
-      plannedAmount: demo.plannedAmount,
     });
   }
 };

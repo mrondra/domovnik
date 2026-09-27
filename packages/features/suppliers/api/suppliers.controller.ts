@@ -1,21 +1,16 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import type { z } from 'zod';
 import { requireContext } from '../../../kernel/src/context/index';
 import { svjIdSchema } from '../../../kernel/src/ids/index';
-import { InvoicesService } from '../service/index';
-import {
-  contractListResponse,
-  invoiceListResponse,
-  invoiceQuery,
-  supplierListResponse,
-} from './invoices.schema';
+import { SuppliersService } from '../service/index';
+import { contractListResponse, supplierListResponse } from './suppliers.schema';
 
 /** The address book of the management company, and what one SVJ has agreed with whom. */
-@ApiTags('invoices')
+@ApiTags('suppliers')
 @Controller()
 export class SuppliersController {
-  constructor(private readonly service: InvoicesService) {}
+  constructor(private readonly service: SuppliersService) {}
 
   @Get('suppliers')
   @ApiOperation({ summary: 'Dodavatelé správcovské firmy' })
@@ -29,18 +24,5 @@ export class SuppliersController {
   @ApiResponse({ status: 200, description: 'Seznam smluv', standardSchema: contractListResponse })
   contracts(@Param('svjId') svjId: string): Promise<z.output<typeof contractListResponse>> {
     return this.service.listContracts(requireContext(), svjIdSchema.parse(svjId));
-  }
-
-  @Get('svj/:svjId/invoices')
-  @ApiOperation({ summary: 'Faktury jednoho SVJ' })
-  @ApiResponse({ status: 200, description: 'Seznam faktur', standardSchema: invoiceListResponse })
-  invoices(
-    @Param('svjId') svjId: string,
-    @Query() query: unknown,
-  ): Promise<z.output<typeof invoiceListResponse>> {
-    return this.service.listInvoices(requireContext(), {
-      svjId: svjIdSchema.parse(svjId),
-      ...invoiceQuery.parse(query),
-    });
   }
 }

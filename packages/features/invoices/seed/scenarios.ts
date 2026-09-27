@@ -4,7 +4,7 @@ import { putObject, storageKeyFor } from '../../../kernel/src/storage/index';
 import { registerScenario } from '../../demo/index';
 import { DEMO_SCENARIOS } from './data/invoices';
 import type { DemoScenario } from './data/scenario-shape';
-import { supplierNamed } from './data/suppliers';
+import { senderNamed } from './data/sender-catalogue';
 import { invoicePdf } from './pdf/invoice-pdf';
 
 /** The key prefix the demo files live under; nothing else writes into it (kernel `storageKeyFor`). */
@@ -16,7 +16,7 @@ const senderOf = (
   if (scenario.strangerSupplier !== undefined) {
     return { ...scenario.strangerSupplier, email: 'fakturace@zeleny-dum.demo.test' };
   }
-  const known = supplierNamed(scenario.supplier ?? '');
+  const known = senderNamed(scenario.supplier ?? '');
   return { name: known.name, ico: known.ico, bankAccount: known.bankAccount, email: known.email };
 };
 

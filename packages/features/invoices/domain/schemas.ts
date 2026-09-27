@@ -1,16 +1,7 @@
 import { z } from 'zod';
+import { budgetCategorySchema } from '../../suppliers/index';
 
-/** One zod definition per domain shape, reused by the events, the tools and the HTTP contract. */
-export const budgetCategorySchema = z.enum([
-  'uklid',
-  'vytah',
-  'energie',
-  'opravy',
-  'revize',
-  'sprava',
-  'pojisteni',
-  'ostatni',
-]);
+export { budgetCategorySchema };
 
 export const invoiceStatusSchema = z.enum([
   'received',
@@ -22,18 +13,6 @@ export const invoiceStatusSchema = z.enum([
   'posted',
   'paid',
 ]);
-
-export const contractSchema = z.object({
-  id: z.uuid(),
-  svjId: z.uuid(),
-  supplierId: z.uuid(),
-  subject: z.string().min(1),
-  budgetCategory: budgetCategorySchema,
-  monthlyAmount: z.number().nullable(),
-  validFrom: z.iso.date(),
-  validTo: z.iso.date().nullable(),
-  documentId: z.uuid().nullable(),
-});
 
 export const budgetStatusSchema = z.object({
   svjId: z.uuid(),

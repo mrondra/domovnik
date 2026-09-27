@@ -7,14 +7,12 @@ import {
   type TestDatabase,
   type TestTenant,
 } from '../../../kernel/src/testing/index';
-import type { SupplierId } from '../domain/ids';
+import { supplierIdSchema, type SupplierId } from '../../suppliers/index';
 import type { Invoice } from '../domain/types';
-import { budgetLine, contract, invoice, invoiceLine, invoiceStatusEnum, supplier } from '../schema/index';
-import { createInvoice, createSupplier } from '../service/index';
+import { budgetLine, invoice, invoiceLine, invoiceStatusEnum } from '../schema/index';
+import { createInvoice } from '../service/index';
 
 export const featureSchema = {
-  supplier,
-  contract,
   budgetLine,
   invoice,
   invoiceLine,
@@ -29,17 +27,12 @@ export const someSvj = (): SvjId => newId(svjIdSchema);
 /** And a document id: the file itself is `documents`' business, not this feature's (task 011). */
 export const someDocument = (): string => newId(svjIdSchema);
 
-let sequence = 0;
-
-export const seedSupplier = async (ctx: RequestContext, name = 'Výtahy Praha'): Promise<SupplierId> => {
-  sequence += 1;
-  const created = await createSupplier(ctx, {
-    name,
-    ico: String(20_000_000 + sequence),
-    bankAccount: '2801234567/2010',
-  });
-  return created.id;
-};
+/**
+ * `invoice.supplierId` carries no foreign key to `suppliers`' own table (features never join
+ * across a table boundary, ADR 0002) — a fresh id is exactly as good as a persisted supplier for
+ * a test that never asks `suppliers` about it.
+ */
+export const someSupplierId = (): SupplierId => newId(supplierIdSchema);
 
 export const receiveInvoice = (ctx: RequestContext, svjId: SvjId): Promise<Invoice> =>
   createInvoice(ctx, {

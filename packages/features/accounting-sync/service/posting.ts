@@ -1,6 +1,7 @@
 import type { RequestContext } from '../../../kernel/src/context/index';
 import { DomainError } from '../../../kernel/src/errors/index';
-import { getInvoice, supplierById, transition, type InvoiceId } from '../../invoices/index';
+import { getInvoice, transition, type InvoiceId } from '../../invoices/index';
+import { supplierById } from '../../suppliers/index';
 import { accountingAdapterFor } from '../adapters/index';
 import type { PostInvoiceInput } from '../domain/types';
 import { jobDone, runJob } from './jobs';

@@ -1,11 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
-import type { SupplierId } from '../domain/ids';
+import type { SupplierId } from '../../suppliers/index';
 import { budgetStatus, setBudgetLine, transition } from '../service/index';
 import {
   receiveInvoice,
-  seedSupplier,
+  someSupplierId,
   someSvj,
   startInvoicesDb,
   withTestTenant,
@@ -24,7 +24,7 @@ beforeAll(async () => {
   database = await startInvoicesDb();
   ctx = (await withTestTenant()).ctx;
   svjId = someSvj();
-  supplierId = await seedSupplier(ctx);
+  supplierId = someSupplierId();
 }, 180_000);
 
 afterAll(async () => {

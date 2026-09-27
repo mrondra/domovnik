@@ -7,10 +7,10 @@ import { auditActions } from './audit.fixture';
 import {
   seedSupplier,
   someSvj,
-  startInvoicesDb,
+  startSuppliersDb,
   withTestTenant,
   type TestDatabase,
-} from './invoices.fixture';
+} from './suppliers.fixture';
 
 let database: TestDatabase;
 let ctx: RequestContext;
@@ -18,7 +18,7 @@ let svjId: SvjId;
 let supplierId: SupplierId;
 
 beforeAll(async () => {
-  database = await startInvoicesDb();
+  database = await startSuppliersDb();
   ctx = (await withTestTenant()).ctx;
   svjId = someSvj();
   supplierId = await seedSupplier(ctx, 'Úklid s.r.o.');

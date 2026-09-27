@@ -1,7 +1,7 @@
 import type { RequestContext } from '../../../../kernel/src/context/index';
 import type { SvjId } from '../../../../kernel/src/ids/index';
+import type { BudgetCategory, Contract, Supplier } from '../../../suppliers/index';
 import type { Check } from '../../domain/checks';
-import type { BudgetCategory, Contract, Supplier } from '../../domain/types';
 import type { ExtractedInvoice } from '../extraction/schema';
 import type { InvoiceId } from '../../domain/ids';
 import { amountCheck } from './amount';

@@ -6,7 +6,7 @@ import { newId, type SvjId } from '../../../kernel/src/ids/index';
 import { asDay, type IsoDay } from '../domain/day';
 import { contractIdSchema, type SupplierId } from '../domain/ids';
 import type { BudgetCategory, Contract } from '../domain/types';
-import { contract } from '../schema/index';
+import { contract } from '../schema';
 import { assertReachable } from './reach';
 import { asMoney, toContract } from './rows';
 

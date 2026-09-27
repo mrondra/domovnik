@@ -1,8 +1,12 @@
 import type { RequestContext } from '../../../../kernel/src/context/index';
 import type { SvjId } from '../../../../kernel/src/ids/index';
-import type { BudgetCategory, Contract, Supplier } from '../../domain/types';
-import { findContractsForSupplier } from '../contracts';
-import { findSupplierByIco } from '../suppliers';
+import {
+  findContractsForSupplier,
+  findSupplierByIco,
+  type BudgetCategory,
+  type Contract,
+  type Supplier,
+} from '../../../suppliers/index';
 import type { ExtractedInvoice } from './schema';
 
 export interface MatchedInvoice {

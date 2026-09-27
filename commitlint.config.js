@@ -39,6 +39,7 @@ export default {
         'agent-builder',
         'api-tokens',
         'demo',
+        'suppliers',
       ],
     ],
     'subject-case': [2, 'always', 'lower-case'],

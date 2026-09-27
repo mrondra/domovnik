@@ -1,5 +1,5 @@
+import type { Contract } from '../../../suppliers/index';
 import type { Check } from '../../domain/checks';
-import type { Contract } from '../../domain/types';
 import type { ExtractedInvoice } from '../extraction/schema';
 
 export const TOLERANCE = 0.1;

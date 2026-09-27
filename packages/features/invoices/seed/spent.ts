@@ -1,7 +1,7 @@
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
 import { storeDocument } from '../../documents/index';
-import type { SupplierId } from '../domain/ids';
+import type { SupplierId } from '../../suppliers/index';
 import { budgetStatus, createInvoice, transition } from '../service/index';
 import { DEMO_BUDGETS } from './data/budget';
 import { invoicePdf } from './pdf/invoice-pdf';

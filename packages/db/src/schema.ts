@@ -8,4 +8,5 @@ export * from '../../features/documents/schema';
 export * from '../../features/invoices/schema';
 export * from '../../features/payments/schema';
 export * from '../../features/receivables/schema';
+export * from '../../features/suppliers/schema';
 export * from '../../features/svj/schema';
