@@ -1,4 +1,6 @@
+import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { schema, withTenant } from '../../../kernel/src/db/index';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import { NotFoundError } from '../../../kernel/src/errors/index';
 import {
@@ -17,7 +19,7 @@ let ctx: RequestContext;
 /** Runs a scenario and lets the deterministic half of the platform do what it would do. */
 const deliver = async (code: string): Promise<Invoice> => {
   const result = await runScenario(ctx, code);
-  const invoiceId = invoiceIdSchema.parse(result.invoiceId);
+  const invoiceId = invoiceIdSchema.parse(result.link?.path.split('/').at(-1));
   await processReceivedInvoice(ctx, invoiceId);
   return getInvoice(ctx, invoiceId);
 };
@@ -99,5 +101,23 @@ describe('running a scenario', () => {
     const again = await runScenario(ctx, 'invoice-duplicate');
 
     expect(again.outcome).toBe('duplicate');
+  });
+});
+
+describe('the daily-tick scenario the demo feature offers about itself', () => {
+  /** How many `tick.daily` events the outbox holds for this tenant. */
+  const dailyTickCount = (): Promise<number> =>
+    withTenant(ctx, async (tx) => {
+      const rows = await tx.select().from(schema.event).where(eq(schema.event.name, 'tick.daily'));
+      return rows.length;
+    });
+
+  it('puts tick.daily in the outbox for this tenant', async () => {
+    const before = await dailyTickCount();
+
+    const result = await runScenario(ctx, 'daily-tick');
+
+    expect(result.outcome).toBe('started');
+    await expect(dailyTickCount()).resolves.toBe(before + 1);
   });
 });

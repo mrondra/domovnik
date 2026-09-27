@@ -1,25 +1,43 @@
 import { audit } from '../../../kernel/src/audit/index';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import { schema, withTenant } from '../../../kernel/src/db/index';
-import { resetAccountingSync } from '../../accounting-sync/index';
-import { resetDocuments } from '../../documents/index';
-import { resetInvoices } from '../../invoices/index';
-import { resetPayments } from '../../payments/index';
-import { resetReceivables } from '../../receivables/index';
+import { orderSeedModules, registeredSeeds, type SeedModule } from '../../../kernel/src/seed/index';
+import { registeredDemoResets, type DemoResetDefinition } from '../domain/definition';
 import type { ResetResult } from '../domain/types';
+import { loadDemoModules } from './discovery';
 
 /**
- * Each feature says what of its own data a demonstration produced, and `demo` never names another
- * feature's tables. The order is the order of the chain: the accounting first, then the money,
- * then what it was about (task 026).
+ * Whatever `dependsOn` a feature's seed declared, its reset runs after the resets of what its seed
+ * needed in place — the reverse of the order the seed ran in. A feature whose reset has no matching
+ * seed goes last: nothing was ever ordered around it either way (task 028).
  */
-const HANDLERS: readonly ((ctx: RequestContext) => Promise<number>)[] = [
-  resetAccountingSync,
-  resetPayments,
-  resetReceivables,
-  resetInvoices,
-  resetDocuments,
-];
+export const demoResetOrder = (): readonly DemoResetDefinition[] => {
+  const resets = registeredDemoResets();
+  const byFeature = new Map(resets.map((reset) => [reset.feature, reset]));
+  const seedsByName = new Map(registeredSeeds().map((seed) => [seed.name, seed]));
+
+  const needed = new Map<string, SeedModule>();
+  const include = (name: string): void => {
+    if (needed.has(name)) return;
+    const seed = seedsByName.get(name);
+    if (seed === undefined) return;
+    needed.set(name, seed);
+    for (const dependency of seed.dependsOn ?? []) include(dependency);
+  };
+  for (const reset of resets) include(reset.feature);
+
+  const ordered = orderSeedModules([...needed.values()])
+    .filter((seed) => byFeature.has(seed.name))
+    .map((seed) => byFeature.get(seed.name))
+    .filter((reset): reset is DemoResetDefinition => reset !== undefined)
+    .reverse();
+
+  const withoutSeed = [...resets]
+    .filter((reset) => !seedsByName.has(reset.feature))
+    .sort((left, right) => left.feature.localeCompare(right.feature));
+
+  return [...ordered, ...withoutSeed];
+};
 
 /**
  * Approvals, agent runs and anything still queued in the outbox: all of them are the kernel's own
@@ -37,17 +55,18 @@ const forgetDecisions = (ctx: RequestContext): Promise<number> =>
 
 /**
  * Puts the tenant back to the state the seed leaves it in: everything a demonstration produced is
- * deleted, and everything the seed gave it — houses, units, prescriptions, suppliers, contracts,
- * budgets, bank accounts, the accounting link — stays. Nothing is re-seeded, because nothing the
- * seed wrote is touched.
+ * deleted, and everything the seed gave it stays. Nothing is re-seeded, because nothing the seed
+ * wrote is touched.
  *
  * Audited like anything else somebody does: a reset that left no trace would be indistinguishable
  * from data loss (ADR 0011).
  */
 export const resetDemo = async (ctx: RequestContext): Promise<ResetResult> => {
+  await loadDemoModules();
+
   let removed = await forgetDecisions(ctx);
-  for (const handler of HANDLERS) {
-    removed += await handler(ctx);
+  for (const reset of demoResetOrder()) {
+    removed += await reset.run(ctx);
   }
 
   await withTenant(ctx, async () => {

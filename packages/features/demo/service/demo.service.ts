@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, type OnModuleInit } from '@nestjs/common';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { ResetResult, Scenario, ScenarioResult } from '../domain/types';
+import { loadDemoModules } from './discovery';
 import { listScenarios } from './registry';
 import { resetDemo } from './reset';
 import { runScenario } from './run';
@@ -10,7 +11,11 @@ import { runScenario } from './run';
  * the module next to it, so a seed can call the same function without going through Nest.
  */
 @Injectable()
-export class DemoService {
+export class DemoService implements OnModuleInit {
+  onModuleInit(): Promise<void> {
+    return loadDemoModules();
+  }
+
   list(ctx: RequestContext): Promise<readonly Scenario[]> {
     return listScenarios(ctx);
   }

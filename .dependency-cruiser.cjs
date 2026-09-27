@@ -15,6 +15,19 @@ module.exports = {
       to: { path: '^packages/(features|db)' },
     },
     {
+      // `demo` knows only the registry (task 028): a feature adds itself by writing `demo/<kind>.ts`
+      // and `demo/reset.ts`, discovered by glob, never imported here by name. Integration tests are
+      // exempt: verifying that a reset actually cleared another feature's rows is a test concern,
+      // not a production dependency (mirrors `no-test-in-prod`'s own test-file carve-out).
+      name: 'demo-knows-no-feature',
+      severity: 'error',
+      from: {
+        path: '^packages/features/demo/',
+        pathNot: '\\.(test|int\\.test|contract\\.test|fixture)\\.ts$',
+      },
+      to: { path: '^packages/features/(?!demo/)' },
+    },
+    {
       name: 'shared-knows-nothing',
       severity: 'error',
       from: { path: '^packages/shared' },

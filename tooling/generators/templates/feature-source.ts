@@ -45,3 +45,27 @@ export const ${names.camel}RecordCreated = defineEvent(
   z.object({ id: z.uuid(), title: z.string().min(1) }),
 );
 `;
+
+export const demoResetTs = (names: Names): string => `import { defineDemoReset } from '../../demo/index';
+
+/**
+ * What a demonstration threw away, once this feature has something worth throwing away. Returns
+ * how many rows it removed — \`0\` until this feature writes something a demo scenario produces
+ * (task 028).
+ */
+export const ${names.camel}DemoReset = defineDemoReset({
+  feature: '${names.kebab}',
+  run: () => Promise.resolve(0),
+});
+`;
+
+export const demoReadme = (names: Names): string => `# ${names.kebab}/demo
+
+| File       | Contents                                          |
+| ---------- | -------------------------------------------------- |
+| \`reset.ts\` | registers this feature's \`demoReset\` with \`demo\`  |
+
+**The rule:** \`demo\` never imports this directory. A scenario kind of this feature's own belongs
+here too, in its own file, found by \`demo\`'s glob discovery (\`loadDemoModules\`) the moment it
+exists — nothing here is ever imported by name.
+`;

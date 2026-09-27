@@ -1,30 +1,7 @@
 import { z } from 'zod';
 
-/** What a scenario does when it is run. One kind per thing the demo can show (task 019). */
-export const scenarioKindSchema = z.enum(['inbound_invoice', 'bank_sync', 'pohoda_mutation']);
-
-export type ScenarioKind = z.output<typeof scenarioKindSchema>;
-
-/** An invoice arriving by e-mail: the file is already in storage, the message is made up here. */
-export const inboundInvoicePayloadSchema = z.object({
-  storageKey: z.string().min(1),
-  svjId: z.uuid(),
-  from: z.string().min(1),
-  subject: z.string().min(1),
-});
-
-/** Reading a statement: which account, and how far back. The movements are derived, not stored. */
-export const bankSyncPayloadSchema = z.object({
-  bankAccountId: z.uuid(),
-  svjId: z.uuid(),
-  months: z.int().positive(),
-});
-
-/** Somebody changing an invoice in Pohoda itself: which house, and by how much (task 025). */
-export const pohodaMutationPayloadSchema = z.object({
-  svjId: z.uuid(),
-  amountChange: z.number(),
-});
+/** Any non-empty string: a feature registers a kind of its own instead of `demo` naming it (task 028). */
+export const scenarioKindSchema = z.string().min(1);
 
 export const scenarioSchema = z.object({
   id: z.uuid(),
@@ -36,12 +13,14 @@ export const scenarioSchema = z.object({
 
 export type Scenario = z.output<typeof scenarioSchema>;
 
+/** Where a person can go and look at what a scenario produced, when it produced anything at all. */
+export const scenarioLinkSchema = z.object({ label: z.string().min(1), path: z.string().min(1) }).nullable();
+
 export const scenarioResultSchema = z.object({
   code: z.string().min(1),
-  outcome: z.enum(['created', 'duplicate', 'imported', 'conflict']),
+  outcome: z.string().min(1),
   message: z.string().min(1),
-  /** What the scenario produced, when it produced something a person can go and look at. */
-  invoiceId: z.uuid().nullable(),
+  link: scenarioLinkSchema,
 });
 
 export type ScenarioResult = z.output<typeof scenarioResultSchema>;
@@ -55,6 +34,6 @@ export interface RegisterScenarioInput {
   readonly code: string;
   readonly title: string;
   readonly description: string;
-  readonly kind: ScenarioKind;
+  readonly kind: string;
   readonly payload: Readonly<Record<string, unknown>>;
 }

@@ -2,7 +2,6 @@ export { PaymentsModule } from './api/payments.module';
 export {
   PaymentsService,
   createBankAccount,
-  demoReset as resetPayments,
   importTransactions,
   listBankAccounts,
   listTransactions,
