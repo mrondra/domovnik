@@ -1,3 +1,4 @@
+import './registry.generated';
 export { ReceivablesModule } from './api/receivables.module';
 export {
   ReceivablesService,

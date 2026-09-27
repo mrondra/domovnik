@@ -1,3 +1,4 @@
+import './registry.generated';
 export { DocumentsModule } from './api/documents.module';
 export {
   DocumentsService,

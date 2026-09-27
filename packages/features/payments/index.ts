@@ -1,3 +1,4 @@
+import './registry.generated';
 export { PaymentsModule } from './api/payments.module';
 export {
   PaymentsService,

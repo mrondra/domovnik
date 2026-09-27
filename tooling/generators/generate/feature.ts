@@ -11,6 +11,7 @@ import { featurePath } from '../lib/repo';
 import { addScope, loadScopes } from '../lib/scopes';
 import { featureDependencies } from '../lib/versions';
 import { featureFiles } from '../templates/feature';
+import { composeDemoRegistries } from './demo-registry';
 
 export interface FeatureOptions {
   readonly root: string;
@@ -41,11 +42,16 @@ const ensureScope = async (options: FeatureOptions): Promise<void> => {
 /**
  * A Nest module has to be listed statically, so the feature the generator just wrote is invisible to
  * `apps/api` until the committed barrel names it. Composing here means a generated feature is served
- * the moment it exists, instead of after a separate command nobody is reminded to run.
+ * the moment it exists, instead of after a separate command nobody is reminded to run. The freshly
+ * scaffolded `demo/reset.ts` needs the same treatment, in its own `registry.generated.ts`: `demo`
+ * may not import it by name (ADR 0002), so its own `index.ts` reaches it instead.
  */
 const registerWithApi = async (root: string): Promise<void> => {
   await composeModules(root);
   report(`  ~ ${relative(root, modulesFile(root))}`);
+
+  const registries = await composeDemoRegistries(root);
+  for (const path of registries) report(`  ~ ${relative(root, path)}`);
 };
 
 /** A new workspace package has no linked dependencies until pnpm relinks the workspace. */

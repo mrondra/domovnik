@@ -1,3 +1,4 @@
+import './registry.generated';
 export { InvoicesModule } from './api/invoices.module';
 export {
   InvoicesService,

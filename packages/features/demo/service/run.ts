@@ -4,7 +4,6 @@ import { withTenant } from '../../../kernel/src/db/index';
 import { NotFoundError } from '../../../kernel/src/errors/index';
 import { scenarioKindOf } from '../domain/definition';
 import type { ScenarioResult } from '../domain/types';
-import { loadDemoModules } from './discovery';
 import { scenarioOf } from './registry';
 
 /**
@@ -12,8 +11,6 @@ import { scenarioOf } from './registry';
  * no trace is indistinguishable from data somebody invented (ADR 0011).
  */
 export const runScenario = async (ctx: RequestContext, code: string): Promise<ScenarioResult> => {
-  await loadDemoModules();
-
   return withTenant(ctx, async () => {
     const { kind, payload } = await scenarioOf(ctx, code);
     const definition = scenarioKindOf(kind);

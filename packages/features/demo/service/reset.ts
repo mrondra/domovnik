@@ -4,7 +4,6 @@ import { schema, withTenant } from '../../../kernel/src/db/index';
 import { orderSeedModules, registeredSeeds, type SeedModule } from '../../../kernel/src/seed/index';
 import { registeredDemoResets, type DemoResetDefinition } from '../domain/definition';
 import type { ResetResult } from '../domain/types';
-import { loadDemoModules } from './discovery';
 
 /**
  * Whatever `dependsOn` a feature's seed declared, its reset runs after the resets of what its seed
@@ -62,8 +61,6 @@ const forgetDecisions = (ctx: RequestContext): Promise<number> =>
  * from data loss (ADR 0011).
  */
 export const resetDemo = async (ctx: RequestContext): Promise<ResetResult> => {
-  await loadDemoModules();
-
   let removed = await forgetDecisions(ctx);
   for (const reset of demoResetOrder()) {
     removed += await reset.run(ctx);

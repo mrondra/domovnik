@@ -1,3 +1,5 @@
+import { glob } from 'node:fs/promises';
+import { pathToFileURL } from 'node:url';
 import * as composedSchema from '../../../db/src/schema';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { TenantId } from '../../../kernel/src/ids/index';
@@ -24,7 +26,23 @@ export interface DemoWorld {
   stop(): Promise<void>;
 }
 
+const DEMO_FILES = new URL('../../*/demo/*.ts', import.meta.url).pathname;
+
+/**
+ * Registers every feature's scenario kind and reset the same door `runFeatureSeeds` below already
+ * uses for seeds: a glob a test file may open (docs/engineering.md §2), which `demo` itself no
+ * longer can — `apps/api` bundles it into one file, so it gets a generated, static list instead
+ * (`apps/api/src/demo/registry.generated.ts`, `pnpm api:modules`). Safe to call again after a test
+ * adds a `demo/<kind>.ts` file of its own: Node's module cache makes it idempotent.
+ */
+export const registerDemoFiles = async (): Promise<void> => {
+  for await (const entry of glob(DEMO_FILES)) {
+    await import(pathToFileURL(entry).href);
+  }
+};
+
 export const startDemoWorld = async (): Promise<DemoWorld> => {
+  await registerDemoFiles();
   const database = await startTestDb(TEST_SCHEMA);
   const storage = await startTestStorage();
 

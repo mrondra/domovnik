@@ -1,3 +1,4 @@
+import './registry.generated';
 export { AccountingSyncModule } from './api/accounting-sync.module';
 export {
   AccountingSyncService,

@@ -13,6 +13,7 @@
         "drizzle-orm",
         "fast-xml-parser",
         "langfuse",
+        "pdf-lib",
         "pdf-parse",
         "pg",
         "pg-boss",

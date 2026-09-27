@@ -3,11 +3,13 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { withTestTenant } from '../../../kernel/src/testing/index';
 import { clearDemoResets, clearScenarioKinds } from '../domain/definition';
 import { registerScenario, runScenario } from '../service/index';
-import { startDemoWorld, type DemoWorld } from './demo.fixture';
+import { registerDemoFiles, startDemoWorld, type DemoWorld } from './demo.fixture';
 
 /**
- * Sits next to a real feature, matching the glob `loadDemoModules` scans — the same door a real
+ * Sits next to a real feature, matching the glob `registerDemoFiles` scans — the same door a real
  * feature's `demo/<kind>.ts` walks through, without `demo` importing anything by name (task 028).
+ * Production no longer scans at runtime (`apps/api` bundles `demo` into one file, ADR 0010), but a
+ * test may still open this door itself (docs/engineering.md §2).
  */
 const FIXTURE_ROOT = new URL('../../__discovery_fixture__', import.meta.url).pathname;
 
@@ -51,6 +53,7 @@ describe('a feature that adds demo/<kind>.ts', () => {
   it('can have its scenario run without demo naming the feature', async () => {
     await mkdir(`${FIXTURE_ROOT}/demo`, { recursive: true });
     await writeFile(`${FIXTURE_ROOT}/demo/fixture.ts`, FIXTURE_FILE, 'utf8');
+    await registerDemoFiles();
 
     const tenant = await withTestTenant();
     await registerScenario(tenant.ctx, {

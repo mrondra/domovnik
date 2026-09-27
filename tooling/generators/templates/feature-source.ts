@@ -1,8 +1,8 @@
 import type { Names } from '../lib/names';
 
-export const indexTs = (
-  names: Names,
-): string => `export { ${names.pascal}Module } from './api/${names.kebab}.module';
+export const indexTs = (names: Names): string => `import './registry.generated';
+
+export { ${names.pascal}Module } from './api/${names.kebab}.module';
 export { ${names.camel}RecordCreated } from './domain/events';
 export type { Create${names.pascal}RecordInput, ${names.pascal}Record } from './domain/types';
 export { ${names.pascal}Service } from './service/${names.kebab}.service';
@@ -66,6 +66,7 @@ export const demoReadme = (names: Names): string => `# ${names.kebab}/demo
 | \`reset.ts\` | registers this feature's \`demoReset\` with \`demo\`  |
 
 **The rule:** \`demo\` never imports this directory. A scenario kind of this feature's own belongs
-here too, in its own file, found by \`demo\`'s glob discovery (\`loadDemoModules\`) the moment it
-exists — nothing here is ever imported by name.
+here too, in its own file — named in this feature's own generated \`registry.generated.ts\`
+(\`pnpm demo:registry\`, run by \`pnpm gen:feature\` too), which \`index.ts\` imports for its side
+effects. Nothing here is ever imported by name from \`demo\` itself.
 `;
