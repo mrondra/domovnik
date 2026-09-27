@@ -1,8 +1,8 @@
 import type { Names } from '../lib/names';
 
-export const indexTs = (
-  names: Names,
-): string => `export { ${names.pascal}Module } from './api/${names.kebab}.module';
+export const indexTs = (names: Names): string => `import './registry.generated';
+
+export { ${names.pascal}Module } from './api/${names.kebab}.module';
 export { ${names.camel}RecordCreated } from './domain/events';
 export type { Create${names.pascal}RecordInput, ${names.pascal}Record } from './domain/types';
 export { ${names.pascal}Service } from './service/${names.kebab}.service';
@@ -44,4 +44,29 @@ export const ${names.camel}RecordCreated = defineEvent(
   '${names.snake}.record.created',
   z.object({ id: z.uuid(), title: z.string().min(1) }),
 );
+`;
+
+export const demoResetTs = (names: Names): string => `import { defineDemoReset } from '../../demo/index';
+
+/**
+ * What a demonstration threw away, once this feature has something worth throwing away. Returns
+ * how many rows it removed — \`0\` until this feature writes something a demo scenario produces
+ * (task 028).
+ */
+export const ${names.camel}DemoReset = defineDemoReset({
+  feature: '${names.kebab}',
+  run: () => Promise.resolve(0),
+});
+`;
+
+export const demoReadme = (names: Names): string => `# ${names.kebab}/demo
+
+| File       | Contents                                          |
+| ---------- | -------------------------------------------------- |
+| \`reset.ts\` | registers this feature's \`demoReset\` with \`demo\`  |
+
+**The rule:** \`demo\` never imports this directory. A scenario kind of this feature's own belongs
+here too, in its own file — named in this feature's own generated \`registry.generated.ts\`
+(\`pnpm demo:registry\`, run by \`pnpm gen:feature\` too), which \`index.ts\` imports for its side
+effects. Nothing here is ever imported by name from \`demo\` itself.
 `;

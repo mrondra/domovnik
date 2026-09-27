@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useTransition, type ReactElement } from 'react';
 import { Alert, Button, Card } from '../../../shared/src/ui/elements/index';
 import { Stack } from '../../../shared/src/ui/layout/index';
@@ -48,7 +49,14 @@ export const ScenarioCard = ({ scenario, onRun }: ScenarioCardProps): ReactEleme
             tone={result.outcome === 'created' ? 'success' : 'info'}
             title={result.outcome === 'created' ? 'Hotovo' : 'Duplicita'}
           >
-            <Text size="sm">{result.message}</Text>
+            <Stack gap="2xs">
+              <Text size="sm">{result.message}</Text>
+              {result.link === null ? null : (
+                <Link href={result.link.path}>
+                  <Text size="sm">{result.link.label}</Text>
+                </Link>
+              )}
+            </Stack>
           </Alert>
         )}
       </Stack>

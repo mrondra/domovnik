@@ -25,6 +25,7 @@
     "db:migrate": "pnpm --filter @domovnik/db migrate",
     "db:seed": "pnpm --filter @domovnik/db seed",
     "api:modules": "pnpm --filter @domovnik/api compose",
+    "demo:registry": "tsx tooling/generators/demo-registry.ts",
     "web:navigation": "pnpm --filter @domovnik/web compose",
     "prepare": "lefthook install"
   },

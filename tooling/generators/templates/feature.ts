@@ -4,7 +4,7 @@ import { featurePath } from '../lib/repo';
 import type { FeatureDependencies } from '../lib/versions';
 import { packageJson, readme, tsconfigJson } from './feature-meta';
 import { moduleTs, serviceTs } from './feature-service';
-import { domainEvents, domainTypes, indexTs, schemaTs } from './feature-source';
+import { demoReadme, demoResetTs, domainEvents, domainTypes, indexTs, schemaTs } from './feature-source';
 import { rlsIntTest } from './feature-test';
 
 export const featureFiles = (names: Names, dependencies: FeatureDependencies): readonly GeneratedFile[] => {
@@ -20,6 +20,8 @@ export const featureFiles = (names: Names, dependencies: FeatureDependencies): r
     { path: at('domain/events.ts'), contents: domainEvents(names) },
     { path: at(`service/${names.kebab}.service.ts`), contents: serviceTs(names) },
     { path: at(`api/${names.kebab}.module.ts`), contents: moduleTs(names) },
+    { path: at('demo/reset.ts'), contents: demoResetTs(names) },
+    { path: at('demo/README.md'), contents: demoReadme(names) },
     { path: at(`tests/${names.kebab}.int.test.ts`), contents: rlsIntTest(names) },
   ];
 };

@@ -1,7 +1,7 @@
+import './registry.generated';
 export { DocumentsModule } from './api/documents.module';
 export {
   DocumentsService,
-  demoReset as resetDocuments,
   documentDownloadUrl,
   findBySha256,
   getDocument,

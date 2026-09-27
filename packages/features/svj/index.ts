@@ -1,3 +1,4 @@
+import './registry.generated';
 import { svjSequence, svjSummary } from './service/index';
 
 export { SvjModule } from './api/svj.module';

@@ -13,6 +13,7 @@
         "drizzle-orm",
         "fast-xml-parser",
         "langfuse",
+        "pdf-lib",
         "pdf-parse",
         "pg",
         "pg-boss",
@@ -25,7 +26,7 @@
     "packages/db": {
       "entry": ["src/bin/*.ts"]
     },
-    "packages/features/*": {},
+    "packages/features/*": { "entry": ["demo/*.ts"] },
     "packages/kernel": {},
     "packages/shared": {}
   },

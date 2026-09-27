@@ -7,7 +7,10 @@ import { runScenario } from './run';
 
 /**
  * The injectable face of this feature. It holds no state and no queries of its own: every method is
- * the module next to it, so a seed can call the same function without going through Nest.
+ * the module next to it, so a seed can call the same function without going through Nest. Every
+ * `demo/*.ts`/`seed/*.seed.ts` scenario kind and reset is registered before this class is even
+ * loaded — `apps/api`'s `bootstrap.ts` statically imports the generated registry first
+ * (`apps/api/src/demo/registry.generated.ts`, `pnpm api:modules`).
  */
 @Injectable()
 export class DemoService {

@@ -1,9 +1,9 @@
+import './registry.generated';
 export { InvoicesModule } from './api/invoices.module';
 export {
   InvoicesService,
   budgetStatus,
   createInvoice,
-  demoReset as resetInvoices,
   findContractsForSupplier,
   findPayableByVariableSymbol,
   findSupplierByIco,
