@@ -1,7 +1,20 @@
 import { z } from 'zod';
-import { budgetCategorySchema } from '../../suppliers/index';
 
-export { budgetCategorySchema };
+/**
+ * A local copy of `suppliers`' enum, not an import: this file is reachable from `ui/wire.ts`
+ * (ADR 0017), and a value import from `suppliers/index` would drag its Nest module — and the
+ * native argon2 binary behind `kernel/identity` — into the Next.js build (task 029 review round 3).
+ */
+export const budgetCategorySchema = z.enum([
+  'uklid',
+  'vytah',
+  'energie',
+  'opravy',
+  'revize',
+  'sprava',
+  'pojisteni',
+  'ostatni',
+]);
 
 export const invoiceStatusSchema = z.enum([
   'received',
