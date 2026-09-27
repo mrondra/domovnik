@@ -1,3 +1,4 @@
+import './registry.generated';
 export { SuppliersModule } from './api/suppliers.module';
 export {
   SuppliersService,
