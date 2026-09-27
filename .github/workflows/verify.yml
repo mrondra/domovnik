@@ -58,3 +58,69 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # `pnpm verify` běží nad zdrojáky ve Vitestu, takže nepozná chybu, která vznikne
+  # až sestavením — dynamický import, který bundler nerozbalí, projde jednotkovými
+  # i integračními testy a rozbité je až chování v prohlížeči. Proto e2e patří do
+  # CI, ne jen na něčí stroj: jinak ho nespustí nikdo a nechytne nic.
+  #
+  # Vlastní job, ne další krok ve `verify`: běží souběžně a jeho selhání se nemíchá
+  # s ostatními.
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env: { POSTGRES_PASSWORD: test, POSTGRES_DB: domovnik }
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 5s --health-retries 10
+    env:
+      # Aplikace jede pod rolí bez BYPASSRLS, jinak by row level security tiše
+      # neplatila a testy by procházely, aniž by cokoli dokázaly (ADR 0013).
+      DATABASE_URL: postgresql://domovnik_app:domovnik@localhost:5432/domovnik
+      DATABASE_ADMIN_URL: postgresql://postgres:test@localhost:5432/domovnik
+      APP_SECRET: ci-secret-that-is-at-least-32-chars
+      # Model nahrazuje lokální endpoint ze `globalSetup`; klíč musí jen existovat.
+      ANTHROPIC_API_KEY: not-set-replay-only
+      S3_ENDPOINT: http://localhost:9000
+      S3_ACCESS_KEY: domovnik
+      S3_SECRET_KEY: domovnik123
+      S3_BUCKET: domovnik
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+
+      # Stejný obraz jako docker-compose. Jako `services:` to nejde: MinIO potřebuje
+      # argument `server /data` a služby v Actions příkaz nastavit neumí.
+      - name: MinIO a bucket
+        run: |
+          docker run -d --name minio -p 9000:9000 \
+            -e MINIO_ROOT_USER=domovnik -e MINIO_ROOT_PASSWORD=domovnik123 \
+            cgr.dev/chainguard/minio:latest server /data
+          for _ in $(seq 1 30); do
+            curl -sf http://localhost:9000/minio/health/live && break
+            sleep 1
+          done
+          docker run --rm --network host \
+            -e MC_HOST_local=http://domovnik:domovnik123@localhost:9000 \
+            cgr.dev/chainguard/minio-client:latest mb --ignore-existing local/domovnik
+
+      # Svazek služby je čerstvý, takže init skript compose tady neproběhl.
+      - name: role aplikace
+        run: psql "$DATABASE_ADMIN_URL" -f docker/postgres/init-app-role.sql
+        env: { PGPASSWORD: test }
+
+      - run: pnpm db:migrate
+      - run: pnpm db:seed
+      - run: pnpm --filter @domovnik/web exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web/test-results/
+          retention-days: 7
