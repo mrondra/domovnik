@@ -1,6 +1,5 @@
 import { newId, svjIdSchema } from '../../../../kernel/src/ids/index';
-import { contractIdSchema, supplierIdSchema } from '../../domain/ids';
-import type { Contract, Supplier } from '../../domain/types';
+import { contractIdSchema, supplierIdSchema, type Contract, type Supplier } from '../../../suppliers/index';
 
 /** Domain records built rather than cast, so a change to the shape breaks the test that uses it. */
 export const aSupplier = (overrides: Partial<Supplier> = {}): Supplier => ({

@@ -2,7 +2,7 @@ import { and, desc, eq } from 'drizzle-orm';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import { withTenant } from '../../../kernel/src/db/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
-import type { SupplierId } from '../domain/ids';
+import type { SupplierId } from '../../suppliers/index';
 import type { InvoiceStatus } from '../domain/status';
 import { invoiceStatusSchema } from '../domain/schemas';
 import { invoice } from '../schema/index';

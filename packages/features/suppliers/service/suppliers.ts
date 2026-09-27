@@ -5,7 +5,7 @@ import { withTenant } from '../../../kernel/src/db/index';
 import { newId } from '../../../kernel/src/ids/index';
 import { supplierIdSchema, type SupplierId } from '../domain/ids';
 import type { Supplier } from '../domain/types';
-import { supplier } from '../schema/index';
+import { supplier } from '../schema';
 import { toSupplier } from './rows';
 
 export interface CreateSupplierInput {

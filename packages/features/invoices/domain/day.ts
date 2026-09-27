@@ -5,10 +5,6 @@
  */
 export type IsoDay = string;
 
-const DAY_LENGTH = 10;
-
-export const asDay = (value: Date): IsoDay => value.toISOString().slice(0, DAY_LENGTH);
-
 export const firstDayOf = (year: number): IsoDay => `${String(year)}-01-01`;
 
 export const lastDayOf = (year: number): IsoDay => `${String(year)}-12-31`;

@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
-/** One zod definition per domain shape, reused by the events, the tools and the HTTP contract. */
+/**
+ * A local copy of `suppliers`' enum, not an import: this file is reachable from `ui/wire.ts`
+ * (ADR 0017), and a value import from `suppliers/index` would drag its Nest module — and the
+ * native argon2 binary behind `kernel/identity` — into the Next.js build (task 029 review round 3).
+ */
 export const budgetCategorySchema = z.enum([
   'uklid',
   'vytah',
@@ -22,18 +26,6 @@ export const invoiceStatusSchema = z.enum([
   'posted',
   'paid',
 ]);
-
-export const contractSchema = z.object({
-  id: z.uuid(),
-  svjId: z.uuid(),
-  supplierId: z.uuid(),
-  subject: z.string().min(1),
-  budgetCategory: budgetCategorySchema,
-  monthlyAmount: z.number().nullable(),
-  validFrom: z.iso.date(),
-  validTo: z.iso.date().nullable(),
-  documentId: z.uuid().nullable(),
-});
 
 export const budgetStatusSchema = z.object({
   svjId: z.uuid(),

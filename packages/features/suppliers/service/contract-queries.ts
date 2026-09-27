@@ -5,7 +5,7 @@ import type { SvjId } from '../../../kernel/src/ids/index';
 import { asDay } from '../domain/day';
 import type { ContractId } from '../domain/ids';
 import type { Contract } from '../domain/types';
-import { contract } from '../schema/index';
+import { contract } from '../schema';
 import { assertReachable } from './reach';
 import { toContract } from './rows';
 

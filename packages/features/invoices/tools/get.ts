@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import { contractSchema } from '../../suppliers/index';
 import { defineTool, neverRequiresApproval } from '../../../kernel/src/tools/index';
 import { invoiceIdSchema } from '../domain/ids';
-import { budgetStatusSchema, contractSchema, invoiceSchema } from '../domain/schemas';
+import { budgetStatusSchema, invoiceSchema } from '../domain/schemas';
 import { invoiceDossier } from '../service/index';
 
 /**

@@ -1,21 +1,10 @@
 import { z } from 'zod';
+import { contractSchema, supplierSchema } from '../../suppliers/index';
 import { approveInputSchema } from '../domain/proposal';
-import { budgetStatusSchema, contractSchema, invoiceSchema, invoiceStatusSchema } from '../domain/schemas';
+import { budgetStatusSchema, invoiceSchema, invoiceStatusSchema } from '../domain/schemas';
 
 /** The HTTP contract is the domain shape: one zod schema both validates and documents it. */
 export const invoiceListResponse = z.array(invoiceSchema).readonly();
-
-export const supplierResponse = z.object({
-  id: z.uuid(),
-  name: z.string().min(1),
-  ico: z.string().min(1),
-  dic: z.string().nullable(),
-  bankAccount: z.string().nullable(),
-  email: z.string().nullable(),
-});
-
-export const supplierListResponse = z.array(supplierResponse).readonly();
-export const contractListResponse = z.array(contractSchema).readonly();
 
 export const agentRunResponse = z.object({
   id: z.uuid(),
@@ -36,7 +25,7 @@ export const invoiceDetailResponse = z.object({
   invoice: invoiceSchema,
   extraction: z.unknown(),
   checks: z.unknown(),
-  supplier: supplierResponse.nullable(),
+  supplier: supplierSchema.nullable(),
   contract: contractSchema.nullable(),
   budget: budgetStatusSchema.nullable(),
   agentRun: agentRunResponse.nullable(),

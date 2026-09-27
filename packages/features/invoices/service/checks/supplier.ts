@@ -1,5 +1,5 @@
+import type { Supplier } from '../../../suppliers/index';
 import type { Check } from '../../domain/checks';
-import type { Supplier } from '../../domain/types';
 import type { ExtractedInvoice } from '../extraction/schema';
 
 /**

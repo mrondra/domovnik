@@ -1,8 +1,8 @@
 import type { RequestContext } from '../../../kernel/src/context/index';
+import { contractById, type Contract } from '../../suppliers/index';
 import type { InvoiceId } from '../domain/ids';
-import type { BudgetStatus, Contract, Invoice } from '../domain/types';
+import type { BudgetStatus, Invoice } from '../domain/types';
 import { budgetStatus } from './budget';
-import { contractById } from './contract-queries';
 import { getInvoice } from './invoice-records';
 
 export interface InvoiceDossier {

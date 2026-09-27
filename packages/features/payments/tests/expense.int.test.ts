@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import { newRowId } from '../../../kernel/src/ids/index';
 import { InvoicesService, getInvoice, type InvoiceId } from '../../invoices/index';
+import { createSupplier } from '../../suppliers/index';
 import type { IncomingTransaction } from '../domain/types';
 import { importTransactions } from '../service/index';
 import {
@@ -24,7 +25,7 @@ const invoices = new InvoicesService();
 /** An invoice taken as far as the caller asks; only a posted one may be called paid (ADR 0005). */
 const payableInvoice = async (upTo: 'approved' | 'posted', symbol: string): Promise<InvoiceId> => {
   sequence += 1;
-  const supplier = await invoices.createSupplier(ctx, {
+  const supplier = await createSupplier(ctx, {
     name: `Dodavatel ${String(sequence)}`,
     ico: String(70_000_000 + sequence),
   });

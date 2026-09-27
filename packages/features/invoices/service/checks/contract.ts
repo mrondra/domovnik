@@ -1,5 +1,5 @@
+import { type Contract, type Supplier } from '../../../suppliers/index';
 import type { Check } from '../../domain/checks';
-import type { Contract, Supplier } from '../../domain/types';
 
 /**
  * A known supplier invoicing an SVJ it has no contract with. Not a refusal — one-off repairs are

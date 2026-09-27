@@ -3,14 +3,11 @@ import type { RequestContext } from '../../../kernel/src/context/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
 import { listScenarios } from '../../demo/index';
 import { readModels, SvjService } from '../../svj/index';
-import { budgetStatus, listContracts, listSuppliers } from '../service/index';
+import { budgetStatus } from '../service/index';
 import { DEMO_BUDGETS } from '../seed/data/budget';
-import { DEMO_CONTRACTS } from '../seed/data/contracts';
 import { DEMO_SCENARIOS } from '../seed/data/invoices';
-import { DEMO_SUPPLIERS } from '../seed/data/suppliers';
-import { withChecksum } from '../seed/data/ico';
 import { invoicesSeed } from '../seed/invoices.seed';
-import { startInvoicesWorld, withTestTenant, type InvoicesWorld } from './world.fixture';
+import { runFeatureSeeds, startInvoicesWorld, withTestTenant, type InvoicesWorld } from './world.fixture';
 
 const YEAR = new Date().getUTCFullYear();
 
@@ -21,7 +18,7 @@ let houses: readonly SvjId[];
 
 const svj = new SvjService();
 
-const runSeed = (): Promise<void> => invoicesSeed.run({ tenantId: tenantId as never, ctx });
+const runSeed = (): Promise<void> => runFeatureSeeds({ tenantId: tenantId as never, ctx });
 
 beforeAll(async () => {
   world = await startInvoicesWorld();
@@ -57,19 +54,8 @@ const houseAt = (index: number): SvjId => {
 };
 
 describe('the invoices seed', () => {
-  it('writes the address book with IČO that pass their own check digit', async () => {
-    const suppliers = await listSuppliers(ctx);
-
-    expect(suppliers).toHaveLength(DEMO_SUPPLIERS.length);
-    for (const supplier of suppliers) {
-      expect(withChecksum(supplier.ico.slice(0, 7))).toBe(supplier.ico);
-    }
-  });
-
-  it('gives each house the contracts its own plan names', async () => {
-    for (const [index, expected] of DEMO_CONTRACTS.entries()) {
-      await expect(listContracts(ctx, houseAt(index))).resolves.toHaveLength(expected.length);
-    }
+  it('depends on suppliers, which owns the address book it needs for its historical invoice', () => {
+    expect(invoicesSeed.dependsOn).toContain('suppliers');
   });
 
   it('plans the budget of the current year for every house', async () => {
@@ -100,8 +86,6 @@ describe('the invoices seed', () => {
   it('adds nothing on a second run', async () => {
     await runSeed();
 
-    await expect(listSuppliers(ctx)).resolves.toHaveLength(DEMO_SUPPLIERS.length);
-    await expect(listContracts(ctx, houseAt(0))).resolves.toHaveLength(DEMO_CONTRACTS[0]?.length ?? 0);
     await expect(listScenarios(ctx)).resolves.toHaveLength(DEMO_SCENARIOS.length);
   });
 });

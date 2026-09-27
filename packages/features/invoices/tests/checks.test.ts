@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Contract } from '../domain/types';
+import type { Contract } from '../../suppliers/index';
 import {
   amountCheck,
   contractCheck,

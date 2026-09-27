@@ -1,5 +1,5 @@
 import { date, index, numeric, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
-import { svjTable, tenantTable } from '../../../kernel/src/db/index';
+import { svjTable, tenantTable } from '../../kernel/src/db/index';
 
 const MONEY = { precision: 12, scale: 2 } as const;
 

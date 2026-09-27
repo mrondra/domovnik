@@ -1,8 +1,6 @@
 export { InvoicesService } from './invoices.service';
 export { demoReset } from './demo-reset';
 export { budgetStatus, setBudgetLine } from './budget';
-export { listContracts } from './contract-queries';
-export { createContract, findContractsForSupplier } from './contracts';
 export {
   approveInvoice,
   committeeOf,
@@ -15,7 +13,6 @@ export { invoiceDossier } from './dossier';
 export { supplierHistory } from './history';
 export { createInvoice, getInvoice, listInvoices } from './invoice-records';
 export { findPayableByVariableSymbol } from './payable';
-export { createSupplier, findSupplierByIco, listSuppliers, supplierById } from './suppliers';
 export { processReceivedInvoice } from './extraction/index';
 export { receiveInvoiceMail } from './receive';
 export { transition } from './transitions';

@@ -3,6 +3,7 @@ import { withTenant } from '../../../kernel/src/db/index';
 import { eventIdSchema, newId, newRowId, tenantIdSchema } from '../../../kernel/src/ids/index';
 import type { EventHandler, DeliveredEvent } from '../../../kernel/src/events/index';
 import { InvoicesService, type InvoiceId } from '../../invoices/index';
+import { createSupplier } from '../../suppliers/index';
 import { SvjService } from '../../svj/index';
 import { linkSvj } from '../service/index';
 
@@ -46,7 +47,7 @@ export const approvedInvoice = async (
   symbol: string,
 ): Promise<ApprovedInvoice> => {
   sequence += 1;
-  const supplier = await invoices.createSupplier(ctx, {
+  const supplier = await createSupplier(ctx, {
     name: `Výtahy ${String(sequence)} s.r.o.`,
     ico: String(27_000_000 + sequence),
     dic: `CZ${String(27_000_000 + sequence)}`,

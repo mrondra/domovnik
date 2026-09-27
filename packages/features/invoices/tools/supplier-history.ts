@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { svjIdSchema } from '../../../kernel/src/ids/index';
 import { defineTool, neverRequiresApproval } from '../../../kernel/src/tools/index';
-import { supplierIdSchema } from '../domain/ids';
+import { supplierIdSchema } from '../../suppliers/index';
 import { invoiceStatusSchema } from '../domain/schemas';
 import { supplierHistory } from '../service/index';
 
