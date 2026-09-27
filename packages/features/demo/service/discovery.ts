@@ -1,9 +1,31 @@
+import { existsSync } from 'node:fs';
 import { glob } from 'node:fs/promises';
-import { pathToFileURL } from 'node:url';
+import { dirname, join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { AdapterError } from '../../../kernel/src/errors/index';
 import { loadSeedsFrom } from '../../../kernel/src/seed/index';
 
-const DEMO_FILES = new URL('../../*/demo/*.ts', import.meta.url).pathname;
-const SEED_FILES = new URL('../../*/seed/*.seed.ts', import.meta.url).pathname;
+/**
+ * `apps/api` bundles this file into `dist/main.cjs` (`apps/api/tsup.config.ts`); esbuild empties
+ * `import.meta.url` for that CommonJS output, and `__dirname` there points at `dist`, not here — so
+ * neither survives the bundle as a fix location for *this* file. Both survive as a *starting point*
+ * for finding the repository root, though: walk up from wherever we are until `pnpm-workspace.yaml`
+ * shows up, then the glob below stays `packages/features/<kind>/demo/<file>.ts` either way.
+ */
+const startDir = typeof __dirname === 'string' ? __dirname : dirname(fileURLToPath(import.meta.url));
+
+const repoRootFrom = (dir: string): string => {
+  if (existsSync(join(dir, 'pnpm-workspace.yaml'))) return dir;
+  const parent = dirname(dir);
+  if (parent === dir) {
+    throw new AdapterError(`pnpm-workspace.yaml not found above ${startDir}`, { retryable: false });
+  }
+  return repoRootFrom(parent);
+};
+
+const ROOT = repoRootFrom(startDir);
+const DEMO_FILES = join(ROOT, 'packages/features/*/demo/*.ts');
+const SEED_FILES = join(ROOT, 'packages/features/*/seed/*.seed.ts');
 
 /** Plugin loading from a runtime registry: the glob finds the file, so the specifier is not known at author time. */
 const importAll = async (pattern: string): Promise<void> => {
