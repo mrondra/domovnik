@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { checkSchema } from '../domain/checks';
 import { approveInputSchema } from '../domain/proposal';
-import { budgetStatusSchema, invoiceSchema } from '../domain/schemas';
+import { budgetCategorySchema, budgetStatusSchema, invoiceSchema } from '../domain/schemas';
 
 /**
  * What the browser side of this feature sees. It is the same zod the API answers with — the screens
@@ -25,7 +25,7 @@ export const contractView = z.object({
   svjId: z.uuid(),
   supplierId: z.uuid(),
   subject: z.string().min(1),
-  budgetCategory: z.string().min(1),
+  budgetCategory: budgetCategorySchema,
   monthlyAmount: z.number().nullable(),
   validFrom: z.iso.date(),
   validTo: z.iso.date().nullable(),

@@ -1,4 +1,5 @@
 import type { RequestContext } from '../../../kernel/src/context/index';
+import { DomainError } from '../../../kernel/src/errors/index';
 import { defineSeed, type SeedContext } from '../../../kernel/src/seed/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
 import { findSupplierByIco } from '../../suppliers/index';
@@ -38,20 +39,24 @@ const housesInSeedOrder = async (ctx: RequestContext): Promise<readonly House[]>
  * No invoice is delivered here. An invoice arrives because somebody sent it, and in the demo that
  * somebody is whoever clicks the button (task 019).
  */
-export const invoicesSeed = defineSeed({
+defineSeed({
   name: 'invoices',
   dependsOn: ['suppliers', 'svj'],
   run: async ({ ctx }: SeedContext): Promise<void> => {
     const year = new Date().getUTCFullYear();
     const houses = await housesInSeedOrder(ctx);
-    const roofer = await findSupplierByIco(ctx, senderNamed('strechar').ico);
+    const rooferIco = senderNamed('strechar').ico;
+    const roofer = await findSupplierByIco(ctx, rooferIco);
+    if (roofer === null) {
+      throw new DomainError('Seed nenašel dodavatele střechaře podle IČO z katalogu odesílatelů', {
+        code: 'demo_sender_supplier_missing',
+        details: { ico: rooferIco },
+      });
+    }
 
     for (const [house, one] of houses.entries()) {
       await seedBudget(ctx, one.id, house, year);
-
-      if (roofer !== null) {
-        await seedSpentBudget(ctx, one.id, house, year, roofer.id, one.name);
-      }
+      await seedSpentBudget(ctx, one.id, house, year, roofer.id, one.name);
     }
 
     await seedScenarios(ctx, houses);

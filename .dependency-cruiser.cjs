@@ -28,6 +28,21 @@ module.exports = {
       to: { path: '^packages/features/(?!demo/)' },
     },
     {
+      // `suppliers` promises (README, ADR 0023/0024) to depend on no other feature: `invoices` and
+      // `accounting-sync` reach it, never the other way around. The one documented exception is its
+      // own seed, which reads `svj`'s read model (`readModels.svjSummary`/`svjSequence`, engineering
+      // §2) to know which demo house is which — the same pattern `receivables`, `payments`,
+      // `invoices` and `accounting-sync` use for the same reason (ADR 0024). Tests get the same
+      // carve-out as `demo-knows-no-feature`: setting up SVJ fixtures is a test concern.
+      name: 'suppliers-knows-no-feature',
+      severity: 'error',
+      from: {
+        path: '^packages/features/suppliers/',
+        pathNot: ['^packages/features/suppliers/seed/', '\\.(test|int\\.test|contract\\.test|fixture)\\.ts$'],
+      },
+      to: { path: '^packages/features/(?!suppliers/)[^/]+/' },
+    },
+    {
       name: 'shared-knows-nothing',
       severity: 'error',
       from: { path: '^packages/shared' },

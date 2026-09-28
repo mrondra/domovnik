@@ -1,6 +1,6 @@
 # 0023 – Dodavatelé a smlouvy jako samostatná feature suppliers
 
-- Status: Accepted
+- Status: Superseded by 0024
 - Date: 2026-09-27
 - Deciders: Ondra
 

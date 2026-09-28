@@ -23,8 +23,8 @@ Three decisions worth knowing before changing anything here:
   is the machine's and not the caller's, so a controller, a tool and an agent all get the same
   answer to "may this happen now?".
 - A supplier and a contract live in `packages/features/suppliers`, reached only through its
-  `index.ts` (task 029): the same lift service invoices several houses, and `inspections`/`quotes`
-  need the same address book without depending on this whole feature.
+  `index.ts` (task 029, ADR 0023/0024): the same lift service invoices several houses, and
+  `inspections`/`quotes` need the same address book without depending on this whole feature.
 - `extraction` and `checks` are kept as they were — what the model read, and what the deterministic
   rules made of it — so a decision taken months ago can still be explained (ADR 0004, task 016).
 

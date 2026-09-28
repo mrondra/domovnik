@@ -1,4 +1,4 @@
-import { type Contract, type Supplier } from '../../../suppliers/index';
+import type { Contract, Supplier } from '../../../suppliers/index';
 import type { Check } from '../../domain/checks';
 
 /**

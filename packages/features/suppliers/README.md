@@ -16,5 +16,10 @@ the same address book without depending on the whole invoices feature.
 
 **The rule:** a supplier is tenant-scoped and a contract is SVJ-scoped — the same lift service
 invoices several houses, and the address book is one thing the management company keeps (zadání
-kap. 4); what that supplier agreed with a given SVJ belongs to that SVJ. This feature depends on no
-other feature: `invoices` reaches it through `index.ts`, never the other way around.
+kap. 4); what that supplier agreed with a given SVJ belongs to that SVJ. `invoices` and
+`accounting-sync` reach this feature through `index.ts`, never the other way around, and nothing
+outside `seed/` may import another feature — enforced by `suppliers-knows-no-feature` in
+`.dependency-cruiser.cjs`, not just claimed here. The one exception is the seed itself: it reads
+`svj`'s read model (`readModels.svjSummary`/`svjSequence`) to know which demo house is which, the
+same pattern `receivables`, `payments`, `invoices` and `accounting-sync` use for their own seeds
+(ADR 0024).
