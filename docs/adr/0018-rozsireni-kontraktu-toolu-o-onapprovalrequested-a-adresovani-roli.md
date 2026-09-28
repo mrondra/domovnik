@@ -1,6 +1,6 @@
 # 0018 – Rozšíření kontraktu toolu o onApprovalRequested a adresování rolí
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-09-26
 - Deciders: Ondra
 

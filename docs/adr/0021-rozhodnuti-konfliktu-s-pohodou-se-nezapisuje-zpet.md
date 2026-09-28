@@ -1,6 +1,6 @@
 # 0021 – Rozhodnutí konfliktu s Pohodou se nezapisuje zpět
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-09-26
 - Deciders: Ondra
 

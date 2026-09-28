@@ -1,6 +1,6 @@
 # 0019 – Verzování doménových událostí
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-09-26
 - Deciders: Ondra
 
