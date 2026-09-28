@@ -1,6 +1,6 @@
 # 0024 – seed smí číst svj's read model, aby věděl, do kterého domu seeduje
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-09-28
 - Deciders: Ondra
 - Supersedes: 0023
