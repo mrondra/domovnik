@@ -89,7 +89,7 @@ pnpm adr:new "<title>"
 - [ ] Veřejný API feature (`index.ts`) obsahuje jen to, co ostatní opravdu potřebují
 - [ ] Žádná změna rozhodnutí z ADR/zadání; pokud byla nutná, existuje schválené ADR
 - [ ] Commit: conventional commits, jeden logický celek
-- [ ] Každé rozhodnutí mimo zadání a ADR má ADR se statusem Proposed a je uvedené v reportu úkolu; tabulka „odchylky bez ADR" se nezakládá.
+- [ ] Každé rozhodnutí mimo zadání a ADR má ADR se statusem Proposed a je uvedené v reportu úkolu; tabulka „odchylky bez ADR" se nezakládá. **`Accepted` nenastavuj nikdy sám** – na `Accepted` přepne ADR workflow `adr.yml` po mergi do `main`, protože ten merge je ten souhlas.
 
 ## 7. Co nikdy nedělat
 

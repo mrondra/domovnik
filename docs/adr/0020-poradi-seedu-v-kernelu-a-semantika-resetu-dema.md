@@ -1,6 +1,6 @@
 # 0020 – Pořadí seedů v kernelu a sémantika resetu dema
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-09-26
 - Deciders: Ondra
 

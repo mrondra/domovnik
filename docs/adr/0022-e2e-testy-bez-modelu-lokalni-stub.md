@@ -1,6 +1,6 @@
 # 0022 – E2E testy bez modelu: lokální stub
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-09-26
 - Deciders: Ondra
 
