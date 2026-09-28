@@ -4,8 +4,8 @@
 #
 # Bez tohohle by se návrhy hromadily: agenti se na ADR odvolávají při
 # rozhodování, takže `Proposed` ADR ovlivňuje jejich práci, i když ho nikdo
-# neodsouhlasil. Zamčení statusem `Accepted` navíc podle AGENTS.md §7 znamená,
-# že do něj agent smí dopsat už jen `Superseded by`.
+# neodsouhlasil. Zamčení statusem `Accepted` podle AGENTS.md §7 znamená, že do
+# něj agent smí dopsat už jen `Superseded by`.
 name: adr
 
 on:
@@ -25,28 +25,29 @@ jobs:
           # Potřeba předchozí commit, aby šlo zjistit, co v tomhle pushi přibylo.
           fetch-depth: 2
 
-      - name: přepnout Proposed na Accepted
+      - name: prepnout proposed na accepted
+        env:
+          # Hláška commitu jde přes proměnnou, ne přes víceřádkový řetězec v YAML:
+          # prettier takový řetězec přeformátuje a odsazení se rozjede tak, že
+          # GitHub workflow vůbec nepřečte (stalo se 2026-09-28).
+          BODY: 'Prepnuto automaticky: merge do main je potvrzeni navrhu (AGENTS.md §6).'
         run: |
           set -euo pipefail
           changed=$(git diff --name-only --diff-filter=AM HEAD^ HEAD -- 'docs/adr/*.md' || true)
-          [ -n "$changed" ] || { echo 'žádné ADR v tomhle pushi'; exit 0; }
+          if [ -z "$changed" ]; then echo 'zadne ADR v tomhle pushi'; exit 0; fi
 
           flipped=""
           for f in $changed; do
-            # Jen přesný řádek statusu a jen Proposed. Nic jiného v souboru.
             if grep -qx -- '- Status: Proposed' "$f"; then
               sed -i 's|^- Status: Proposed$|- Status: Accepted|' "$f"
               flipped="$flipped $f"
-              echo "  ✓ $f"
+              echo "prepnuto: $f"
             fi
           done
-          [ -n "$flipped" ] || { echo 'nic ve stavu Proposed'; exit 0; }
+          if [ -z "$flipped" ]; then echo 'nic ve stavu Proposed'; exit 0; fi
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add $flipped
-          # [skip ci] jinak by push na main spustil verify i e2e kvůli jednomu řádku
-          git commit -m "docs(adr): prijato mergem do main [skip ci]
-
-Prepnuto automaticky: merge do main je potvrzeni navrhu (AGENTS.md §6)."
-  git push
+          git commit -m 'docs(adr): prijato mergem do main [skip ci]' -m "$BODY"
+          git push
