@@ -12,7 +12,7 @@ export {
   supplierById,
 } from './service/index';
 
-export { budgetCategorySchema, contractSchema, supplierSchema } from './domain/schemas';
+export { contractSchema, supplierSchema } from './domain/schemas';
 export { contractIdSchema, supplierIdSchema } from './domain/ids';
 export type { ContractId, SupplierId } from './domain/ids';
 export type { BudgetCategory, Contract, Supplier } from './domain/types';

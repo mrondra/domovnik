@@ -4,7 +4,6 @@ export {
   InvoicesService,
   budgetStatus,
   createInvoice,
-  demoReset as resetInvoices,
   findPayableByVariableSymbol,
   getInvoice,
   listInvoices,

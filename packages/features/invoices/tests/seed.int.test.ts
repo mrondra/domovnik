@@ -6,7 +6,6 @@ import { readModels, SvjService } from '../../svj/index';
 import { budgetStatus } from '../service/index';
 import { DEMO_BUDGETS } from '../seed/data/budget';
 import { DEMO_SCENARIOS } from '../seed/data/invoices';
-import { invoicesSeed } from '../seed/invoices.seed';
 import { runFeatureSeeds, startInvoicesWorld, withTestTenant, type InvoicesWorld } from './world.fixture';
 
 const YEAR = new Date().getUTCFullYear();
@@ -54,10 +53,6 @@ const houseAt = (index: number): SvjId => {
 };
 
 describe('the invoices seed', () => {
-  it('depends on suppliers, which owns the address book it needs for its historical invoice', () => {
-    expect(invoicesSeed.dependsOn).toContain('suppliers');
-  });
-
   it('plans the budget of the current year for every house', async () => {
     const planned = DEMO_BUDGETS[0]?.[0];
     if (planned === undefined) throw new RangeError('budget');

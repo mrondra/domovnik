@@ -1,3 +1,4 @@
+import { DomainError } from '../../../../kernel/src/errors/index';
 import { withChecksum } from './ico';
 
 export interface DemoSender {
@@ -36,6 +37,11 @@ const SENDERS: Readonly<Record<string, DemoSender>> = {
 
 export const senderNamed = (code: string): DemoSender => {
   const found = SENDERS[code];
-  if (found === undefined) throw new RangeError(`Scénář nezná odesílatele ${code}`);
+  if (found === undefined) {
+    throw new DomainError(`Scénář nezná odesílatele ${code}`, {
+      code: 'demo_sender_unknown',
+      details: { sender: code },
+    });
+  }
   return found;
 };
