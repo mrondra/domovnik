@@ -1,12 +1,16 @@
-import type { BudgetCategory } from '../../domain/types';
+import {
+  HASICI_A,
+  INSTALATER,
+  PLYN,
+  REVIZE,
+  REVIZE_ELEKTRO_A,
+  REVIZE_PLYN_KOMINY_B,
+  STRECHAR,
+  VYTAHY_REVIZE,
+} from './contracts-definitions';
+import type { DemoContract } from './contract-shape';
 
-export interface DemoContract {
-  readonly supplier: string;
-  readonly subject: string;
-  readonly budgetCategory: BudgetCategory;
-  /** `null` is a one-off job rather than a standing arrangement — the roofer, for instance. */
-  readonly monthlyAmount: number | null;
-}
+export type { DemoContract } from './contract-shape';
 
 const uklid = (amount: number): DemoContract => ({
   supplier: 'uklid',
@@ -36,40 +40,30 @@ const pojisteni = (amount: number): DemoContract => ({
   monthlyAmount: amount,
 });
 
-const REVIZE: DemoContract = {
-  supplier: 'revize',
-  subject: 'Revize elektro, plyn a hasicí přístroje',
-  budgetCategory: 'revize',
-  monthlyAmount: null,
-};
-
-const PLYN: DemoContract = {
-  supplier: 'plyn',
-  subject: 'Dodávka plynu do kotelny',
-  budgetCategory: 'energie',
-  monthlyAmount: 24_000,
-};
-
-const INSTALATER: DemoContract = {
-  supplier: 'instalater',
-  subject: 'Pohotovost a drobné opravy vody',
-  budgetCategory: 'opravy',
-  monthlyAmount: null,
-};
-
-const STRECHAR: DemoContract = {
-  supplier: 'strechar',
-  subject: 'Rekonstrukce ploché střechy',
-  budgetCategory: 'opravy',
-  monthlyAmount: null,
-};
-
 /**
  * What each of the three demo SVJ has agreed with whom, keyed by the order the `svj` seed writes
  * them in: the twelve-unit house, the eighty-unit one and the forty-unit one (zadání kap. 10).
  */
 export const DEMO_CONTRACTS: readonly (readonly DemoContract[])[] = [
-  [uklid(8500), vytahy(3200), elektrina(4200), pojisteni(2600)],
-  [uklid(24_000), vytahy(9800), elektrina(11_500), pojisteni(6400), PLYN, REVIZE],
-  [uklid(14_000), vytahy(5200), elektrina(7300), pojisteni(4100), REVIZE, INSTALATER, STRECHAR],
+  [uklid(8500), vytahy(3200), elektrina(4200), pojisteni(2600), REVIZE_ELEKTRO_A, HASICI_A],
+  [
+    uklid(24_000),
+    vytahy(9800),
+    elektrina(11_500),
+    pojisteni(6400),
+    PLYN,
+    REVIZE,
+    VYTAHY_REVIZE,
+    REVIZE_PLYN_KOMINY_B,
+  ],
+  [
+    uklid(14_000),
+    vytahy(5200),
+    elektrina(7300),
+    pojisteni(4100),
+    REVIZE,
+    INSTALATER,
+    STRECHAR,
+    VYTAHY_REVIZE,
+  ],
 ];

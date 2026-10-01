@@ -37,6 +37,15 @@ describe('permissions', () => {
   it('lets the system actor through', () => {
     expect(hasPermission({ type: 'system', id: null, roles: [] }, 'finance.pay')).toBe(true);
   });
+
+  it('gives suppliers.* to manager and finance, but only suppliers.read to committee and technician', () => {
+    expect(hasPermission(user(['manager']), 'suppliers.write')).toBe(true);
+    expect(hasPermission(user(['finance']), 'suppliers.write')).toBe(true);
+    expect(hasPermission(user(['committee']), 'suppliers.read')).toBe(true);
+    expect(hasPermission(user(['committee']), 'suppliers.write')).toBe(false);
+    expect(hasPermission(user(['technician']), 'suppliers.read')).toBe(true);
+    expect(hasPermission(user(['technician']), 'suppliers.write')).toBe(false);
+  });
 });
 
 describe('secrets', () => {

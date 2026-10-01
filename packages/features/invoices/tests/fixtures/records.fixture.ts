@@ -9,6 +9,10 @@ export const aSupplier = (overrides: Partial<Supplier> = {}): Supplier => ({
   dic: 'CZ27000111',
   bankAccount: '2801234567/2010',
   email: null,
+  specializations: ['uklid'],
+  phone: null,
+  contactPerson: null,
+  isActive: true,
   ...overrides,
 });
 
@@ -22,5 +26,6 @@ export const aContract = (overrides: Partial<Contract> = {}): Contract => ({
   validFrom: '2026-01-01',
   validTo: null,
   documentId: null,
+  covers: [],
   ...overrides,
 });

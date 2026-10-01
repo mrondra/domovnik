@@ -1,4 +1,4 @@
-import { date, index, numeric, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { boolean, date, index, numeric, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { svjTable, tenantTable } from '../../kernel/src/db/index';
 
 const MONEY = { precision: 12, scale: 2 } as const;
@@ -15,6 +15,10 @@ export const supplier = tenantTable(
     dic: text('dic'),
     bankAccount: text('bank_account'),
     email: text('email'),
+    specializations: text('specializations').array().notNull().default([]),
+    phone: text('phone'),
+    contactPerson: text('contact_person'),
+    isActive: boolean('is_active').notNull().default(true),
   },
   (table) => [uniqueIndex('supplier_ico_unique').on(table.tenantId, table.ico)],
 );
@@ -33,6 +37,7 @@ export const contract = svjTable(
     validFrom: date('valid_from').notNull(),
     validTo: date('valid_to'),
     documentId: uuid('document_id'),
+    covers: text('covers').array().notNull().default([]),
   },
   (table) => [index('contract_supplier_idx').on(table.tenantId, table.svjId, table.supplierId)],
 );

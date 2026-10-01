@@ -64,6 +64,13 @@
       "when": 1790002588485,
       "tag": "0008_salty_hex",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790796366562,
+      "tag": "0009_nosy_reaper",
+      "breakpoints": true
     }
   ]
 }

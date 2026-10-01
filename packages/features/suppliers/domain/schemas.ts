@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { specializationSchema } from './specializations';
 
 /** One zod definition per domain shape, reused by the HTTP contract and by `invoices` (task 029). */
 export const budgetCategorySchema = z.enum([
@@ -19,6 +20,10 @@ export const supplierSchema = z.object({
   dic: z.string().nullable(),
   bankAccount: z.string().nullable(),
   email: z.string().nullable(),
+  specializations: z.array(specializationSchema).readonly(),
+  phone: z.string().nullable(),
+  contactPerson: z.string().nullable(),
+  isActive: z.boolean(),
 });
 
 export const contractSchema = z.object({
@@ -31,4 +36,5 @@ export const contractSchema = z.object({
   validFrom: z.iso.date(),
   validTo: z.iso.date().nullable(),
   documentId: z.uuid().nullable(),
+  covers: z.array(specializationSchema).readonly(),
 });

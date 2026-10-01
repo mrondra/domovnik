@@ -2,6 +2,7 @@ import type { InferSelectModel } from 'drizzle-orm';
 import { svjIdSchema } from '../../../kernel/src/ids/index';
 import { contractIdSchema, supplierIdSchema } from '../domain/ids';
 import { budgetCategorySchema } from '../domain/schemas';
+import { specializationSchema } from '../domain/specializations';
 import type { Contract, Supplier } from '../domain/types';
 import { contract, supplier } from '../schema';
 
@@ -17,6 +18,10 @@ export const toSupplier = (row: InferSelectModel<typeof supplier>): Supplier => 
   dic: row.dic,
   bankAccount: row.bankAccount,
   email: row.email,
+  specializations: row.specializations.map((value) => specializationSchema.parse(value)),
+  phone: row.phone,
+  contactPerson: row.contactPerson,
+  isActive: row.isActive,
 });
 
 export const toContract = (row: InferSelectModel<typeof contract>): Contract => ({
@@ -29,4 +34,5 @@ export const toContract = (row: InferSelectModel<typeof contract>): Contract => 
   validFrom: row.validFrom,
   validTo: row.validTo,
   documentId: row.documentId,
+  covers: row.covers.map((value) => specializationSchema.parse(value)),
 });

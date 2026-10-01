@@ -4,6 +4,7 @@ import type { RequestContext } from '../../../kernel/src/context/index';
 import { withTenant } from '../../../kernel/src/db/index';
 import { newId } from '../../../kernel/src/ids/index';
 import { supplierIdSchema, type SupplierId } from '../domain/ids';
+import type { Specialization } from '../domain/specializations';
 import type { Supplier } from '../domain/types';
 import { supplier } from '../schema';
 import { toSupplier } from './rows';
@@ -14,6 +15,10 @@ export interface CreateSupplierInput {
   readonly dic?: string | undefined;
   readonly bankAccount?: string | undefined;
   readonly email?: string | undefined;
+  readonly specializations?: readonly Specialization[] | undefined;
+  readonly phone?: string | undefined;
+  readonly contactPerson?: string | undefined;
+  readonly isActive?: boolean | undefined;
 }
 
 /**
@@ -29,11 +34,16 @@ export const createSupplier = (ctx: RequestContext, input: CreateSupplierInput):
     dic: input.dic ?? null,
     bankAccount: input.bankAccount ?? null,
     email: input.email ?? null,
+    specializations: input.specializations ?? [],
+    phone: input.phone ?? null,
+    contactPerson: input.contactPerson ?? null,
+    isActive: input.isActive ?? true,
   };
 
   return withTenant(ctx, async (tx) => {
     await tx.insert(supplier).values({
       ...created,
+      specializations: [...created.specializations],
       tenantId: ctx.tenantId,
       createdBy: ctx.actor.type === 'user' ? ctx.actor.id : null,
     });

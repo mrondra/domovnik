@@ -7,6 +7,7 @@ import { navigation as demoNavigation } from '../../../../packages/features/demo
 import { navigation as invoicesNavigation } from '../../../../packages/features/invoices/ui/index';
 import { navigation as paymentsNavigation } from '../../../../packages/features/payments/ui/index';
 import { navigation as receivablesNavigation } from '../../../../packages/features/receivables/ui/index';
+import { navigation as suppliersNavigation } from '../../../../packages/features/suppliers/ui/index';
 import { navigation as svjNavigation } from '../../../../packages/features/svj/ui/index';
 
 export const featureNavigation: readonly NavigationItem[] = [
@@ -15,5 +16,6 @@ export const featureNavigation: readonly NavigationItem[] = [
   ...invoicesNavigation,
   ...paymentsNavigation,
   ...receivablesNavigation,
+  ...suppliersNavigation,
   ...svjNavigation,
 ];

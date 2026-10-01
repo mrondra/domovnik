@@ -5,11 +5,17 @@ import type { ContractId, SupplierId } from '../domain/ids';
 import type { Contract, Supplier } from '../domain/types';
 import { contractById, listContracts } from './contract-queries';
 import {
+  contractedSupplierFor,
+  type ContractedSupplier,
+  type ContractedSupplierForInput,
+} from './contracted';
+import {
   createContract,
   findContractsForSupplier,
   type ContractsForSupplierInput,
   type CreateContractInput,
 } from './contracts';
+import { searchSuppliers, type SearchSuppliersInput } from './search';
 import {
   createSupplier,
   findSupplierByIco,
@@ -17,6 +23,7 @@ import {
   supplierById,
   type CreateSupplierInput,
 } from './suppliers';
+import { updateSupplier, type UpdateSupplierInput } from './update';
 
 /**
  * The injectable face of this feature. It holds no state and no queries of its own: every method is
@@ -40,6 +47,14 @@ export class SuppliersService {
     return supplierById(ctx, supplierId);
   }
 
+  searchSuppliers(ctx: RequestContext, input?: SearchSuppliersInput): Promise<readonly Supplier[]> {
+    return searchSuppliers(ctx, input);
+  }
+
+  updateSupplier(ctx: RequestContext, supplierId: SupplierId, patch: UpdateSupplierInput): Promise<Supplier> {
+    return updateSupplier(ctx, supplierId, patch);
+  }
+
   createContract(ctx: RequestContext, input: CreateContractInput): Promise<Contract> {
     return createContract(ctx, input);
   }
@@ -53,6 +68,13 @@ export class SuppliersService {
 
   contractById(ctx: RequestContext, contractId: ContractId): Promise<Contract | null> {
     return contractById(ctx, contractId);
+  }
+
+  contractedSupplierFor(
+    ctx: RequestContext,
+    input: ContractedSupplierForInput,
+  ): Promise<ContractedSupplier | null> {
+    return contractedSupplierFor(ctx, input);
   }
 
   listContracts(ctx: RequestContext, svjId: SvjId): Promise<readonly Contract[]> {
