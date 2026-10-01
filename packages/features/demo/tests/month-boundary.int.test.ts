@@ -20,18 +20,25 @@ const DAYS = [
   ['the 15th, the due day', '2026-10-15T00:00:00Z'],
 ] as const;
 
+let world: DemoWorld;
+
+beforeAll(async () => {
+  world = await startDemoWorld();
+  useRecordedLlm();
+}, 600_000);
+
+afterAll(async () => {
+  await world.stop();
+});
+
 describe.each(DAYS)('the demonstration on %s', (_name, now) => {
-  let world: DemoWorld;
   let ctx: RequestContext;
   let banked: { svjId: SvjId; accountId: string; debtors: number }[];
 
   beforeAll(async () => {
-    world = await startDemoWorld();
-    useRecordedLlm();
-
     // Only `Date` is fake, and it is frozen: the boundary case at 23:59 must stay on the 14th
-    // however slow the machine is. Timers and ticks stay real, so waiting on the containers
-    // cannot hang. It starts after the containers are up and ends before they are stopped.
+    // however slow the machine is. Timers and ticks stay real. The clock is real while the
+    // containers start and stop; each day seeds its own tenant in the one shared world.
     vi.useFakeTimers({ toFake: ['Date'], shouldAdvanceTime: false });
     vi.setSystemTime(new Date(now));
     ctx = await seedDemoTenantWith();
@@ -51,9 +58,8 @@ describe.each(DAYS)('the demonstration on %s', (_name, now) => {
     );
   }, 600_000);
 
-  afterAll(async () => {
+  afterAll(() => {
     vi.useRealTimers();
-    await world.stop();
   });
 
   it('seeds houses with a bank account and debts to be paid', () => {
