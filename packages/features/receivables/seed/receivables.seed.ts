@@ -1,7 +1,8 @@
 import { defineSeed, type SeedContext } from '../../../kernel/src/seed/index';
 import { readModels } from '../../svj/index';
 import { generatePrescriptions } from '../service/index';
-import { DEMO_PLAN, monthsUpTo } from './plan';
+import { demoToday } from '../../demo/index';
+import { DEMO_PLAN, dueMonthsAt } from './plan';
 
 /**
  * Twelve months of prescriptions for every seeded SVJ. Idempotent because
@@ -15,7 +16,7 @@ export const receivablesSeed = defineSeed({
   name: 'receivables',
   dependsOn: ['svj'],
   run: async ({ ctx }: SeedContext): Promise<void> => {
-    const periods = monthsUpTo(new Date());
+    const periods = dueMonthsAt(demoToday());
 
     for (const summary of await readModels.svjSummary(ctx)) {
       for (const period of periods) {

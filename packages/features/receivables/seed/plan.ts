@@ -23,11 +23,17 @@ export const DEMO_PLAN: PrescriptionPlan = {
 export const SEEDED_MONTHS = 12;
 
 /**
- * The twelve months up to and including the one the demo is being shown in — a year of history, so
- * a balance and a debtor list have something to be about from the first minute.
+ * The twelve months whose due date has already passed on `today` — a year of history, so a balance
+ * and a debtor list have something to be about from the first minute. A month still waiting for its
+ * due day is left out: nothing could have paid it yet, and a bank statement ending today would
+ * never contain that payment, so seeding it would leave every unit in debt on the 1st–14th.
  */
-export const monthsUpTo = (today: Date, count = SEEDED_MONTHS): readonly Period[] =>
-  Array.from({ length: count }, (_unused, index) => {
-    const month = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - (count - 1 - index), 1));
+export const dueMonthsAt = (today: Date, count = SEEDED_MONTHS): readonly Period[] => {
+  const lastDue = today.getUTCDate() >= DEMO_PLAN.dueDayOfMonth ? 0 : 1;
+  return Array.from({ length: count }, (_unused, index) => {
+    const month = new Date(
+      Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - lastDue - (count - 1 - index), 1),
+    );
     return { year: month.getUTCFullYear(), month: month.getUTCMonth() + 1 };
   });
+};

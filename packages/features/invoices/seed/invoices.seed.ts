@@ -2,6 +2,7 @@ import type { RequestContext } from '../../../kernel/src/context/index';
 import { DomainError } from '../../../kernel/src/errors/index';
 import { defineSeed, type SeedContext } from '../../../kernel/src/seed/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
+import { demoToday } from '../../demo/index';
 import { findSupplierByIco } from '../../suppliers/index';
 import { readModels } from '../../svj/index';
 import { seedBudget } from './budget';
@@ -43,7 +44,8 @@ defineSeed({
   name: 'invoices',
   dependsOn: ['suppliers', 'svj'],
   run: async ({ ctx }: SeedContext): Promise<void> => {
-    const year = new Date().getUTCFullYear();
+    const today = demoToday();
+    const year = today.getUTCFullYear();
     const houses = await housesInSeedOrder(ctx);
     const rooferIco = senderNamed('strechar').ico;
     const roofer = await findSupplierByIco(ctx, rooferIco);
@@ -59,6 +61,6 @@ defineSeed({
       await seedSpentBudget(ctx, one.id, house, year, roofer.id, one.name);
     }
 
-    await seedScenarios(ctx, houses);
+    await seedScenarios(ctx, houses, today);
   },
 });

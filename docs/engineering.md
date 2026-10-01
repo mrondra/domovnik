@@ -93,6 +93,7 @@ Viz `AGENTS.md` §2. Doplnění:
 - Agenti: `runAgentInTest(agent, event, { tools: mocks, llm: replay('fixtures/x.json') })`. Ověřuje se volaná sekvence toolů a výsledek, ne text.
 - Evaly: `fixtures/evals/<agent>/` golden dataset, skóre reportované do Langfuse. Spouští se `pnpm test:evals`, ne v CI.
 - Coverage prahy: kernel 90 %, features service 80 %, ui bez prahu.
+- Datum v testech: test nesmí záležet na dnešním datu. Datum vstupuje jedním explicitním místem (`demoToday()` u dema, parametr u čisté funkce), nikdy přes `new Date()` uvnitř testované cesty. Hraniční dny mají vlastní případ, protože připíchnutí na jedno pohodlné datum chybu schová. Platí pro nové testy a pro ty, kterých se úkol dotkne; stávající testy se kvůli tomu nepřepisují.
 
 ## 8. Databáze
 

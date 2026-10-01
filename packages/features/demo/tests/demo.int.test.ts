@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { schema, withTenant } from '../../../kernel/src/db/index';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import { NotFoundError } from '../../../kernel/src/errors/index';
@@ -12,6 +12,10 @@ import {
 } from '../../invoices/index';
 import { listScenarios, runScenario } from '../service/index';
 import { seedDemoTenantWith, startDemoWorld, useRecordedLlm, type DemoWorld } from './demo.fixture';
+
+// The recorded extraction answers are keyed by a hash of the PDF text, which carries the date the
+// seed issued the invoices on. Frozen to the day they were recorded against.
+vi.mock('../domain/today', () => ({ demoToday: (): Date => new Date('2026-09-01T08:00:00.000Z') }));
 
 let world: DemoWorld;
 let ctx: RequestContext;
