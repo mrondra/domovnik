@@ -7,12 +7,14 @@ import type { Role } from './roles';
  */
 const ROLE_PERMISSIONS: Readonly<Record<Role, readonly string[]>> = {
   tenant_admin: ['*'],
-  manager: ['svj.*', 'ops.*', 'tasks.*', 'documents.*', 'comms.*', 'approval.decide'],
-  finance: ['finance.*', 'svj.read', 'documents.read', 'approval.decide'],
-  technician: ['ops.read', 'tasks.read', 'tasks.update', 'defects.*', 'field.*'],
-  committee: ['svj.read', 'finance.read', 'ops.read', 'documents.read', 'approval.decide'],
+  manager: ['svj.*', 'ops.*', 'tasks.*', 'documents.*', 'comms.*', 'approval.decide', 'suppliers.*'],
+  finance: ['finance.*', 'svj.read', 'documents.read', 'approval.decide', 'suppliers.*'],
+  technician: ['ops.read', 'tasks.read', 'tasks.update', 'defects.*', 'field.*', 'suppliers.read'],
+  committee: ['svj.read', 'finance.read', 'ops.read', 'documents.read', 'approval.decide', 'suppliers.read'],
   owner: ['owner.self'],
   agent_author: ['agent.compose'],
+  // `suppliers.write` (the tools of subtask 4) is granted only through the `suppliers.*`
+  // wildcard above — manager and finance, and no one else (task 030).
 };
 
 const matches = (pattern: string, permission: string): boolean => {

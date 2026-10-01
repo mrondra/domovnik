@@ -5,6 +5,7 @@ import { withTenant } from '../../../kernel/src/db/index';
 import { newId, type SvjId } from '../../../kernel/src/ids/index';
 import { asDay, type IsoDay } from '../domain/day';
 import { contractIdSchema, type SupplierId } from '../domain/ids';
+import type { Specialization } from '../domain/specializations';
 import type { BudgetCategory, Contract } from '../domain/types';
 import { contract } from '../schema';
 import { assertReachable } from './reach';
@@ -19,6 +20,7 @@ export interface CreateContractInput {
   readonly validFrom: IsoDay;
   readonly validTo?: IsoDay | undefined;
   readonly documentId?: string | undefined;
+  readonly covers?: readonly Specialization[] | undefined;
 }
 
 export interface ContractsForSupplierInput {
@@ -39,12 +41,14 @@ export const createContract = (ctx: RequestContext, input: CreateContractInput):
     validFrom: input.validFrom,
     validTo: input.validTo ?? null,
     documentId: input.documentId ?? null,
+    covers: input.covers ?? [],
   };
 
   return withTenant(ctx, async (tx) => {
     await assertReachable(ctx, input.svjId);
     await tx.insert(contract).values({
       ...created,
+      covers: [...created.covers],
       monthlyAmount: created.monthlyAmount === null ? null : asMoney(created.monthlyAmount),
       tenantId: ctx.tenantId,
       createdBy: ctx.actor.type === 'user' ? ctx.actor.id : null,

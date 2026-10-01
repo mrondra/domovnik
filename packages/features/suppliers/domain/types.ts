@@ -1,6 +1,7 @@
 import type { SvjId } from '../../../kernel/src/ids/index';
 import type { IsoDay } from './day';
 import type { ContractId, SupplierId } from './ids';
+import type { Specialization } from './specializations';
 
 /** The budget categories of zadání kap. 4; a contract names one, and `invoices` reuses it. */
 export type BudgetCategory =
@@ -13,6 +14,10 @@ export interface Supplier {
   readonly dic: string | null;
   readonly bankAccount: string | null;
   readonly email: string | null;
+  readonly specializations: readonly Specialization[];
+  readonly phone: string | null;
+  readonly contactPerson: string | null;
+  readonly isActive: boolean;
 }
 
 export interface Contract {
@@ -25,4 +30,5 @@ export interface Contract {
   readonly validFrom: IsoDay;
   readonly validTo: IsoDay | null;
   readonly documentId: string | null;
+  readonly covers: readonly Specialization[];
 }
