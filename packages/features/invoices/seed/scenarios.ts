@@ -2,7 +2,7 @@ import type { RequestContext } from '../../../kernel/src/context/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
 import { putObject, storageKeyFor } from '../../../kernel/src/storage/index';
 import { registerScenario } from '../../demo/index';
-import { DEMO_SCENARIOS } from './data/invoices';
+import { demoScenarios } from './data/invoices';
 import type { DemoScenario } from './data/scenario-shape';
 import { senderNamed } from './data/sender-catalogue';
 import { invoicePdf } from './pdf/invoice-pdf';
@@ -41,11 +41,12 @@ const pdfFor = (scenario: DemoScenario, customer: string): Promise<Buffer> => {
  */
 const storeInvoice = async (
   ctx: RequestContext,
+  scenarios: readonly DemoScenario[],
   source: string,
   fallback: DemoScenario,
   customer: string,
 ): Promise<string> => {
-  const original = DEMO_SCENARIOS.find((one) => one.code === source) ?? fallback;
+  const original = scenarios.find((one) => one.code === source) ?? fallback;
   const stored = await putObject(
     ctx,
     storageKeyFor(ctx, AREA, `${source}.pdf`),
@@ -64,15 +65,17 @@ const storeInvoice = async (
 export const seedScenarios = async (
   ctx: RequestContext,
   houses: readonly { readonly id: SvjId; readonly name: string }[],
+  today: Date,
 ): Promise<void> => {
+  const scenarios = demoScenarios(today);
   const storedKeys = new Map<string, string>();
 
-  for (const scenario of DEMO_SCENARIOS) {
+  for (const scenario of scenarios) {
     const house = houses[scenario.house];
     if (house === undefined) continue;
 
     const source = scenario.repeats ?? scenario.code;
-    const key = storedKeys.get(source) ?? (await storeInvoice(ctx, source, scenario, house.name));
+    const key = storedKeys.get(source) ?? (await storeInvoice(ctx, scenarios, source, scenario, house.name));
     storedKeys.set(source, key);
 
     await registerScenario(ctx, {

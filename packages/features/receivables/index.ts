@@ -10,6 +10,7 @@ export {
   unitBalance,
 } from './service/index';
 
+export { dueMonthsAt } from './seed/plan';
 export { paymentRecorded, prescriptionsGenerated } from './domain/events';
 export type { Period } from './domain/period';
 export type { Prescription, PrescriptionItem, PrescriptionPlan, UnitBalance } from './domain/types';

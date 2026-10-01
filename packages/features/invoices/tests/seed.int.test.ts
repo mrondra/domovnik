@@ -1,14 +1,19 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
 import { listScenarios } from '../../demo/index';
 import { readModels, SvjService } from '../../svj/index';
 import { budgetStatus } from '../service/index';
 import { DEMO_BUDGETS } from '../seed/data/budget';
-import { DEMO_SCENARIOS } from '../seed/data/invoices';
+import { demoScenarios } from '../seed/data/invoices';
 import { runFeatureSeeds, startInvoicesWorld, withTestTenant, type InvoicesWorld } from './world.fixture';
 
-const YEAR = new Date().getUTCFullYear();
+// The seed reads its day from `demoToday()`; frozen here, so the test depends on no clock.
+vi.mock('../../demo/domain/today', () => ({ demoToday: (): Date => new Date('2026-09-01T08:00:00.000Z') }));
+
+const TODAY = new Date('2026-09-01T08:00:00.000Z');
+const YEAR = TODAY.getUTCFullYear();
+const SCENARIOS = demoScenarios(TODAY);
 
 let world: InvoicesWorld;
 let ctx: RequestContext;
@@ -72,15 +77,13 @@ describe('the invoices seed', () => {
   it('prepares every scenario the demo can run', async () => {
     const scenarios = await listScenarios(ctx);
 
-    expect(scenarios.map((one) => one.code).sort()).toStrictEqual(
-      DEMO_SCENARIOS.map((one) => one.code).sort(),
-    );
+    expect(scenarios.map((one) => one.code).sort()).toStrictEqual(SCENARIOS.map((one) => one.code).sort());
     expect(scenarios.every((one) => one.description.length > 40)).toBe(true);
   });
 
   it('adds nothing on a second run', async () => {
     await runSeed();
 
-    await expect(listScenarios(ctx)).resolves.toHaveLength(DEMO_SCENARIOS.length);
+    await expect(listScenarios(ctx)).resolves.toHaveLength(SCENARIOS.length);
   });
 });

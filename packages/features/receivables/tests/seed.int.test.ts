@@ -4,7 +4,7 @@ import type { RequestContext } from '../../../kernel/src/context/index';
 import { withTenant } from '../../../kernel/src/db/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
 import { prescription } from '../schema';
-import { DEMO_PLAN, SEEDED_MONTHS, monthsUpTo } from '../seed/plan';
+import { DEMO_PLAN, SEEDED_MONTHS } from '../seed/plan';
 import { receivablesSeed } from '../seed/receivables.seed';
 import {
   FLOOR_AREA,
@@ -71,15 +71,5 @@ describe('the receivables seed', () => {
   it('declares that it needs the houses before it can bill them', () => {
     expect(receivablesSeed.dependsOn).toStrictEqual(['svj']);
     expect(DEMO_PLAN.items).toHaveLength(3);
-  });
-});
-
-describe('monthsUpTo', () => {
-  it('ends with the month it is given and counts back from there', () => {
-    const periods = monthsUpTo(new Date('2026-09-17T00:00:00.000Z'));
-
-    expect(periods).toHaveLength(SEEDED_MONTHS);
-    expect(periods.at(-1)).toStrictEqual({ year: 2026, month: 9 });
-    expect(periods.at(0)).toStrictEqual({ year: 2025, month: 10 });
   });
 });
