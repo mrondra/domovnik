@@ -7,10 +7,10 @@ jedné větve** — je to závislost dema na dni, kdy se testy spustí.
 
 Důkaz, tentýž commit `ad0c213` na `main`:
 
-| kdy | `pnpm verify` |
-| --- | ------------- |
-| 2026-09-30 ~21:0x | **zelený** · 146/146 souborů, 794 testů |
-| 2026-10-01 07:33 | **padá** na `packages/features/demo/tests/reset.int.test.ts:66` |
+| kdy               | `pnpm verify`                                                   |
+| ----------------- | --------------------------------------------------------------- |
+| 2026-09-30 ~21:0x | **zelený** · 146/146 souborů, 794 testů                         |
+| 2026-10-01 07:33  | **padá** na `packages/features/demo/tests/reset.int.test.ts:66` |
 
 ```
 AssertionError: expected 80 to be less than 80
