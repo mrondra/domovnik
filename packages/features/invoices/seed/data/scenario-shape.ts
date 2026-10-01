@@ -18,15 +18,40 @@ export interface DemoScenario {
   readonly repeats?: string | undefined;
 }
 
+const DAY_MS = 86_400_000;
+
+/** A demonstration invoice is payable this many days after the day it is issued. */
+const DAYS_TO_PAY = 29;
+
+const isoDay = (at: Date): string => at.toISOString().slice(0, 10);
+
+/**
+ * The year and month the invoices of a given day are about, as the PDF and the mail subject print
+ * them. They come from the same day `dated` issues on, so the number, the variable symbol and the
+ * text of the line never disagree.
+ */
+export const periodOf = (today: Date): { readonly year: string; readonly label: string } => {
+  const year = String(today.getUTCFullYear());
+  return { year, label: `${String(today.getUTCMonth() + 1).padStart(2, '0')}/${year}` };
+};
+
+/**
+ * Issued on `today` and due `DAYS_TO_PAY` days later, so the due date is always after the day the
+ * bank statement of the demo ends on (that is `today` too) and the invoice stays unpaid. A fixed
+ * date would sit inside the statement from the day it passed and the bank sync would pay it.
+ */
 export const dated = (
-  number: string,
-  variableSymbol: string,
-): Pick<InvoicePdfInput, 'number' | 'variableSymbol' | 'issuedOn' | 'dueOn'> => ({
-  number,
-  variableSymbol,
-  issuedOn: '2026-09-01',
-  dueOn: '2026-09-30',
-});
+  today: Date,
+  suffix: string,
+): Pick<InvoicePdfInput, 'number' | 'variableSymbol' | 'issuedOn' | 'dueOn'> => {
+  const { year } = periodOf(today);
+  return {
+    number: `${year}-${suffix}`,
+    variableSymbol: `${year}${suffix}`,
+    issuedOn: isoDay(today),
+    dueOn: isoDay(new Date(today.getTime() + DAYS_TO_PAY * DAY_MS)),
+  };
+};
 
 export const withVat = (net: number): { total: number; vat: number } => ({
   total: net,

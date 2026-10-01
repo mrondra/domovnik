@@ -1,5 +1,7 @@
 import { z } from 'zod';
-import { defineScenarioKind, type ScenarioResult } from '../../demo/index';
+import { defineScenarioKind, demoToday, type ScenarioResult } from '../../demo/index';
+import { DomainError } from '../../../kernel/src/errors/index';
+import { dueMonthsAt } from '../../receivables/index';
 import { bankAccountIdSchema } from '../domain/ids';
 import { syncBankAccount } from '../service/index';
 
@@ -15,11 +17,19 @@ const DAY_LENGTH = 10;
 
 const asDay = (value: Date): string => value.toISOString().slice(0, DAY_LENGTH);
 
-/** The last `months` whole months up to today — the stretch a person would ask the bank for. */
-const rangeOf = (months: number, today = new Date()): { from: string; to: string } => ({
-  from: asDay(new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - (months - 1), 1))),
-  to: asDay(today),
-});
+/**
+ * The statement a person would ask the bank for: from the first day of the oldest of the last
+ * `months` months whose due day has passed, up to `today`. Seeded prescriptions come from the same
+ * rule, so every payment they imply falls inside the range, on any day of the month.
+ */
+export const statementRange = (months: number, today: Date): { from: string; to: string } => {
+  const [oldest] = dueMonthsAt(today, months);
+  if (!oldest) throw new DomainError('A statement covers at least one month');
+  return {
+    from: asDay(new Date(Date.UTC(oldest.year, oldest.month - 1, 1))),
+    to: asDay(today),
+  };
+};
 
 /**
  * Reading a statement, the same call the bank button in the UI makes. What the movements turn out
@@ -30,7 +40,7 @@ export const bankSyncScenario = defineScenarioKind({
   feature: 'payments',
   payload: bankSyncPayloadSchema,
   run: async (ctx, code, asked): Promise<ScenarioResult> => {
-    const range = rangeOf(Math.min(asked.months, MONTHS));
+    const range = statementRange(Math.min(asked.months, MONTHS), demoToday());
 
     const result = await syncBankAccount(ctx, {
       bankAccountId: bankAccountIdSchema.parse(asked.bankAccountId),

@@ -1,6 +1,7 @@
 import type { RequestContext } from '../../../kernel/src/context/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
 import type { SupplierId } from '../domain/ids';
+import { demoToday } from '../../demo/index';
 import {
   createContract,
   createSupplier,
@@ -78,7 +79,7 @@ export const seedContracts = async (
       subject: demo.subject,
       budgetCategory: demo.budgetCategory,
       monthlyAmount: demo.monthlyAmount ?? undefined,
-      validFrom: `${String(new Date().getUTCFullYear())}-01-01`,
+      validFrom: `${String(demoToday().getUTCFullYear())}-01-01`,
       covers: demo.covers,
     });
   }
