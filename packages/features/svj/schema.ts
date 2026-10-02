@@ -62,3 +62,16 @@ export const department = tenantTable(
   },
   (table) => [uniqueIndex('department_code_unique').on(table.tenantId, table.code)],
 );
+
+/**
+ * Which people sit in which department. Roles say what someone may do; this says whose queue they
+ * work from, which is what a task is routed by (task 031).
+ */
+export const departmentMember = tenantTable(
+  'department_member',
+  {
+    departmentId: uuid('department_id').notNull(),
+    userId: uuid('user_id').notNull(),
+  },
+  (table) => [uniqueIndex('department_member_unique').on(table.tenantId, table.departmentId, table.userId)],
+);

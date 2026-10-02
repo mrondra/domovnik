@@ -5,10 +5,10 @@ import { startTestDb, withTestTenant } from '../../../kernel/src/testing/index';
 import type { TestDatabase, TestTenant } from '../../../kernel/src/testing/index';
 import { share } from '../domain/share';
 import type { Svj } from '../domain/types';
-import { building, department, svj, unit, unitKindEnum } from '../schema';
+import { building, department, departmentMember, svj, unit, unitKindEnum } from '../schema';
 import { createBuilding, createSvj, createUnit } from '../service/index';
 
-export const featureSchema = { svj, building, unit, department, unitKindEnum };
+export const featureSchema = { svj, building, unit, department, departmentMember, unitKindEnum };
 
 export const startSvjDb = (): Promise<TestDatabase> => startTestDb(featureSchema);
 
