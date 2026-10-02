@@ -49,16 +49,14 @@ const TABLES: readonly Isolation[] = [
     name: 'taskActivity',
     insert: (tenant, tenantId) =>
       withTenant(tenant.ctx, async (tx) => {
-        await tx
-          .insert(taskActivity)
-          .values({
-            id: newRowId(),
-            tenantId,
-            taskId: MARK_TASK,
-            kind: 'comment',
-            body: MARK,
-            actorType: 'system',
-          });
+        await tx.insert(taskActivity).values({
+          id: newRowId(),
+          tenantId,
+          taskId: MARK_TASK,
+          kind: 'comment',
+          body: MARK,
+          actorType: 'system',
+        });
       }),
     count: (tenant) =>
       withTenant(

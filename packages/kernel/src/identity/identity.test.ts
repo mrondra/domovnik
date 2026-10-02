@@ -13,8 +13,9 @@ const user = (roles: Parameters<typeof permissionsOf>[0]) =>
   ({ type: 'user', id: newId(userIdSchema), roles }) as const;
 
 describe('permissions', () => {
-  it('grants a tenant admin everything', () => {
+  it('grants a tenant admin and the system actor everything', () => {
     expect(hasPermission(user(['tenant_admin']), 'finance.pay')).toBe(true);
+    expect(hasPermission({ type: 'system', id: null, roles: [] }, 'finance.pay')).toBe(true);
   });
 
   it('expands a domain wildcard but not across domains', () => {
@@ -32,10 +33,6 @@ describe('permissions', () => {
     const both = user(['finance', 'technician']);
     expect(hasPermission(both, 'finance.pay')).toBe(true);
     expect(hasPermission(both, 'field.report.submit')).toBe(true);
-  });
-
-  it('lets the system actor through', () => {
-    expect(hasPermission({ type: 'system', id: null, roles: [] }, 'finance.pay')).toBe(true);
   });
 
   it('gives suppliers.* to manager and finance, but only suppliers.read to committee and technician', () => {

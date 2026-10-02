@@ -13,9 +13,7 @@ const ALLOWED: Readonly<Record<TaskStatus, readonly TaskStatus[]>> = {
   cancelled: ['open'],
 };
 
-const pairs = ALL.flatMap((from) =>
-  ALL.map((to) => [from, to, ALLOWED[from].includes(to)] as const),
-);
+const pairs = ALL.flatMap((from) => ALL.map((to) => [from, to, ALLOWED[from].includes(to)] as const));
 
 describe('the task state machine', () => {
   it('covers all 25 pairs', () => {
@@ -26,9 +24,17 @@ describe('the task state machine', () => {
     const attempt = (): void => {
       assertTransition(from, to);
     };
+    const outcome = allowed ? 'ok' : 'rejected';
+    const actual = ((): string => {
+      try {
+        attempt();
+        return 'ok';
+      } catch (error) {
+        return error instanceof DomainError ? 'rejected' : 'unexpected';
+      }
+    })();
 
-    if (allowed) expect(attempt).not.toThrow();
-    else expect(attempt).toThrow(DomainError);
+    expect(actual).toBe(outcome);
   });
 
   it('names the rule it broke', () => {
