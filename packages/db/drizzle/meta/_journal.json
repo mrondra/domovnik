@@ -71,6 +71,13 @@
       "when": 1790796366562,
       "tag": "0009_nosy_reaper",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790861110570,
+      "tag": "0010_steady_misty_knight",
+      "breakpoints": true
     }
   ]
 }

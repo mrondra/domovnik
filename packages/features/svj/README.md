@@ -3,17 +3,17 @@
 The management company's SVJ and their property: the SVJ record, its buildings and units, and the
 company's own departments. Everything SVJ-scoped elsewhere in the platform points at an id from here.
 
-| File / directory | Contents                                                                   |
-| ---------------- | -------------------------------------------------------------------------- |
-| `schema.ts`      | `svj`, `building`, `unit`, `department` — through `tenantTable`/`svjTable` |
-| `domain/`        | types, the share fraction, the zod shapes and the two event definitions    |
-| `service/`       | the only place that mutates; emits events and writes audit rows            |
-| `tools/`         | `svj.get`, `svj.list`, `svj.listUnits` — read-only and user-composable     |
-| `api/`           | the Nest module `apps/api` discovers, and its controllers                  |
-| `ui/`            | the screens `apps/web` mounts, and the sidebar entry                       |
-| `seed/`          | the three demo SVJ from zadání kap. 10, idempotent by IČO                  |
-| `tests/`         | unit tests, the RLS isolation test for every table, and the HTTP tests     |
-| `index.ts`       | the public face: what other features and apps may import                   |
+| File / directory | Contents                                                                                        |
+| ---------------- | ----------------------------------------------------------------------------------------------- |
+| `schema.ts`      | `svj`, `building`, `unit`, `department`, `department_member` — through `tenantTable`/`svjTable` |
+| `domain/`        | types, the share fraction, the zod shapes and the two event definitions                         |
+| `service/`       | the only place that mutates; emits events and writes audit rows                                 |
+| `tools/`         | `svj.get`, `svj.list`, `svj.listUnits` — read-only and user-composable                          |
+| `api/`           | the Nest module `apps/api` discovers, and its controllers                                       |
+| `ui/`            | the screens `apps/web` mounts, and the sidebar entry                                            |
+| `seed/`          | the three demo SVJ from zadání kap. 10, idempotent by IČO                                       |
+| `tests/`         | unit tests, the RLS isolation test for every table, and the HTTP tests                          |
+| `index.ts`       | the public face: what other features and apps may import                                        |
 
 **The rule:** everything outside this directory sees the feature through one of its two front doors —
 `index.ts` for anything running on a server, `ui/index.ts` for a browser build (ADR 0017). Reach

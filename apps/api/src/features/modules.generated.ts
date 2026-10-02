@@ -10,6 +10,7 @@ import { PaymentsModule } from '../../../../packages/features/payments';
 import { ReceivablesModule } from '../../../../packages/features/receivables';
 import { SuppliersModule } from '../../../../packages/features/suppliers';
 import { SvjModule } from '../../../../packages/features/svj';
+import { TasksModule } from '../../../../packages/features/tasks';
 
 export const featureModules: readonly Type[] = [
   AccountingSyncModule,
@@ -20,4 +21,5 @@ export const featureModules: readonly Type[] = [
   ReceivablesModule,
   SuppliersModule,
   SvjModule,
+  TasksModule,
 ];

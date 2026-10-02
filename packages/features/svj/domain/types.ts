@@ -50,6 +50,13 @@ export interface Department {
   readonly name: string;
 }
 
+/** `created` is false when the person already sat in the department. */
+export interface DepartmentMembership {
+  readonly departmentId: DepartmentId;
+  readonly userId: UserId;
+  readonly created: boolean;
+}
+
 export interface CreateSvjInput {
   readonly name: string;
   readonly ico: string;

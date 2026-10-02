@@ -1,3 +1,4 @@
+import type { Role } from '../../../kernel/src/identity/index';
 import type { Address, UnitKind } from '../domain/types';
 
 export interface DemoBuilding {
@@ -72,3 +73,11 @@ export const AREA_BY_KIND: Readonly<Record<UnitKind, readonly number[]>> = {
   commercial: [118.4],
   garage: [16.2],
 };
+
+/** Which departments a person with a role sits in — the demo's stand-in for an HR list. */
+export const DEMO_MEMBERSHIPS: readonly { readonly role: Role; readonly departments: readonly string[] }[] = [
+  { role: 'finance', departments: ['finance'] },
+  { role: 'technician', departments: ['technicians', 'maintenance'] },
+  { role: 'manager', departments: ['administration'] },
+  { role: 'tenant_admin', departments: ['administration'] },
+];

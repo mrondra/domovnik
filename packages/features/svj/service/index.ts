@@ -1,6 +1,7 @@
 export { SvjService } from './svj.service';
 export { createBuilding } from './buildings';
 export { createDepartment, listDepartments } from './departments';
+export { addDepartmentMember, departmentByCode, departmentsOf, membersOf } from './members';
 export { svjSequence } from './ordinals';
 export { createSvj, getSvjById } from './svj-records';
 export { updateSvj } from './svj-updates';

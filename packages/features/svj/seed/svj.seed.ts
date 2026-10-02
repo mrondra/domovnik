@@ -9,6 +9,7 @@ import { department, svj } from '../schema';
 import { createBuilding, createDepartment, createSvj, createUnit, updateSvj } from '../service/index';
 import { ensureChair } from './committee';
 import { DEMO_DEPARTMENTS, DEMO_SVJ, type DemoSvj } from './data';
+import { seedDepartmentMembers } from './members';
 import { planUnits, shareDenominatorOf, shareNumeratorOf } from './units';
 
 const seededDepartments = (ctx: RequestContext): Promise<readonly string[]> =>
@@ -82,5 +83,7 @@ export const svjSeed = defineSeed({
     for (const demo of DEMO_SVJ) {
       if (!(await isSeeded(ctx, demo.ico))) await seedOne(ctx, demo);
     }
+
+    await seedDepartmentMembers(ctx);
   },
 });

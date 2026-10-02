@@ -13,8 +13,9 @@ const user = (roles: Parameters<typeof permissionsOf>[0]) =>
   ({ type: 'user', id: newId(userIdSchema), roles }) as const;
 
 describe('permissions', () => {
-  it('grants a tenant admin everything', () => {
+  it('grants a tenant admin and the system actor everything', () => {
     expect(hasPermission(user(['tenant_admin']), 'finance.pay')).toBe(true);
+    expect(hasPermission({ type: 'system', id: null, roles: [] }, 'finance.pay')).toBe(true);
   });
 
   it('expands a domain wildcard but not across domains', () => {
@@ -34,10 +35,6 @@ describe('permissions', () => {
     expect(hasPermission(both, 'field.report.submit')).toBe(true);
   });
 
-  it('lets the system actor through', () => {
-    expect(hasPermission({ type: 'system', id: null, roles: [] }, 'finance.pay')).toBe(true);
-  });
-
   it('gives suppliers.* to manager and finance, but only suppliers.read to committee and technician', () => {
     expect(hasPermission(user(['manager']), 'suppliers.write')).toBe(true);
     expect(hasPermission(user(['finance']), 'suppliers.write')).toBe(true);
@@ -45,6 +42,17 @@ describe('permissions', () => {
     expect(hasPermission(user(['committee']), 'suppliers.write')).toBe(false);
     expect(hasPermission(user(['technician']), 'suppliers.read')).toBe(true);
     expect(hasPermission(user(['technician']), 'suppliers.write')).toBe(false);
+  });
+
+  it('gives finance tasks.read and tasks.update, committee only tasks.read, neither tasks.write', () => {
+    expect(hasPermission(user(['finance']), 'tasks.read')).toBe(true);
+    expect(hasPermission(user(['finance']), 'tasks.update')).toBe(true);
+    expect(hasPermission(user(['finance']), 'tasks.write')).toBe(false);
+    expect(hasPermission(user(['committee']), 'tasks.read')).toBe(true);
+    expect(hasPermission(user(['committee']), 'tasks.update')).toBe(false);
+    expect(hasPermission(user(['committee']), 'tasks.write')).toBe(false);
+    expect(hasPermission(user(['manager']), 'tasks.write')).toBe(true);
+    expect(hasPermission(user(['technician']), 'tasks.write')).toBe(false);
   });
 });
 

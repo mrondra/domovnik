@@ -10,3 +10,4 @@ export * from '../../features/payments/schema';
 export * from '../../features/receivables/schema';
 export * from '../../features/suppliers/schema';
 export * from '../../features/svj/schema';
+export * from '../../features/tasks/schema';
