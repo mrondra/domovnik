@@ -46,6 +46,17 @@ describe('permissions', () => {
     expect(hasPermission(user(['technician']), 'suppliers.read')).toBe(true);
     expect(hasPermission(user(['technician']), 'suppliers.write')).toBe(false);
   });
+
+  it('gives finance tasks.read and tasks.update, committee only tasks.read, neither tasks.write', () => {
+    expect(hasPermission(user(['finance']), 'tasks.read')).toBe(true);
+    expect(hasPermission(user(['finance']), 'tasks.update')).toBe(true);
+    expect(hasPermission(user(['finance']), 'tasks.write')).toBe(false);
+    expect(hasPermission(user(['committee']), 'tasks.read')).toBe(true);
+    expect(hasPermission(user(['committee']), 'tasks.update')).toBe(false);
+    expect(hasPermission(user(['committee']), 'tasks.write')).toBe(false);
+    expect(hasPermission(user(['manager']), 'tasks.write')).toBe(true);
+    expect(hasPermission(user(['technician']), 'tasks.write')).toBe(false);
+  });
 });
 
 describe('secrets', () => {
