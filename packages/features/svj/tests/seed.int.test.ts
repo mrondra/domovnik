@@ -1,7 +1,15 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { DomainError } from '../../../kernel/src/errors/index';
+import { createUser } from '../../../kernel/src/identity/index';
 import type { Unit } from '../domain/types';
-import { listDepartments, listForActor, listUnits, svjSummary } from '../service/index';
+import {
+  departmentByCode,
+  listDepartments,
+  listForActor,
+  membersOf,
+  listUnits,
+  svjSummary,
+} from '../service/index';
 import { DEMO_DEPARTMENTS, DEMO_SVJ } from '../seed/data';
 import { svjSeed } from '../seed/svj.seed';
 import { startSvjDb, withTestTenant, type TestDatabase, type TestTenant } from './svj.fixture';
@@ -27,6 +35,31 @@ const unitsOfSmallest = async (): Promise<readonly Unit[]> => {
 };
 
 describe('the demo seed', () => {
+  it('seats people by role and adds nobody on a second run', async () => {
+    const roles = ['finance', 'technician', 'manager'] as const;
+    const [fin, tech, boss] = await Promise.all(
+      roles.map((role) =>
+        createUser(tenant.ctx, {
+          email: `${role}@seed.test`,
+          displayName: role,
+          password: 'x'.repeat(12),
+          roles: [role],
+        }),
+      ),
+    );
+    await svjSeed.run({ tenantId: tenant.tenantId, ctx: tenant.ctx });
+    await svjSeed.run({ tenantId: tenant.tenantId, ctx: tenant.ctx });
+
+    const membersByCode = async (code: string) =>
+      membersOf(tenant.ctx, (await departmentByCode(tenant.ctx, code)).id);
+    expect(await membersByCode('finance')).toEqual([fin]);
+    expect(await membersByCode('technicians')).toEqual([tech]);
+    expect(await membersByCode('maintenance')).toEqual([tech]);
+    const administration = await membersByCode('administration');
+    expect(administration).toContain(boss);
+    expect(new Set(administration).size).toBe(administration.length);
+  });
+
   it('writes the three SVJ of zadání kap. 10 with their unit counts', async () => {
     const seeded = await listForActor(tenant.ctx);
 
