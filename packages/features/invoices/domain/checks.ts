@@ -34,3 +34,17 @@ export const codesOfSeverity = (checks: unknown, severity: CheckSeverity): reado
     .filter((check) => check.severity === severity)
     .map((check) => check.code);
 };
+
+export const CHECK_LABEL: Readonly<Record<string, string>> = {
+  supplier_unknown: 'Neznámý dodavatel',
+  contract_missing: 'Chybí smlouva',
+  amount_deviates: 'Jiná částka než ve smlouvě',
+  budget_exceeded: 'Překročený rozpočet',
+  duplicate_number: 'Faktura už je založená',
+  due_soon: 'Blíží se splatnost',
+  vs_missing: 'Chybí variabilní symbol',
+  pdf_no_text: 'Nečitelné PDF',
+};
+
+/** A code nobody has written a label for is still better shown than hidden. */
+export const checkLabel = (code: string): string => CHECK_LABEL[code] ?? code;

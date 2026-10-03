@@ -2,8 +2,7 @@ import type { ReactElement } from 'react';
 import { Badge, EmptyState, type BadgeTone } from '../../../shared/src/ui/elements/index';
 import { Inline, Stack } from '../../../shared/src/ui/layout/index';
 import { Text } from '../../../shared/src/ui/typography/index';
-import type { Check, CheckSeverity } from '../domain/checks';
-import { checkLabel } from './labels';
+import { checkLabel, type Check, type CheckSeverity } from '../domain/checks';
 
 const TONE: Readonly<Record<CheckSeverity, BadgeTone>> = {
   blocking: 'negative',
