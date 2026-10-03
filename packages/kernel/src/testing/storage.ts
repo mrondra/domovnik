@@ -60,7 +60,8 @@ const dropBucket = async (admin: S3Client, bucket: string): Promise<void> => {
   do {
     const page = await admin.send(new ListObjectsV2Command({ Bucket: bucket, ContinuationToken: token }));
     const keys = (page.Contents ?? []).flatMap(({ Key }) => (Key === undefined ? [] : [{ Key }]));
-    if (keys.length > 0) await admin.send(new DeleteObjectsCommand({ Bucket: bucket, Delete: { Objects: keys } }));
+    if (keys.length > 0)
+      await admin.send(new DeleteObjectsCommand({ Bucket: bucket, Delete: { Objects: keys } }));
     token = page.NextContinuationToken;
   } while (token !== undefined);
   await admin.send(new DeleteBucketCommand({ Bucket: bucket }));
