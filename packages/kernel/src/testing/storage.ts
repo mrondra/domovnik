@@ -1,5 +1,12 @@
-import { CreateBucketCommand, S3Client } from '@aws-sdk/client-s3';
-import { GenericContainer, Wait } from 'testcontainers';
+import { randomBytes } from 'node:crypto';
+import {
+  CreateBucketCommand,
+  DeleteBucketCommand,
+  DeleteObjectsCommand,
+  ListObjectsV2Command,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import { GenericContainer, type StartedTestContainer, Wait } from 'testcontainers';
 import { AdapterError } from '../errors/index';
 import { resetStorageClient } from '../storage/index';
 import { applyTestEnv } from './env';
@@ -18,7 +25,13 @@ const IMAGE = 'cgr.dev/chainguard/minio:latest';
 const PORT = 9000;
 const ROOT_USER = 'domovnik';
 const ROOT_PASSWORD = 'domovnik123';
-const BUCKET = 'domovnik-test';
+const BUCKET_PREFIX = 'domovnik-test';
+
+interface Provided {
+  readonly endpoint: string;
+  readonly accessKey: string;
+  readonly secretKey: string;
+}
 
 export interface TestStorage {
   readonly endpoint: string;
@@ -27,62 +40,95 @@ export interface TestStorage {
 }
 
 /**
- * Over the S3 API, not with `mc` inside the container: the image is distroless in places and what
- * ships in it is not ours to depend on. The bucket is made with the same protocol the tests use,
- * so if this call works the tests can talk to the container at all.
+ * What the process was started with, read once when this module loads. `applyTestEnv` fills in
+ * placeholders (`S3_ENDPOINT=http://localhost:9000`, `test`/`test`) through `??=` before any test
+ * reaches `startTestStorage`, and this function itself writes the container's endpoint into the
+ * environment — so a read at call time could not tell a MinIO somebody started from a leftover.
+ * Imports run before test bodies, which makes this the one moment the environment is still the
+ * caller's own.
  */
-const createBucket = async (endpoint: string): Promise<void> => {
-  const admin = new S3Client({
-    endpoint,
-    region: 'us-east-1',
-    forcePathStyle: true,
-    // gitleaks:allow — fixed credentials of a throwaway container, never a real secret.
-    credentials: { accessKeyId: ROOT_USER, secretAccessKey: ROOT_PASSWORD },
-  });
-  try {
-    await admin.send(new CreateBucketCommand({ Bucket: BUCKET }));
-  } catch (cause) {
-    throw new AdapterError(`Bucket ${BUCKET} se nepodařilo vytvořit`, {
-      code: 'test_bucket_failed',
-      retryable: false,
-      details: { endpoint },
-      cause,
-    });
-  } finally {
-    admin.destroy();
-  }
+const readProvided = (): Provided | undefined => {
+  const { S3_ENDPOINT: endpoint, S3_ACCESS_KEY: accessKey, S3_SECRET_KEY: secretKey } = process.env;
+  if (endpoint === undefined || accessKey === undefined || secretKey === undefined) return undefined;
+  return { endpoint, accessKey, secretKey };
+};
+const PROVIDED = readProvided();
+
+/** Emptied and dropped on `stop()`; only ever a bucket this harness made, never the one from the environment. */
+const dropBucket = async (admin: S3Client, bucket: string): Promise<void> => {
+  let token: string | undefined;
+  do {
+    const page = await admin.send(new ListObjectsV2Command({ Bucket: bucket, ContinuationToken: token }));
+    const keys = (page.Contents ?? []).flatMap(({ Key }) => (Key === undefined ? [] : [{ Key }]));
+    if (keys.length > 0) await admin.send(new DeleteObjectsCommand({ Bucket: bucket, Delete: { Objects: keys } }));
+    token = page.NextContinuationToken;
+  } while (token !== undefined);
+  await admin.send(new DeleteBucketCommand({ Bucket: bucket }));
 };
 
 /**
- * A MinIO per test file, with the bucket already there. It writes the `S3_*` variables into the
- * environment and drops the memoised client, so `putObject` and friends talk to this container.
+ * A bucket of its own per call, in a MinIO either already running (`S3_ENDPOINT`, `S3_ACCESS_KEY`
+ * and `S3_SECRET_KEY` in the environment of the process — docker compose locally) or started here
+ * by testcontainers. It writes the `S3_*` variables into the environment and drops the memoised
+ * client, so `putObject` and friends talk to this bucket.
+ *
+ * Test files share a running MinIO, and so do worktrees on one machine, hence the random suffix.
+ * `stop()` empties and deletes the bucket in a reused MinIO and stops the container otherwise.
  */
 export const startTestStorage = async (): Promise<TestStorage> => {
-  const container = await new GenericContainer(IMAGE)
-    .withEnvironment({ MINIO_ROOT_USER: ROOT_USER, MINIO_ROOT_PASSWORD: ROOT_PASSWORD })
-    .withCommand(['server', '/data'])
-    .withExposedPorts(PORT)
-    .withWaitStrategy(Wait.forHttp('/minio/health/live', PORT))
-    .start();
+  const bucket = `${BUCKET_PREFIX}-${randomBytes(6).toString('hex')}`;
+  let provided = PROVIDED;
+  let container: StartedTestContainer | undefined;
+  if (provided === undefined) {
+    container = await new GenericContainer(IMAGE)
+      .withEnvironment({ MINIO_ROOT_USER: ROOT_USER, MINIO_ROOT_PASSWORD: ROOT_PASSWORD })
+      .withCommand(['server', '/data'])
+      .withExposedPorts(PORT)
+      .withWaitStrategy(Wait.forHttp('/minio/health/live', PORT))
+      .start();
+    const endpoint = `http://${container.getHost()}:${String(container.getMappedPort(PORT))}`;
+    provided = { endpoint, accessKey: ROOT_USER, secretKey: ROOT_PASSWORD };
+  }
 
-  const endpoint = `http://${container.getHost()}:${String(container.getMappedPort(PORT))}`;
-  await createBucket(endpoint);
+  const admin = new S3Client({
+    endpoint: provided.endpoint,
+    region: 'us-east-1',
+    forcePathStyle: true,
+    credentials: { accessKeyId: provided.accessKey, secretAccessKey: provided.secretKey },
+  });
+  try {
+    await admin.send(new CreateBucketCommand({ Bucket: bucket }));
+  } catch (cause) {
+    admin.destroy();
+    await container?.stop();
+    throw new AdapterError(`Bucket ${bucket} se nepodařilo vytvořit`, {
+      code: 'test_bucket_failed',
+      retryable: false,
+      details: { endpoint: provided.endpoint },
+      cause,
+    });
+  }
 
   applyTestEnv({
-    S3_ENDPOINT: endpoint,
+    S3_ENDPOINT: provided.endpoint,
     S3_REGION: 'us-east-1',
-    S3_ACCESS_KEY: ROOT_USER,
-    S3_SECRET_KEY: ROOT_PASSWORD,
-    S3_BUCKET: BUCKET,
+    S3_ACCESS_KEY: provided.accessKey,
+    S3_SECRET_KEY: provided.secretKey,
+    S3_BUCKET: bucket,
   });
   resetStorageClient();
 
   return {
-    endpoint,
-    bucket: BUCKET,
+    endpoint: provided.endpoint,
+    bucket,
     stop: async () => {
       resetStorageClient();
-      await container.stop();
+      try {
+        if (container === undefined) await dropBucket(admin, bucket);
+        else await container.stop();
+      } finally {
+        admin.destroy();
+      }
     },
   };
 };
