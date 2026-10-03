@@ -14,7 +14,7 @@ export {
   resolveConflict,
 } from './service/index';
 export { accountingAdapterFor, pohodaMock } from './adapters/index';
-export { syncConflictDetected } from './domain/events';
+export { syncConflictDetected, syncConflictResolved } from './domain/events';
 export { syncConflictIdSchema } from './domain/ids';
 
 export type { SyncConflictId } from './domain/ids';

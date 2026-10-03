@@ -1,9 +1,11 @@
 import { and, desc, eq } from 'drizzle-orm';
 import { audit } from '../../../kernel/src/audit/index';
-import type { RequestContext } from '../../../kernel/src/context/index';
+import { withSvj, type RequestContext } from '../../../kernel/src/context/index';
 import { withTenant } from '../../../kernel/src/db/index';
 import { NotFoundError } from '../../../kernel/src/errors/index';
+import { events } from '../../../kernel/src/events/index';
 import type { SvjId } from '../../../kernel/src/ids/index';
+import { syncConflictResolved } from '../domain/events';
 import type { SyncConflictId } from '../domain/ids';
 import type { ConflictResolution, SyncConflict } from '../domain/sync';
 import { syncConflict } from '../schema/index';
@@ -73,6 +75,15 @@ export const resolveConflict = (ctx: RequestContext, input: ResolveConflictInput
       before: { status: before.status },
       after: { status: 'resolved', resolution: input.resolution },
     });
+
+    await events.emit(
+      withSvj(ctx, before.svjId),
+      syncConflictResolved.create({
+        svjId: before.svjId,
+        conflictId: input.conflictId,
+        resolution: input.resolution,
+      }),
+    );
 
     return { ...before, status: 'resolved', resolution };
   });

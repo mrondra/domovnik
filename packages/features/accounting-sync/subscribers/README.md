@@ -2,11 +2,13 @@
 
 What makes this feature act without anybody asking it to.
 
-| File              | Listens to                 | Does                                                    |
-| ----------------- | -------------------------- | ------------------------------------------------------- |
-| `post-invoice.ts` | `finance.invoice.approved` | writes the invoice into the accounting, marks it posted |
-| `liquidate.ts`    | `finance.payment.matched`  | tells the accounting an invoice was paid                |
-| `tick-daily.ts`   | `tick.daily`               | reads posted invoices back and records disagreements    |
+| File                     | Listens to                       | Does                                                    |
+| ------------------------ | -------------------------------- | ------------------------------------------------------- |
+| `post-invoice.ts`        | `finance.invoice.approved`       | writes the invoice into the accounting, marks it posted |
+| `liquidate.ts`           | `finance.payment.matched`        | tells the accounting an invoice was paid                |
+| `tick-daily.ts`          | `tick.daily`                     | reads posted invoices back and records disagreements    |
+| `conflict-tasks.ts`      | `finance.sync.conflict`          | raises one finance task per conflict in the batch       |
+| `close-conflict-task.ts` | `finance.sync.conflict_resolved` | closes the task of the conflict that was decided        |
 
 **The rule:** every handler is idempotent, because delivery is at-least-once. Each one asks what it
 has already done — the invoice's own status, or a finished `sync_job` — before it does it again.
