@@ -75,8 +75,9 @@ proti Pohodě — projíždí `apps/web/e2e/phase1.e2e.ts` při každém `pnpm t
 
 - **Příkaz k úhradě.** Zadání kap. 11 ho čeká po schválení faktury; fáze 1 fakturu zapíše do Pohody
   a čeká na výpis. Platební příkaz (formát, podpis, banka) nemá ADR ani úkol.
-- **Úkoly.** Konflikt i návrh agenta dnes končí jako `Approval`. Úkoly (`task`) přijdou ve fázi 2 a
-  teprve ony jsou to, co zadání u konfliktu popisuje.
+- ~~**Úkoly.** Konflikt i návrh agenta dnes končí jako `Approval`. Úkoly (`task`) přijdou ve fázi 2 a
+  teprve ony jsou to, co zadání u konfliktu popisuje.~~ Vyřešeno v úkolu 032: konflikt, faktura
+  `needs_review` i selhání agenta zakládají úkol a rozhodnutí ho zavře.
 - **Ověření XML na POHODA Start.** Předpoklad z kap. 8 a ADR 0005 nebyl splněn; `mserver` adapter
   proto existuje jen jako klient a `adapters/resolve.ts` přes něj odmítne SVJ obsloužit. Co přesně
   je neověřené, je vypsané v `features/accounting-sync/adapters/pohoda/xml/README.md`.

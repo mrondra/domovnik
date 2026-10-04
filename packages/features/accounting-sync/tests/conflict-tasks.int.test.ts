@@ -1,5 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { eq } from 'drizzle-orm';
 import type { RequestContext } from '../../../kernel/src/context/index';
+import { schema, withTenant } from '../../../kernel/src/db/index';
 import { newRowId } from '../../../kernel/src/ids/index';
 import { SvjService } from '../../svj/index';
 import { listTasks } from '../../tasks/index';
@@ -71,11 +73,11 @@ describe('tasks for sync conflicts', () => {
       note: 'Opraveno.',
     });
 
-    const event = {
-      name: syncConflictResolved.name,
-      version: syncConflictResolved.version,
-      payload: { svjId: house.svjId, conflictId: first, resolution: 'take_theirs' },
-    };
+    const [row, ...rest] = await withTenant(ctx, (tx) =>
+      tx.select().from(schema.event).where(eq(schema.event.name, syncConflictResolved.name)),
+    );
+    if (row === undefined || rest.length > 0) throw new RangeError('expected one syncConflictResolved event');
+    const event = { name: row.name, version: row.version, payload: row.payload };
     await deliver(ctx, closeConflictTask.handler, event);
     await deliver(ctx, closeConflictTask.handler, event);
 

@@ -37,3 +37,9 @@ the agent (task 017) is given all of them. That is because what the agent produc
 the committee reads, not the decision — the decision is already made by the rules in
 `service/checks/`. In production an invoice with no warnings could go straight to an approval
 without a model ever seeing it, and only the ones with something to explain would need one.
+
+**Tasks.** Two subscribers keep the department's task list in step with the invoice (task 032):
+`subscribers/needs-review-task.ts` raises a `finance` task when `finance.invoice.needs_review` is
+announced, and `subscribers/close-review-task.ts` closes it once the invoice is approved or
+rejected. Delivery is at-least-once; the task's `dedupeKey` and the idempotent close make a repeat
+harmless. The two queues are independent, so a decision processed before the task exists leaves it open.
