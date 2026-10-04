@@ -10,3 +10,13 @@ export const syncConflictDetected = defineEvent(
   'finance.sync.conflict',
   z.object({ svjId: z.uuid(), conflictIds: z.array(z.uuid()).min(1).readonly() }),
 );
+
+/** A person decided a disagreement; whatever was waiting for that decision can stand down. */
+export const syncConflictResolved = defineEvent(
+  'finance.sync.conflict_resolved',
+  z.object({
+    svjId: z.uuid(),
+    conflictId: z.uuid(),
+    resolution: z.enum(['keep_ours', 'take_theirs']),
+  }),
+);
